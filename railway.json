@@ -1,15 +1,4 @@
 {
-  "build": {
-    "builder": "NIXPACKS",
-    "nixpacksPlan": {
-      "providers": ["node"],
-      "phases": {
-        "setup": {
-          "nixPkgs": ["nodejs_20", "npm", "ffmpeg"]
-        }
-      }
-    }
-  },
   "deploy": {
     "startCommand": "node server.js",
     "restartPolicyType": "ON_FAILURE"
