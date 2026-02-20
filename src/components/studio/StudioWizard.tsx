@@ -17,6 +17,7 @@ import type {
 export function StudioWizard() {
   const currentStep = useStudioStore((s) => s.currentStep);
   const goNext = useStudioStore((s) => s.goNext);
+  const plotSquareMeters = useStudioStore((s) => s.plotSquareMeters);
   const providerSettings = useWorkflowStore((s) => s.providerSettings);
   const nodes = useWorkflowStore((s) => s.nodes);
   const regenerateNode = useWorkflowStore((s) => s.regenerateNode);
@@ -57,7 +58,7 @@ export function StudioWizard() {
       case 0: {
         const mapData = getNodeData(STUDIO_NODES.imageInputMap) as ImageInputNodeData | undefined;
         const streetData = getNodeData(STUDIO_NODES.imageInputStreet) as ImageInputNodeData | undefined;
-        return !!(mapData?.image && streetData?.image);
+        return !!(mapData?.image && streetData?.image && plotSquareMeters && plotSquareMeters > 0);
       }
       case 1: {
         const mapAnnotation = getNodeData(STUDIO_NODES.annotationMap) as AnnotationNodeData | undefined;

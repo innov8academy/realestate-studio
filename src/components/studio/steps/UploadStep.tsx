@@ -179,7 +179,7 @@ export function UploadStep() {
       {/* Plot area input */}
       <div className="flex flex-col gap-1.5 pt-2 border-t border-neutral-800">
         <label className="text-sm font-medium text-white">
-          Plot Area <span className="text-neutral-500 font-normal">(optional)</span>
+          Plot Area <span className="text-amber-400 font-normal">*</span>
         </label>
         <div className="flex items-center gap-2">
           <input
