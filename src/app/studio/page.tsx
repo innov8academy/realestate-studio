@@ -27,7 +27,7 @@ function captureWorkflow(): WorkflowFile {
       const d = rest.data as Record<string, unknown> | undefined;
       // Strip outputVideo from video nodes — too large for IndexedDB
       if (d && "outputVideo" in d && d.outputVideo) {
-        return { ...rest, data: { ...d, outputVideo: null, status: "idle" } };
+        return { ...rest, data: { ...d, outputVideo: null, status: "idle" } as typeof rest.data };
       }
       return rest;
     }),
