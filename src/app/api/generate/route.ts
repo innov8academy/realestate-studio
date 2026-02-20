@@ -1846,9 +1846,16 @@ async function generateWithKie(
     };
   }
 
+  // Map internal model IDs to the actual Kie.ai API model ID strings
+  const KIE_API_MODEL_MAP: Record<string, string> = {
+    "gemini-pro":   "nano-banana-pro",
+    "gemini-flash": "google/nano-banana",
+  };
+  const kieApiModelId = KIE_API_MODEL_MAP[modelId] ?? modelId;
+
   // All remaining Kie models use the standard createTask endpoint
   const requestBody: Record<string, unknown> = {
-    model: modelId,
+    model: kieApiModelId,
     input: inputParams,
   };
 
