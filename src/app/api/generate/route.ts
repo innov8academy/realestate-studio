@@ -1554,42 +1554,76 @@ async function uploadImageToKie(
   // Format: data:{mime_type};base64,{data}
   const dataUrl = `data:${mimeType};base64,${imageData}`;
 
-  const response = await fetch("https://kieai.redpandaai.co/api/file-base64-upload", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      base64Data: dataUrl,
-      uploadPath: "images",
-      fileName: filename,
-    }),
+  const maxRetries = 3;
+  const requestBody = JSON.stringify({
+    base64Data: dataUrl,
+    uploadPath: "images",
+    fileName: filename,
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Failed to upload image: ${response.status} - ${errorText}`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 30000);
+
+      const response = await fetch("https://kieai.redpandaai.co/api/file-base64-upload", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: requestBody,
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeout);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        // Only retry on 5xx errors, not 4xx (auth, validation)
+        if (response.status >= 500 && attempt < maxRetries) {
+          const delay = Math.pow(2, attempt) * 1000; // 2s, 4s
+          console.log(`[API:${requestId}] Upload attempt ${attempt}/${maxRetries} failed (${response.status}), retrying in ${delay / 1000}s...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        throw new Error(`Failed to upload image: ${response.status} ${response.statusText}${errorText ? ` - ${errorText}` : ''}`);
+      }
+
+      const result = await response.json();
+      console.log(`[API:${requestId}] Kie upload response:`, JSON.stringify(result).substring(0, 300));
+
+      // Check for error in response
+      if (result.code && result.code !== 200 && !result.success) {
+        throw new Error(`Upload failed: ${result.msg || 'Unknown error'}`);
+      }
+
+      // Response format: { success: true, code: 200, data: { downloadUrl: "...", fileName: "...", fileSize: 123 } }
+      const downloadUrl = result.data?.downloadUrl || result.downloadUrl || result.url;
+
+      if (!downloadUrl) {
+        console.error(`[API:${requestId}] Upload response has no URL:`, result);
+        throw new Error(`No download URL in upload response. Response: ${JSON.stringify(result).substring(0, 200)}`);
+      }
+
+      console.log(`[API:${requestId}] Image uploaded: ${downloadUrl.substring(0, 80)}...`);
+      return downloadUrl;
+    } catch (error: unknown) {
+      const isAbort = error instanceof DOMException && error.name === "AbortError";
+      const isNetworkOrServer = isAbort || (error instanceof TypeError);
+
+      if (isNetworkOrServer && attempt < maxRetries) {
+        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s
+        console.log(`[API:${requestId}] Upload attempt ${attempt}/${maxRetries} failed (${isAbort ? 'timeout' : 'network error'}), retrying in ${delay / 1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      throw error;
+    }
   }
 
-  const result = await response.json();
-  console.log(`[API:${requestId}] Kie upload response:`, JSON.stringify(result).substring(0, 300));
-
-  // Check for error in response
-  if (result.code && result.code !== 200 && !result.success) {
-    throw new Error(`Upload failed: ${result.msg || 'Unknown error'}`);
-  }
-
-  // Response format: { success: true, code: 200, data: { downloadUrl: "...", fileName: "...", fileSize: 123 } }
-  const downloadUrl = result.data?.downloadUrl || result.downloadUrl || result.url;
-
-  if (!downloadUrl) {
-    console.error(`[API:${requestId}] Upload response has no URL:`, result);
-    throw new Error(`No download URL in upload response. Response: ${JSON.stringify(result).substring(0, 200)}`);
-  }
-
-  console.log(`[API:${requestId}] Image uploaded: ${downloadUrl.substring(0, 80)}...`);
-  return downloadUrl;
+  // Should not reach here, but TypeScript needs it
+  throw new Error("Upload failed after all retries");
 }
 
 /**
@@ -2811,10 +2845,23 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Process images - Kie requires URLs, we'll upload base64 images in generateWithKie
-      const processedImages: string[] = images ? [...images] : [];
+      // Pre-upload all base64 images ONCE before the fallback loop.
+      // This way both the primary model and any fallback models receive URLs
+      // and skip re-uploading, avoiding duplicate 504-prone CDN calls.
+      const kieUpload = async (img: string) => {
+        if (img.startsWith("http")) return img;
+        return uploadImageToKie(requestId, kieApiKey, img);
+      };
 
-      // Process dynamicInputs: filter empty values
+      const processedImages: string[] = [];
+      if (images && images.length > 0) {
+        for (const img of images) {
+          processedImages.push(await kieUpload(img));
+        }
+        console.log(`[API:${requestId}] Pre-uploaded ${processedImages.length} image(s) before fallback loop`);
+      }
+
+      // Process dynamicInputs: filter empty values and pre-upload any base64 images
       let processedDynamicInputs: Record<string, string | string[]> | undefined = undefined;
 
       if (dynamicInputs) {
@@ -2827,7 +2874,22 @@ export async function POST(request: NextRequest) {
             continue;
           }
 
-          processedDynamicInputs[key] = value;
+          // Pre-upload base64 images in dynamic inputs
+          if (typeof value === 'string' && value.startsWith('data:image')) {
+            processedDynamicInputs[key] = await kieUpload(value);
+          } else if (Array.isArray(value)) {
+            const uploaded: string[] = [];
+            for (const item of value) {
+              if (typeof item === 'string' && item.startsWith('data:image')) {
+                uploaded.push(await kieUpload(item));
+              } else {
+                uploaded.push(item);
+              }
+            }
+            processedDynamicInputs[key] = uploaded;
+          } else {
+            processedDynamicInputs[key] = value;
+          }
         }
       }
 

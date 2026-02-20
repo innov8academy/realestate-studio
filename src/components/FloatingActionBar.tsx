@@ -161,7 +161,6 @@ export function FloatingActionBar() {
     currentNodeIds,
     executeWorkflow,
     regenerateNode,
-    stopWorkflow,
     validateWorkflow,
     edgeStyle,
     setEdgeStyle,
@@ -213,9 +212,7 @@ export function FloatingActionBar() {
   };
 
   const handleRunClick = () => {
-    if (isRunning) {
-      stopWorkflow();
-    } else {
+    if (!isRunning) {
       executeWorkflow();
     }
   };
@@ -266,11 +263,11 @@ export function FloatingActionBar() {
         <div className="relative flex items-center" ref={runMenuRef}>
           <button
             onClick={handleRunClick}
-            disabled={!valid && !isRunning}
-            title={!valid ? errors.join("\n") : isRunning ? "Stop" : "Run"}
+            disabled={isRunning || !valid}
+            title={!valid ? errors.join("\n") : isRunning ? getRunningLabel() : "Run"}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium transition-colors ${
               isRunning
-                ? "bg-white text-neutral-900 hover:bg-neutral-200 rounded"
+                ? "bg-neutral-700 text-neutral-400 cursor-not-allowed rounded"
                 : valid
                 ? "bg-white text-neutral-900 hover:bg-neutral-200 rounded-l"
                 : "bg-neutral-700 text-neutral-500 cursor-not-allowed rounded"
@@ -298,7 +295,7 @@ export function FloatingActionBar() {
                   />
                 </svg>
                 <span className="max-w-[150px] truncate" title={getRunningLabel()}>
-                  {runningNodeCount > 1 ? `${runningNodeCount} nodes` : "Stop"}
+                  {getRunningLabel()}
                 </span>
               </>
             ) : (

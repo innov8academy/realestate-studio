@@ -475,7 +475,7 @@ describe("FloatingActionBar", () => {
       expect(mockExecuteWorkflow).toHaveBeenCalled();
     });
 
-    it("should show Stop button when isRunning is true", async () => {
+    it("should show disabled running state when isRunning is true", async () => {
       mockUseWorkflowStore.mockImplementation((selector) => {
         return selector(createDefaultState({
           isRunning: true,
@@ -489,31 +489,12 @@ describe("FloatingActionBar", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText("Stop")).toBeInTheDocument();
-      });
-    });
-
-    it("should call stopWorkflow when Stop button is clicked", async () => {
-      mockUseWorkflowStore.mockImplementation((selector) => {
-        return selector(createDefaultState({
-          isRunning: true,
-        }));
+        expect(screen.getByText("Running...")).toBeInTheDocument();
       });
 
-      render(
-        <TestWrapper>
-          <FloatingActionBar />
-        </TestWrapper>
-      );
-
-      await waitFor(() => {
-        expect(screen.getByText("Stop")).toBeInTheDocument();
-      });
-
-      const stopButton = screen.getByText("Stop");
-      fireEvent.click(stopButton);
-
-      expect(mockStopWorkflow).toHaveBeenCalled();
+      // Button should be disabled (no stop action - Kie.AI has no cancel endpoint)
+      const runButton = screen.getByText("Running...").closest("button");
+      expect(runButton).toBeDisabled();
     });
 
     it("should disable Run button when workflow is invalid", async () => {
