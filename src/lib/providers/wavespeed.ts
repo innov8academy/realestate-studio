@@ -27,7 +27,7 @@ import {
 import { validateMediaUrl } from "@/utils/urlValidation";
 
 const WAVESPEED_API_BASE = "https://api.wavespeed.ai/api/v3";
-const PROVIDER_SETTINGS_KEY = "node-banana-provider-settings";
+const PROVIDER_SETTINGS_KEY = "plotai-provider-settings";
 
 /**
  * WaveSpeed task status from API

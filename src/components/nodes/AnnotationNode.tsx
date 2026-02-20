@@ -35,7 +35,7 @@ export function AnnotationNode({ id, data, selected }: NodeProps<AnnotationNodeT
       return (sourceNode.data as any).image || null;
     } else if (sourceNode.type === "annotation") {
       return (sourceNode.data as any).outputImage || null;
-    } else if (sourceNode.type === "nanoBanana") {
+    } else if (sourceNode.type === "generateImage") {
       return (sourceNode.data as any).outputImage || null;
     }
     return null;

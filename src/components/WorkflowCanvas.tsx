@@ -41,7 +41,7 @@ import { MultiSelectToolbar } from "./MultiSelectToolbar";
 import { EdgeToolbar } from "./EdgeToolbar";
 import { GlobalImageHistory } from "./GlobalImageHistory";
 import { GroupBackgroundsPortal, GroupControlsOverlay } from "./GroupsOverlay";
-import { NodeType, NanoBananaNodeData } from "@/types";
+import { NodeType, GenerateImageNodeData } from "@/types";
 import { defaultNodeDimensions } from "@/store/utils/nodeDefaults";
 import { detectAndSplitGrid } from "@/utils/gridSplitter";
 import { logger } from "@/utils/logger";
@@ -56,7 +56,7 @@ const nodeTypes: NodeTypes = {
   annotation: AnnotationNode,
   prompt: PromptNode,
   promptConstructor: PromptConstructorNode,
-  nanoBanana: GenerateImageNode,
+  generateImage: GenerateImageNode,
   generateVideo: GenerateVideoNode,
   llmGenerate: LLMGenerateNode,
   splitGrid: SplitGridNode,
@@ -106,7 +106,7 @@ const getNodeHandles = (nodeType: string): { inputs: string[]; outputs: string[]
       return { inputs: ["text"], outputs: ["text"] };
     case "promptConstructor":
       return { inputs: ["text"], outputs: ["text"] };
-    case "nanoBanana":
+    case "generateImage":
       return { inputs: ["image", "text"], outputs: ["image"] };
     case "generateVideo":
       return { inputs: ["image", "text"], outputs: ["video"] };
@@ -580,8 +580,8 @@ export function WorkflowCanvas() {
 
       // Get the output image from the source node
       let sourceImage: string | null = null;
-      if (sourceNode.type === "nanoBanana") {
-        sourceImage = (sourceNode.data as NanoBananaNodeData).outputImage;
+      if (sourceNode.type === "generateImage") {
+        sourceImage = (sourceNode.data as GenerateImageNodeData).outputImage;
       } else if (sourceNode.type === "imageInput") {
         sourceImage = (sourceNode.data as { image: string | null }).image;
       } else if (sourceNode.type === "annotation") {
@@ -593,7 +593,7 @@ export function WorkflowCanvas() {
         return;
       }
 
-      const sourceNodeData = sourceNode.type === "nanoBanana" ? sourceNode.data as NanoBananaNodeData : null;
+      const sourceNodeData = sourceNode.type === "generateImage" ? sourceNode.data as GenerateImageNodeData : null;
       setIsSplitting(true);
 
       try {
@@ -619,7 +619,7 @@ export function WorkflowCanvas() {
             timestamp: Date.now() + index,
             prompt: `Split ${row + 1}-${col + 1} from ${grid.rows}x${grid.cols} grid`,
             aspectRatio: sourceNodeData?.aspectRatio || "1:1",
-            model: sourceNodeData?.model || "nano-banana",
+            model: sourceNodeData?.model || "gemini-flash",
           });
         });
 
@@ -665,7 +665,7 @@ export function WorkflowCanvas() {
         return (node.data as { image: string | null }).image;
       case "annotation":
         return (node.data as { outputImage: string | null }).outputImage;
-      case "nanoBanana":
+      case "generateImage":
         return (node.data as { outputImage: string | null }).outputImage;
       default:
         return null;
@@ -782,13 +782,13 @@ export function WorkflowCanvas() {
           if (nodeType === "annotation") {
             sourceHandleIdForNewNode = "image";
           }
-        } else if (nodeType === "nanoBanana" || nodeType === "generateVideo") {
+        } else if (nodeType === "generateImage" || nodeType === "generateVideo") {
           targetHandleId = "image";
         } else if (nodeType === "imageInput") {
           sourceHandleIdForNewNode = "image";
         }
       } else if (handleType === "text") {
-        if (nodeType === "nanoBanana" || nodeType === "generateVideo" || nodeType === "llmGenerate") {
+        if (nodeType === "generateImage" || nodeType === "generateVideo" || nodeType === "llmGenerate") {
           targetHandleId = "text";
           // llmGenerate also has a text output
           if (nodeType === "llmGenerate") {
@@ -1016,7 +1016,7 @@ export function WorkflowCanvas() {
             nodeType = "imageInput";
             break;
           case "g":
-            nodeType = "nanoBanana";
+            nodeType = "generateImage";
             break;
           case "v":
             nodeType = "generateVideo";
@@ -1039,7 +1039,7 @@ export function WorkflowCanvas() {
             annotation: { width: 300, height: 280 },
             prompt: { width: 320, height: 220 },
             promptConstructor: { width: 340, height: 280 },
-            nanoBanana: { width: 300, height: 300 },
+            generateImage: { width: 300, height: 300 },
             generateVideo: { width: 300, height: 300 },
             llmGenerate: { width: 320, height: 360 },
             splitGrid: { width: 300, height: 320 },
@@ -1569,7 +1569,7 @@ export function WorkflowCanvas() {
                 return "#f97316";
               case "promptConstructor":
                 return "#f472b6";
-              case "nanoBanana":
+              case "generateImage":
                 return "#22c55e";
               case "generateVideo":
                 return "#9333ea";

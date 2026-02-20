@@ -17,7 +17,7 @@ describe("QuickstartInitialView", () => {
   });
 
   describe("Basic Rendering", () => {
-    it("should render the Node Banana title and logo", () => {
+    it("should render the PlotAI title and logo", () => {
       render(
         <QuickstartInitialView
           onNewProject={mockOnNewProject}
@@ -27,7 +27,7 @@ describe("QuickstartInitialView", () => {
         />
       );
 
-      expect(screen.getByText("Node Banana")).toBeInTheDocument();
+      expect(screen.getByText("PlotAI")).toBeInTheDocument();
       expect(screen.getByAltText("")).toBeInTheDocument(); // Logo image
     });
 
@@ -220,7 +220,7 @@ describe("QuickstartInitialView", () => {
       );
 
       const docsLink = screen.getByText("Docs").closest("a");
-      expect(docsLink).toHaveAttribute("href", "https://node-banana-docs.vercel.app/");
+      expect(docsLink).toHaveAttribute("href", "https://plotai-docs.vercel.app/");
       expect(docsLink).toHaveAttribute("target", "_blank");
       expect(docsLink).toHaveAttribute("rel", "noopener noreferrer");
     });

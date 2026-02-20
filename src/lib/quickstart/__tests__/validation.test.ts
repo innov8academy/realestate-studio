@@ -156,7 +156,7 @@ describe("validation", () => {
           "imageInput",
           "annotation",
           "prompt",
-          "nanoBanana",
+          "generateImage",
           "llmGenerate",
           "splitGrid",
           "output",
@@ -220,7 +220,7 @@ describe("validation", () => {
         name: "Test",
         nodes: [
           { id: "node-1", type: "prompt", position: { x: 0, y: 0 }, data: {} },
-          { id: "node-2", type: "nanoBanana", position: { x: 100, y: 0 }, data: {} },
+          { id: "node-2", type: "generateImage", position: { x: 100, y: 0 }, data: {} },
         ],
       };
 
@@ -318,17 +318,17 @@ describe("validation", () => {
           nodes: [
             { id: "prompt-1", type: "prompt", position: { x: 0, y: 0 }, data: { prompt: "test" } },
             {
-              id: "nanoBanana-1",
-              type: "nanoBanana",
+              id: "generateImage-1",
+              type: "generateImage",
               position: { x: 400, y: 0 },
               data: {},
             },
             { id: "output-1", type: "output", position: { x: 800, y: 0 }, data: {} },
           ],
           edges: [
-            { source: "prompt-1", target: "nanoBanana-1", sourceHandle: "text", targetHandle: "text" },
+            { source: "prompt-1", target: "generateImage-1", sourceHandle: "text", targetHandle: "text" },
             {
-              source: "nanoBanana-1",
+              source: "generateImage-1",
               target: "output-1",
               sourceHandle: "image",
               targetHandle: "image",
@@ -436,7 +436,7 @@ describe("validation", () => {
       const result = repairWorkflowJSON({
         nodes: [
           { id: "node-1", type: "prompt", position: { x: 0, y: 0 }, data: {} },
-          { id: "node-2", type: "nanoBanana", position: { x: 100, y: 0 }, data: {} },
+          { id: "node-2", type: "generateImage", position: { x: 100, y: 0 }, data: {} },
         ],
         edges: [{ source: "node-1", target: "node-2", sourceHandle: "text", targetHandle: "image" }],
       });
@@ -447,7 +447,7 @@ describe("validation", () => {
       const result = repairWorkflowJSON({
         nodes: [
           { id: "node-1", type: "prompt", position: { x: 0, y: 0 }, data: {} },
-          { id: "node-2", type: "nanoBanana", position: { x: 100, y: 0 }, data: {} },
+          { id: "node-2", type: "generateImage", position: { x: 100, y: 0 }, data: {} },
         ],
         edges: [{ source: "node-1", target: "node-2", sourceHandle: "text", targetHandle: "text" }],
       });
@@ -458,7 +458,7 @@ describe("validation", () => {
       const result = repairWorkflowJSON({
         nodes: [
           { id: "node-1", type: "prompt", position: { x: 0, y: 0 }, data: {} },
-          { id: "node-2", type: "nanoBanana", position: { x: 100, y: 0 }, data: {} },
+          { id: "node-2", type: "generateImage", position: { x: 100, y: 0 }, data: {} },
         ],
         edges: [{ source: "node-1", target: "node-2", sourceHandle: "text", targetHandle: "text" }],
       });

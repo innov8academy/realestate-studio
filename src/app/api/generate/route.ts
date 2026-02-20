@@ -22,8 +22,8 @@ export const dynamic = 'force-dynamic'; // Ensure this route is always dynamic
 
 // Map model types to Gemini model IDs
 const MODEL_MAP: Record<ModelType, string> = {
-  "nano-banana": "gemini-2.5-flash-image", // Updated to correct model name
-  "nano-banana-pro": "gemini-3-pro-image-preview",
+  "gemini-flash": "gemini-2.5-flash-image", // Updated to correct model name
+  "gemini-pro": "gemini-3-pro-image-preview",
 };
 
 /**
@@ -91,17 +91,17 @@ async function generateWithGemini(
     };
   }
 
-  // Add resolution only for Nano Banana Pro
-  if (model === "nano-banana-pro" && resolution) {
+  // Add resolution only for Gemini Pro
+  if (model === "gemini-pro" && resolution) {
     if (!config.imageConfig) {
       config.imageConfig = {};
     }
     (config.imageConfig as Record<string, unknown>).imageSize = resolution;
   }
 
-  // Add tools array for Google Search (only Nano Banana Pro)
+  // Add tools array for Google Search (only Gemini Pro)
   const tools = [];
-  if (model === "nano-banana-pro" && useGoogleSearch) {
+  if (model === "gemini-pro" && useGoogleSearch) {
     tools.push({ googleSearch: {} });
   }
 
@@ -1211,8 +1211,8 @@ function getKieModelDefaults(modelId: string): Record<string, unknown> {
         quality: "basic",
       };
 
-    // Nano Banana Pro (Kie)
-    case "nano-banana-pro":
+    // Gemini Pro (Kie)
+    case "gemini-pro":
       return {
         aspect_ratio: "1:1",
         resolution: "1K",
@@ -1360,7 +1360,7 @@ function getKieModelDefaults(modelId: string): Record<string, unknown> {
  */
 function getKieImageInputKey(modelId: string): string {
   // Model-specific parameter names
-  if (modelId === "nano-banana-pro") return "image_input";
+  if (modelId === "gemini-pro") return "image_input";
   if (modelId === "seedream/4.5-edit") return "image_urls";
   if (modelId === "gpt-image/1.5-image-to-image") return "input_urls";
   // Flux-2 I2I models use input_urls
@@ -2450,7 +2450,7 @@ export async function POST(request: NextRequest) {
     const {
       images,
       prompt,
-      model = "nano-banana-pro",
+      model = "gemini-pro",
       aspectRatio,
       resolution,
       useGoogleSearch,

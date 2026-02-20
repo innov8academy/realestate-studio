@@ -41,7 +41,7 @@ describe("extractSubgraph", () => {
     it("returns all nodes and edges when selectedNodeIds is empty", () => {
       const nodes: WorkflowNode[] = [
         createNode("A", "prompt"),
-        createNode("B", "nanoBanana"),
+        createNode("B", "generateImage"),
         createNode("C", "output"),
       ];
       const edges: WorkflowEdge[] = [
@@ -62,7 +62,7 @@ describe("extractSubgraph", () => {
     it("returns all nodes with isScoped=true and empty restSummary", () => {
       const nodes: WorkflowNode[] = [
         createNode("A", "prompt"),
-        createNode("B", "nanoBanana"),
+        createNode("B", "generateImage"),
         createNode("C", "output"),
       ];
       const edges: WorkflowEdge[] = [
@@ -85,7 +85,7 @@ describe("extractSubgraph", () => {
     it("selects middle node with incoming and outgoing boundary connections", () => {
       const nodes: WorkflowNode[] = [
         createNode("A", "prompt"),
-        createNode("B", "nanoBanana"),
+        createNode("B", "generateImage"),
         createNode("C", "output"),
       ];
       const edges: WorkflowEdge[] = [
@@ -126,7 +126,7 @@ describe("extractSubgraph", () => {
     it("includes edge between selected nodes", () => {
       const nodes: WorkflowNode[] = [
         createNode("A", "prompt"),
-        createNode("B", "nanoBanana"),
+        createNode("B", "generateImage"),
         createNode("C", "output"),
       ];
       const edges: WorkflowEdge[] = [
@@ -156,7 +156,7 @@ describe("extractSubgraph", () => {
     it("correctly identifies boundary connections for middle segment", () => {
       const nodes: WorkflowNode[] = [
         createNode("A", "prompt"),
-        createNode("B", "nanoBanana"),
+        createNode("B", "generateImage"),
         createNode("C", "annotation"),
         createNode("D", "output"),
       ];
@@ -196,9 +196,9 @@ describe("extractSubgraph", () => {
       const nodes: WorkflowNode[] = [
         createNode("A", "prompt"),
         createNode("B", "prompt"),
-        createNode("C", "nanoBanana"),
-        createNode("D", "nanoBanana"),
-        createNode("E", "nanoBanana"),
+        createNode("C", "generateImage"),
+        createNode("D", "generateImage"),
+        createNode("E", "generateImage"),
         createNode("F", "output"),
       ];
       const edges: WorkflowEdge[] = [];
@@ -210,7 +210,7 @@ describe("extractSubgraph", () => {
       expect(result.restSummary!.nodeCount).toBe(5);
       expect(result.restSummary!.typeBreakdown).toEqual({
         prompt: 1,
-        nanoBanana: 3,
+        generateImage: 3,
         output: 1,
       });
     });
@@ -220,7 +220,7 @@ describe("extractSubgraph", () => {
     it("handles selection with no edges between selected nodes", () => {
       const nodes: WorkflowNode[] = [
         createNode("A", "prompt"),
-        createNode("B", "nanoBanana"),
+        createNode("B", "generateImage"),
         createNode("C", "prompt"),
         createNode("D", "output"),
       ];
@@ -253,7 +253,7 @@ describe("extractSubgraph", () => {
         createNode("prompt1", "prompt"),
         createNode("prompt2", "prompt"),
         createNode("img1", "imageInput"),
-        createNode("gen", "nanoBanana"),
+        createNode("gen", "generateImage"),
         createNode("out", "output"),
       ];
       const edges: WorkflowEdge[] = [

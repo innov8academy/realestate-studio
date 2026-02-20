@@ -155,16 +155,16 @@ export default function StudioPage() {
       const REQUIRED_ANGLE_EDGES = [
         {
           id: "e-angle-front-to-aerial",
-          source: "nanoBanana-angle-front",
+          source: "generateImage-angle-front",
           sourceHandle: "image",
-          target: "nanoBanana-angle-aerial",
+          target: "generateImage-angle-aerial",
           targetHandle: "image",
         },
         {
           id: "e-angle-front-to-corner",
-          source: "nanoBanana-angle-front",
+          source: "generateImage-angle-front",
           sourceHandle: "image",
-          target: "nanoBanana-angle-corner",
+          target: "generateImage-angle-corner",
           targetHandle: "image",
         },
       ];

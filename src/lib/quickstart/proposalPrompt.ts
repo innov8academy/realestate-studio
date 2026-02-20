@@ -6,7 +6,7 @@
  * and connections rather than internal node state.
  */
 export function buildProposalPrompt(description: string): string {
-  return `You are a workflow designer for Node Banana, a visual node-based AI image generation tool. Your task is to create a workflow PROPOSAL that can be reviewed before building the actual workflow.
+  return `You are a workflow designer for PlotAI, a visual node-based AI image generation tool. Your task is to create a workflow PROPOSAL that can be reviewed before building the actual workflow.
 
 ## CRITICAL: OUTPUT FORMAT
 You MUST output ONLY valid JSON. No explanations, no markdown, no code blocks. Just the raw JSON object starting with { and ending with }.
@@ -29,12 +29,12 @@ Purpose: Draw/annotate on images before generation
 - Outputs: "image" handle
 - Use when: User explicitly wants to mark up or draw on images
 
-### 4. nanoBanana
+### 4. generateImage
 Purpose: AI image generation (REQUIRES both image AND text inputs)
 - Inputs: "image" handle (one or more), "text" handle (required)
 - Outputs: "image" handle
 - Use when: Generating or transforming images with AI
-- Models: "nano-banana" (fast), "nano-banana-pro" (high quality)
+- Models: "gemini-flash" (fast), "gemini-pro" (high quality)
 
 ### 5. llmGenerate
 Purpose: AI text generation for prompt expansion or analysis
@@ -55,8 +55,8 @@ Purpose: Display final generated images
 
 ## Connection Rules
 1. **Type matching**: "image" → "image", "text" → "text", "reference" → "reference"
-2. **nanoBanana REQUIRES**: At least one image AND one text connection
-3. **Multiple images**: nanoBanana can accept multiple image inputs for multi-reference generation
+2. **generateImage REQUIRES**: At least one image AND one text connection
+3. **Multiple images**: generateImage can accept multiple image inputs for multi-reference generation
 
 ## WorkflowProposal Schema
 
@@ -72,7 +72,7 @@ Output a JSON object matching this structure:
       "purpose": "Human-readable description of this node's role",
       "suggestedTitle": "Node title shown in UI",
       "suggestedPrompt": "For prompt nodes only: the suggested prompt text",
-      "suggestedModel": "For nanoBanana: 'nano-banana' or 'nano-banana-pro'",
+      "suggestedModel": "For generateImage: 'gemini-flash' or 'gemini-pro'",
       "suggestedSettings": { "aspectRatio": "1:1" }
     }
   ],
@@ -110,9 +110,9 @@ Output a JSON object matching this structure:
 - For minimal workflows: Brief placeholder like "Describe the scene transformation..."
 - For detailed workflows: Complete example prompt
 
-**nodes[].suggestedModel**: For nanoBanana nodes
-- Use "nano-banana-pro" for high-quality final outputs
-- Use "nano-banana" for intermediate processing or speed
+**nodes[].suggestedModel**: For generateImage nodes
+- Use "gemini-pro" for high-quality final outputs
+- Use "gemini-flash" for intermediate processing or speed
 
 **nodes[].suggestedSettings**: Optional settings for generation nodes
 - aspectRatio: "1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"
@@ -157,10 +157,10 @@ For request "Create product photos with different backgrounds":
     },
     {
       "id": "node-3",
-      "type": "nanoBanana",
+      "type": "generateImage",
       "purpose": "Generates the product composited into the first scene",
       "suggestedTitle": "Generate Scene 1",
-      "suggestedModel": "nano-banana-pro",
+      "suggestedModel": "gemini-pro",
       "suggestedSettings": { "aspectRatio": "1:1" }
     }
   ],

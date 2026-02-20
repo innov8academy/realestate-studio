@@ -7,7 +7,7 @@ import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
-import type { NanoBananaNodeData, GenerateVideoNodeData } from "@/types";
+import type { GenerateImageNodeData, GenerateVideoNodeData } from "@/types";
 
 const DURATION_OPTIONS = [
   { value: "5", label: "5s" },
@@ -124,9 +124,9 @@ export function MapVideosStep() {
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
 
   // Check prerequisites
-  const mapFrame1Data = nodes.find((n) => n.id === STUDIO_NODES.generateMap)?.data as NanoBananaNodeData | undefined;
-  const mapFrame2Data = nodes.find((n) => n.id === STUDIO_NODES.generateMapFrame2)?.data as NanoBananaNodeData | undefined;
-  const streetData = nodes.find((n) => n.id === STUDIO_NODES.generateStreet)?.data as NanoBananaNodeData | undefined;
+  const mapFrame1Data = nodes.find((n) => n.id === STUDIO_NODES.generateMap)?.data as GenerateImageNodeData | undefined;
+  const mapFrame2Data = nodes.find((n) => n.id === STUDIO_NODES.generateMapFrame2)?.data as GenerateImageNodeData | undefined;
+  const streetData = nodes.find((n) => n.id === STUDIO_NODES.generateStreet)?.data as GenerateImageNodeData | undefined;
 
   const hasMapFrames = mapFrame1Data?.status === "complete" && mapFrame2Data?.status === "complete";
   const hasSqm = plotSquareMeters !== null && plotSquareMeters > 0;

@@ -754,9 +754,9 @@ describe("/api/models route", () => {
       expect(data.models[1].provider).toBe("fal");
       expect(data.models[1].name).toBe("Zebra");
       expect(data.models[2].provider).toBe("gemini");
-      expect(data.models[2].name).toBe("Nano Banana");
+      expect(data.models[2].name).toBe("Gemini Flash");
       expect(data.models[3].provider).toBe("gemini");
-      expect(data.models[3].name).toBe("Nano Banana Pro");
+      expect(data.models[3].name).toBe("Gemini Pro");
       expect(data.models[4].provider).toBe("replicate");
       expect(data.models[4].name).toBe("alpha");
       expect(data.models[5].provider).toBe("replicate");

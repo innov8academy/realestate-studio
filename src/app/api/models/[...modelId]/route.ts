@@ -604,7 +604,7 @@ function getKieSchema(modelId: string): ExtractedSchema {
         { name: "input_urls", type: "image", required: true, label: "Image", isArray: true },
       ],
     },
-    "nano-banana-pro": {
+    "gemini-pro": {
       parameters: [
         { name: "aspect_ratio", type: "string", description: "Output aspect ratio", enum: ["1:1", "2:3", "3:2", "4:3", "16:9", "9:16", "21:9", "auto"], default: "1:1" },
         { name: "resolution", type: "string", description: "Output resolution", enum: ["1K", "2K", "4K"], default: "1K" },

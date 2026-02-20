@@ -48,7 +48,7 @@ export function ImageCompareNode({
         image = (sourceNode.data as any).image;
       } else if (sourceNode.type === "annotation") {
         image = (sourceNode.data as any).outputImage;
-      } else if (sourceNode.type === "nanoBanana") {
+      } else if (sourceNode.type === "generateImage") {
         image = (sourceNode.data as any).outputImage;
       }
 

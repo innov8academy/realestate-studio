@@ -316,7 +316,7 @@ describe("EditableEdge", () => {
         return selector(createDefaultState({
           nodes: [
             { id: "node-1", type: "prompt", selected: false },
-            { id: "node-2", type: "nanoBanana", selected: false, data: { status: "loading" } },
+            { id: "node-2", type: "generateImage", selected: false, data: { status: "loading" } },
           ],
         }));
       });
@@ -338,7 +338,7 @@ describe("EditableEdge", () => {
         return selector(createDefaultState({
           nodes: [
             { id: "node-1", type: "prompt", selected: false },
-            { id: "node-2", type: "nanoBanana", selected: false, data: { status: "idle" } },
+            { id: "node-2", type: "generateImage", selected: false, data: { status: "idle" } },
           ],
         }));
       });

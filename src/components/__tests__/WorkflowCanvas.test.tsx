@@ -523,7 +523,7 @@ describe("WorkflowCanvas", () => {
       expect(mockAddNode).toHaveBeenCalledWith("imageInput", expect.any(Object));
     });
 
-    it("should add nanoBanana node on Shift+G", () => {
+    it("should add generateImage node on Shift+G", () => {
       render(
         <TestWrapper>
           <WorkflowCanvas />
@@ -532,7 +532,7 @@ describe("WorkflowCanvas", () => {
 
       fireEvent.keyDown(window, { key: "g", shiftKey: true });
 
-      expect(mockAddNode).toHaveBeenCalledWith("nanoBanana", expect.any(Object));
+      expect(mockAddNode).toHaveBeenCalledWith("generateImage", expect.any(Object));
     });
 
     it("should add llmGenerate node on Shift+L", () => {

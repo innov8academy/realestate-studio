@@ -24,7 +24,7 @@ KIE_API_KEY=your_kie_api_key              # Optional, for Kie.ai models (Sora, V
 
 ## Architecture Overview
 
-Node Banana is a node-based visual workflow editor for AI image generation. Users drag nodes onto a React Flow canvas, connect them via typed handles, and execute pipelines that call AI APIs.
+PlotAI is a node-based visual workflow editor for AI image generation. Users drag nodes onto a React Flow canvas, connect them via typed handles, and execute pipelines that call AI APIs.
 
 ### Core Stack
 - **Next.js 16** (App Router) with TypeScript
@@ -65,8 +65,8 @@ All application state lives in `workflowStore.ts` using Zustand. Key patterns:
 ## AI Models
 
 Image generation models (these exist and are recently released):
-- `gemini-2.5-flash-preview-image-generation` → internal name: `nano-banana`
-- `gemini-3-pro-image-preview` → internal name: `nano-banana-pro`
+- `gemini-2.5-flash-preview-image-generation` → internal name: `gemini-flash`
+- `gemini-3-pro-image-preview` → internal name: `gemini-pro`
 
 LLM models:
 - Google: `gemini-2.5-flash`, `gemini-3-flash-preview`, `gemini-3-pro-preview`
@@ -79,7 +79,7 @@ LLM models:
 | `imageInput` | Load/upload images | reference | image |
 | `annotation` | Draw on images (Konva) | image | image |
 | `prompt` | Text prompt input | none | text |
-| `nanoBanana` | AI image generation | image, text | image |
+| `generateImage` | AI image generation | image, text | image |
 | `llmGenerate` | AI text generation | text, image | text |
 | `splitGrid` | Split image into grid cells | image | reference |
 | `output` | Display final result | image | none |
@@ -106,7 +106,7 @@ Returns `{ images: string[], text: string | null }`.
 **Image data extracted from:**
 - `imageInput` → `data.image`
 - `annotation` → `data.outputImage`
-- `nanoBanana` → `data.outputImage`
+- `generateImage` → `data.outputImage`
 
 **Text data extracted from:**
 - `prompt` → `data.prompt`
@@ -118,7 +118,7 @@ Returns `{ images: string[], text: string | null }`.
 - `Cmd/Ctrl + C/V` - Copy/paste nodes
 - `Shift + P` - Add prompt node at center
 - `Shift + I` - Add image input node
-- `Shift + G` - Add generate (nanoBanana) node
+- `Shift + G` - Add generate (generateImage) node
 - `Shift + V` - Add video (generateVideo) node
 - `Shift + L` - Add LLM node
 - `Shift + A` - Add annotation node
@@ -204,9 +204,9 @@ All routes in `src/app/api/`:
 
 ## localStorage Keys
 
-- `node-banana-workflow-configs` - Project metadata (paths)
-- `node-banana-workflow-costs` - Cost tracking per workflow
-- `node-banana-nanoBanana-defaults` - Sticky generation settings
+- `plotai-workflow-configs` - Project metadata (paths)
+- `plotai-workflow-costs` - Cost tracking per workflow
+- `plotai-generateImage-defaults` - Sticky generation settings
 
 ## Commits
 

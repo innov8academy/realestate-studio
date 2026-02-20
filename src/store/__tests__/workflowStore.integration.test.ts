@@ -107,12 +107,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: testImage }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("imageInput-1", "nanoBanana-1", "image", "image")],
+          edges: [createTestEdge("imageInput-1", "generateImage-1", "image", "image")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.images).toContain(testImage);
         expect(result.images).toHaveLength(1);
@@ -125,30 +125,30 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("annotation-1", "annotation", { outputImage: testImage }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("annotation-1", "nanoBanana-1", "image", "image")],
+          edges: [createTestEdge("annotation-1", "generateImage-1", "image", "image")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.images).toContain(testImage);
         expect(result.images).toHaveLength(1);
       });
 
-      it("should extract image from nanoBanana node (outputImage)", () => {
+      it("should extract image from generateImage node (outputImage)", () => {
         const store = useWorkflowStore.getState();
         const testImage = "data:image/png;base64,generatedImageData";
 
         useWorkflowStore.setState({
           nodes: [
-            createTestNode("nanoBanana-1", "nanoBanana", { outputImage: testImage }),
-            createTestNode("nanoBanana-2", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", { outputImage: testImage }),
+            createTestNode("generateImage-2", "generateImage", {}),
           ],
-          edges: [createTestEdge("nanoBanana-1", "nanoBanana-2", "image", "image")],
+          edges: [createTestEdge("generateImage-1", "generateImage-2", "image", "image")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-2");
+        const result = store.getConnectedInputs("generateImage-2");
 
         expect(result.images).toContain(testImage);
         expect(result.images).toHaveLength(1);
@@ -161,12 +161,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: testPrompt }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("prompt-1", "nanoBanana-1", "text", "text")],
+          edges: [createTestEdge("prompt-1", "generateImage-1", "text", "text")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.text).toBe(testPrompt);
       });
@@ -178,12 +178,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("llmGenerate-1", "llmGenerate", { outputText: testOutput }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("llmGenerate-1", "nanoBanana-1", "text", "text")],
+          edges: [createTestEdge("llmGenerate-1", "generateImage-1", "text", "text")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.text).toBe(testOutput);
       });
@@ -201,16 +201,16 @@ describe("workflowStore integration tests", () => {
             createTestNode("imageInput-1", "imageInput", { image: testImage1 }),
             createTestNode("imageInput-2", "imageInput", { image: testImage2 }),
             createTestNode("annotation-1", "annotation", { outputImage: testImage3 }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("imageInput-2", "nanoBanana-1", "image", "image"),
-            createTestEdge("annotation-1", "nanoBanana-1", "image", "image"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
+            createTestEdge("imageInput-2", "generateImage-1", "image", "image"),
+            createTestEdge("annotation-1", "generateImage-1", "image", "image"),
           ],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.images).toHaveLength(3);
         expect(result.images).toContain(testImage1);
@@ -227,15 +227,15 @@ describe("workflowStore integration tests", () => {
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: prompt1 }),
             createTestNode("prompt-2", "prompt", { prompt: prompt2 }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("prompt-2", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+            createTestEdge("prompt-2", "generateImage-1", "text", "text"),
           ],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         // Should have text from one of the prompts (last one processed)
         expect(result.text).toBe(prompt2);
@@ -250,15 +250,15 @@ describe("workflowStore integration tests", () => {
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: testImage }),
             createTestNode("prompt-1", "prompt", { prompt: testPrompt }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.images).toContain(testImage);
         expect(result.images).toHaveLength(1);
@@ -352,12 +352,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: testImage }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("imageInput-1", "nanoBanana-1", "image", "image")],
+          edges: [createTestEdge("imageInput-1", "generateImage-1", "image", "image")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(Object.keys(result.dynamicInputs)).toHaveLength(0);
         // But images array should still be populated
@@ -375,19 +375,19 @@ describe("workflowStore integration tests", () => {
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: img1 }),
             createTestNode("imageInput-2", "imageInput", { image: img2 }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               inputSchema: [
                 { name: "image_urls", type: "image", required: true, label: "Images" },
               ],
             }),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("imageInput-2", "nanoBanana-1", "image", "image"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
+            createTestEdge("imageInput-2", "generateImage-1", "image", "image"),
           ],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         // Both images should be aggregated into an array under the schema name
         expect(Array.isArray(result.dynamicInputs["image_urls"])).toBe(true);
@@ -408,18 +408,18 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: img1 }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               inputSchema: [
                 { name: "image_urls", type: "image", required: true, label: "Images" },
               ],
             }),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
           ],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         // Single image should be a plain string, not wrapped in array
         expect(result.dynamicInputs["image_urls"]).toBe(img1);
@@ -468,20 +468,20 @@ describe("workflowStore integration tests", () => {
             createTestNode("imageInput-1", "imageInput", { image: img1 }),
             createTestNode("imageInput-2", "imageInput", { image: img2 }),
             createTestNode("imageInput-3", "imageInput", { image: img3 }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               inputSchema: [
                 { name: "image_urls", type: "image", required: true, label: "Images" },
               ],
             }),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("imageInput-2", "nanoBanana-1", "image", "image"),
-            createTestEdge("imageInput-3", "nanoBanana-1", "image", "image"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
+            createTestEdge("imageInput-2", "generateImage-1", "image", "image"),
+            createTestEdge("imageInput-3", "generateImage-1", "image", "image"),
           ],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         // Should be array of length 3
         expect(Array.isArray(result.dynamicInputs["image_urls"])).toBe(true);
@@ -497,11 +497,11 @@ describe("workflowStore integration tests", () => {
         const store = useWorkflowStore.getState();
 
         useWorkflowStore.setState({
-          nodes: [createTestNode("nanoBanana-1", "nanoBanana", {})],
+          nodes: [createTestNode("generateImage-1", "generateImage", {})],
           edges: [],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.images).toEqual([]);
         expect(result.text).toBeNull();
@@ -514,12 +514,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: null }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("imageInput-1", "nanoBanana-1", "image", "image")],
+          edges: [createTestEdge("imageInput-1", "generateImage-1", "image", "image")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.images).toEqual([]);
       });
@@ -528,11 +528,11 @@ describe("workflowStore integration tests", () => {
         const store = useWorkflowStore.getState();
 
         useWorkflowStore.setState({
-          nodes: [createTestNode("nanoBanana-1", "nanoBanana", {})],
-          edges: [createTestEdge("nonexistent-1", "nanoBanana-1", "image", "image")],
+          nodes: [createTestNode("generateImage-1", "generateImage", {})],
+          edges: [createTestEdge("nonexistent-1", "generateImage-1", "image", "image")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         expect(result.images).toEqual([]);
         expect(result.text).toBeNull();
@@ -544,12 +544,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("prompt-1", "nanoBanana-1", "text", "text")],
+          edges: [createTestEdge("prompt-1", "generateImage-1", "text", "text")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
 
         // Empty string is treated as falsy/no value by getSourceOutput
         expect(result.text).toBeNull();
@@ -573,11 +573,11 @@ describe("workflowStore integration tests", () => {
       });
     });
 
-    describe("nanoBanana node validation", () => {
-      it("should return error when nanoBanana node missing text input", () => {
+    describe("generateImage node validation", () => {
+      it("should return error when generateImage node missing text input", () => {
         useWorkflowStore.setState({
           nodes: [
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [],
         });
@@ -586,16 +586,16 @@ describe("workflowStore integration tests", () => {
         const result = store.validateWorkflow();
 
         expect(result.valid).toBe(false);
-        expect(result.errors).toContain('Generate node "nanoBanana-1" missing text input');
+        expect(result.errors).toContain('Generate node "generateImage-1" missing text input');
       });
 
       it("should return valid when text input is connected", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("prompt-1", "nanoBanana-1", "text", "text")],
+          edges: [createTestEdge("prompt-1", "generateImage-1", "text", "text")],
         });
 
         const store = useWorkflowStore.getState();
@@ -609,9 +609,9 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("prompt-1", "nanoBanana-1", "text", "text")],
+          edges: [createTestEdge("prompt-1", "generateImage-1", "text", "text")],
         });
 
         const store = useWorkflowStore.getState();
@@ -621,22 +621,22 @@ describe("workflowStore integration tests", () => {
         expect(result.valid).toBe(true);
       });
 
-      it("should validate multiple nanoBanana nodes independently", () => {
+      it("should validate multiple generateImage nodes independently", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
-            createTestNode("nanoBanana-2", "nanoBanana", {}), // No text input
+            createTestNode("generateImage-1", "generateImage", {}),
+            createTestNode("generateImage-2", "generateImage", {}), // No text input
           ],
-          edges: [createTestEdge("prompt-1", "nanoBanana-1", "text", "text")],
+          edges: [createTestEdge("prompt-1", "generateImage-1", "text", "text")],
         });
 
         const store = useWorkflowStore.getState();
         const result = store.validateWorkflow();
 
         expect(result.valid).toBe(false);
-        expect(result.errors).toContain('Generate node "nanoBanana-2" missing text input');
-        expect(result.errors).not.toContain('Generate node "nanoBanana-1" missing text input');
+        expect(result.errors).toContain('Generate node "generateImage-2" missing text input');
+        expect(result.errors).not.toContain('Generate node "generateImage-1" missing text input');
       });
     });
 
@@ -721,16 +721,16 @@ describe("workflowStore integration tests", () => {
     });
 
     describe("Valid workflow scenarios", () => {
-      it("should validate simple prompt -> nanoBanana -> output chain", () => {
+      it("should validate simple prompt -> generateImage -> output chain", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test prompt" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
             createTestNode("output-1", "output", {}),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("nanoBanana-1", "output-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+            createTestEdge("generateImage-1", "output-1", "image", "image"),
           ],
         });
 
@@ -747,15 +747,15 @@ describe("workflowStore integration tests", () => {
             createTestNode("imageInput-1", "imageInput", { image: "data:image/png;base64,test" }),
             createTestNode("prompt-1", "prompt", { prompt: "describe this" }),
             createTestNode("llmGenerate-1", "llmGenerate", {}),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
             createTestNode("annotation-1", "annotation", { sourceImage: null }),
             createTestNode("output-1", "output", {}),
           ],
           edges: [
             createTestEdge("imageInput-1", "llmGenerate-1", "image", "image"),
             createTestEdge("prompt-1", "llmGenerate-1", "text", "text"),
-            createTestEdge("llmGenerate-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("nanoBanana-1", "annotation-1", "image", "image"),
+            createTestEdge("llmGenerate-1", "generateImage-1", "text", "text"),
+            createTestEdge("generateImage-1", "annotation-1", "image", "image"),
             createTestEdge("annotation-1", "output-1", "image", "image"),
           ],
         });
@@ -771,9 +771,9 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             { ...createTestNode("prompt-1", "prompt", { prompt: "test" }), groupId: "group-1" },
-            { ...createTestNode("nanoBanana-1", "nanoBanana", {}), groupId: "group-1" },
+            { ...createTestNode("generateImage-1", "generateImage", {}), groupId: "group-1" },
           ],
-          edges: [createTestEdge("prompt-1", "nanoBanana-1", "text", "text")],
+          edges: [createTestEdge("prompt-1", "generateImage-1", "text", "text")],
           groups: {
             "group-1": {
               id: "group-1",
@@ -812,8 +812,8 @@ describe("workflowStore integration tests", () => {
       it("should report all validation errors, not just the first", () => {
         useWorkflowStore.setState({
           nodes: [
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
-            createTestNode("nanoBanana-2", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
+            createTestNode("generateImage-2", "generateImage", {}),
             createTestNode("annotation-1", "annotation", { sourceImage: null }),
             createTestNode("output-1", "output", {}),
           ],
@@ -825,8 +825,8 @@ describe("workflowStore integration tests", () => {
 
         expect(result.valid).toBe(false);
         expect(result.errors.length).toBeGreaterThanOrEqual(4);
-        expect(result.errors).toContain('Generate node "nanoBanana-1" missing text input');
-        expect(result.errors).toContain('Generate node "nanoBanana-2" missing text input');
+        expect(result.errors).toContain('Generate node "generateImage-1" missing text input');
+        expect(result.errors).toContain('Generate node "generateImage-2" missing text input');
         expect(result.errors).toContain('Annotation node "annotation-1" missing image input');
         expect(result.errors).toContain('Output node "output-1" missing image input');
       });
@@ -854,21 +854,21 @@ describe("workflowStore integration tests", () => {
 
     describe("Execution order tests", () => {
       it("should execute linear chain A -> B -> C in order", async () => {
-        // Set up: imageInput -> prompt -> nanoBanana
-        // Only nanoBanana actually "executes" something visible
+        // Set up: imageInput -> prompt -> generateImage
+        // Only generateImage actually "executes" something visible
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }, { x: 0, y: 0 }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }, { x: 100, y: 0 }),
             createTestNode("output-1", "output", {}, { x: 200, y: 0 }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("nanoBanana-1", "output-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+            createTestEdge("generateImage-1", "output-1", "image", "image"),
           ],
         });
 
@@ -878,27 +878,27 @@ describe("workflowStore integration tests", () => {
         // Check that the workflow completed (isRunning should be false)
         expect(useWorkflowStore.getState().isRunning).toBe(false);
 
-        // Check that nanoBanana node was updated (status should be complete or loading at some point)
+        // Check that generateImage node was updated (status should be complete or loading at some point)
         // The node should have been processed
-        const nanoBananaNode = useWorkflowStore.getState().nodes.find(n => n.id === "nanoBanana-1");
-        expect(nanoBananaNode).toBeDefined();
+        const generateImageNode = useWorkflowStore.getState().nodes.find(n => n.id === "generateImage-1");
+        expect(generateImageNode).toBeDefined();
       });
 
       it("should execute multiple dependencies A, B -> C correctly", async () => {
-        // Two prompts feeding into one nanoBanana
+        // Two prompts feeding into one generateImage
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: "data:image/png;base64,test" }, { x: 0, y: 0 }),
             createTestNode("prompt-1", "prompt", { prompt: "test prompt" }, { x: 0, y: 100 }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }, { x: 200, y: 50 }),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
@@ -914,12 +914,12 @@ describe("workflowStore integration tests", () => {
         // Create a cycle: A -> B -> A
         useWorkflowStore.setState({
           nodes: [
-            createTestNode("nanoBanana-1", "nanoBanana", { prompt: "test" }),
-            createTestNode("nanoBanana-2", "nanoBanana", { prompt: "test" }),
+            createTestNode("generateImage-1", "generateImage", { prompt: "test" }),
+            createTestNode("generateImage-2", "generateImage", { prompt: "test" }),
           ],
           edges: [
-            createTestEdge("nanoBanana-1", "nanoBanana-2", "image", "image"),
-            createTestEdge("nanoBanana-2", "nanoBanana-1", "image", "image"),
+            createTestEdge("generateImage-1", "generateImage-2", "image", "image"),
+            createTestEdge("generateImage-2", "generateImage-1", "image", "image"),
           ],
         });
 
@@ -934,30 +934,30 @@ describe("workflowStore integration tests", () => {
 
       it("should handle parallel branches that merge", async () => {
         // Two parallel paths that merge:
-        // prompt-1 -> nanoBanana-1 --|
+        // prompt-1 -> generateImage-1 --|
         //                            |-> output-1
-        // prompt-2 -> nanoBanana-2 --|
+        // prompt-2 -> generateImage-2 --|
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "path 1" }, { x: 0, y: 0 }),
             createTestNode("prompt-2", "prompt", { prompt: "path 2" }, { x: 0, y: 200 }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }, { x: 200, y: 0 }),
-            createTestNode("nanoBanana-2", "nanoBanana", {
+            createTestNode("generateImage-2", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }, { x: 200, y: 200 }),
             createTestNode("output-1", "output", {}, { x: 400, y: 100 }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("prompt-2", "nanoBanana-2", "text", "text"),
-            createTestEdge("nanoBanana-1", "output-1", "image", "image"),
-            createTestEdge("nanoBanana-2", "output-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+            createTestEdge("prompt-2", "generateImage-2", "text", "text"),
+            createTestEdge("generateImage-1", "output-1", "image", "image"),
+            createTestEdge("generateImage-2", "output-1", "image", "image"),
           ],
         });
 
@@ -967,7 +967,7 @@ describe("workflowStore integration tests", () => {
         // Workflow should complete
         expect(useWorkflowStore.getState().isRunning).toBe(false);
 
-        // Both nanoBanana nodes should have been processed before output
+        // Both generateImage nodes should have been processed before output
         const outputNode = useWorkflowStore.getState().nodes.find(n => n.id === "output-1");
         expect(outputNode).toBeDefined();
       });
@@ -978,16 +978,16 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
             createTestNode("output-1", "output", {}),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("nanoBanana-1", "output-1", "image", "image", true), // Pause edge
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+            createTestEdge("generateImage-1", "output-1", "image", "image", true), // Pause edge
           ],
         });
 
@@ -1003,21 +1003,21 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text", true), // Pause edge
+            createTestEdge("prompt-1", "generateImage-1", "text", "text", true), // Pause edge
           ],
         });
 
         const store = useWorkflowStore.getState();
         await store.executeWorkflow();
 
-        expect(useWorkflowStore.getState().pausedAtNodeId).toBe("nanoBanana-1");
+        expect(useWorkflowStore.getState().pausedAtNodeId).toBe("generateImage-1");
       });
 
       it("should resume from paused node when startFromNodeId matches pausedAtNodeId", async () => {
@@ -1025,14 +1025,14 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text", true), // Pause edge
+            createTestEdge("prompt-1", "generateImage-1", "text", "text", true), // Pause edge
           ],
         });
 
@@ -1040,10 +1040,10 @@ describe("workflowStore integration tests", () => {
         await store.executeWorkflow();
 
         // Should be paused
-        expect(useWorkflowStore.getState().pausedAtNodeId).toBe("nanoBanana-1");
+        expect(useWorkflowStore.getState().pausedAtNodeId).toBe("generateImage-1");
 
         // Now resume from the paused node
-        await store.executeWorkflow("nanoBanana-1");
+        await store.executeWorkflow("generateImage-1");
 
         // After resuming, pausedAtNodeId should be cleared
         expect(useWorkflowStore.getState().pausedAtNodeId).toBeNull();
@@ -1056,16 +1056,16 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             { ...createTestNode("prompt-1", "prompt", { prompt: "test" }), groupId: "group-1" },
-            { ...createTestNode("nanoBanana-1", "nanoBanana", {
+            { ...createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }), groupId: "group-1" },
             createTestNode("output-1", "output", {}),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("nanoBanana-1", "output-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+            createTestEdge("generateImage-1", "output-1", "image", "image"),
           ],
           groups: {
             "group-1": {
@@ -1086,22 +1086,22 @@ describe("workflowStore integration tests", () => {
         expect(useWorkflowStore.getState().isRunning).toBe(false);
 
         // The locked nodes should not have made API calls
-        // Since prompt and nanoBanana are in locked group, they should be skipped
-        // Only output should execute (but it has no image from skipped nanoBanana)
+        // Since prompt and generateImage are in locked group, they should be skipped
+        // Only output should execute (but it has no image from skipped generateImage)
       });
 
       it("should execute non-locked group nodes normally", async () => {
         useWorkflowStore.setState({
           nodes: [
             { ...createTestNode("prompt-1", "prompt", { prompt: "test" }), groupId: "group-1" },
-            { ...createTestNode("nanoBanana-1", "nanoBanana", {
+            { ...createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }), groupId: "group-1" },
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
           groups: {
             "group-1": {
@@ -1129,14 +1129,14 @@ describe("workflowStore integration tests", () => {
             { ...createTestNode("prompt-1", "prompt", { prompt: "locked prompt" }), groupId: "group-locked" },
             // Unlocked nodes
             createTestNode("prompt-2", "prompt", { prompt: "unlocked prompt" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("prompt-2", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-2", "generateImage-1", "text", "text"),
           ],
           groups: {
             "group-locked": {
@@ -1157,7 +1157,7 @@ describe("workflowStore integration tests", () => {
         expect(useWorkflowStore.getState().isRunning).toBe(false);
 
         // The unlocked nodes should have executed
-        // (nanoBanana-1 should have status updated)
+        // (generateImage-1 should have status updated)
       });
     });
 
@@ -1166,23 +1166,23 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               outputImage: "data:image/png;base64,existingImage",
               aspectRatio: "1:1",
               resolution: "1MP",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
             createTestNode("output-1", "output", {}),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("nanoBanana-1", "output-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+            createTestEdge("generateImage-1", "output-1", "image", "image"),
           ],
         });
 
         const store = useWorkflowStore.getState();
 
-        // Start from output node - should skip prompt and nanoBanana
+        // Start from output node - should skip prompt and generateImage
         await store.executeWorkflow("output-1");
 
         expect(useWorkflowStore.getState().isRunning).toBe(false);
@@ -1259,51 +1259,51 @@ describe("workflowStore integration tests", () => {
     });
 
     describe("Image data flow through node chains", () => {
-      it("should pass image from imageInput to nanoBanana via getConnectedInputs", async () => {
+      it("should pass image from imageInput to generateImage via getConnectedInputs", async () => {
         const testImage = "data:image/png;base64,testImageData";
 
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: testImage }),
             createTestNode("prompt-1", "prompt", { prompt: "describe image" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         // Verify getConnectedInputs extracts the image correctly
         const store = useWorkflowStore.getState();
-        const inputs = store.getConnectedInputs("nanoBanana-1");
+        const inputs = store.getConnectedInputs("generateImage-1");
 
         expect(inputs.images).toContain(testImage);
         expect(inputs.images).toHaveLength(1);
         expect(inputs.text).toBe("describe image");
       });
 
-      it("should pass annotation outputImage to downstream nanoBanana", () => {
+      it("should pass annotation outputImage to downstream generateImage", () => {
         const annotatedImage = "data:image/png;base64,annotatedImageData";
 
         useWorkflowStore.setState({
           nodes: [
             createTestNode("annotation-1", "annotation", { outputImage: annotatedImage }),
             createTestNode("prompt-1", "prompt", { prompt: "enhance this" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
-            createTestEdge("annotation-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("annotation-1", "generateImage-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
-        const inputs = store.getConnectedInputs("nanoBanana-1");
+        const inputs = store.getConnectedInputs("generateImage-1");
 
         expect(inputs.images).toContain(annotatedImage);
       });
@@ -1319,18 +1319,18 @@ describe("workflowStore integration tests", () => {
             createTestNode("imageInput-2", "imageInput", { image: image2 }),
             createTestNode("annotation-1", "annotation", { outputImage: image3 }),
             createTestNode("prompt-1", "prompt", { prompt: "combine" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("imageInput-2", "nanoBanana-1", "image", "image"),
-            createTestEdge("annotation-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
+            createTestEdge("imageInput-2", "generateImage-1", "image", "image"),
+            createTestEdge("annotation-1", "generateImage-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
-        const inputs = store.getConnectedInputs("nanoBanana-1");
+        const inputs = store.getConnectedInputs("generateImage-1");
 
         expect(inputs.images).toHaveLength(3);
         expect(inputs.images).toContain(image1);
@@ -1340,45 +1340,45 @@ describe("workflowStore integration tests", () => {
     });
 
     describe("Text data flow through node chains", () => {
-      it("should pass prompt text to nanoBanana inputPrompt", () => {
+      it("should pass prompt text to generateImage inputPrompt", () => {
         const promptText = "A beautiful sunset over mountains";
 
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: promptText }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
-        const inputs = store.getConnectedInputs("nanoBanana-1");
+        const inputs = store.getConnectedInputs("generateImage-1");
 
         expect(inputs.text).toBe(promptText);
       });
 
-      it("should pass llmGenerate outputText to nanoBanana as text input", () => {
+      it("should pass llmGenerate outputText to generateImage as text input", () => {
         const llmOutput = "Generated description from LLM";
 
         useWorkflowStore.setState({
           nodes: [
             createTestNode("llmGenerate-1", "llmGenerate", { outputText: llmOutput }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
-            createTestEdge("llmGenerate-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("llmGenerate-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
-        const inputs = store.getConnectedInputs("nanoBanana-1");
+        const inputs = store.getConnectedInputs("generateImage-1");
 
         expect(inputs.text).toBe(llmOutput);
       });
 
-      it("should chain prompt → llmGenerate → nanoBanana correctly", () => {
+      it("should chain prompt → llmGenerate → generateImage correctly", () => {
         const userPrompt = "Describe this image";
         const llmOutput = "A serene landscape with rolling hills";
 
@@ -1386,11 +1386,11 @@ describe("workflowStore integration tests", () => {
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: userPrompt }),
             createTestNode("llmGenerate-1", "llmGenerate", { outputText: llmOutput }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
             createTestEdge("prompt-1", "llmGenerate-1", "text", "text"),
-            createTestEdge("llmGenerate-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("llmGenerate-1", "generateImage-1", "text", "text"),
           ],
         });
 
@@ -1400,9 +1400,9 @@ describe("workflowStore integration tests", () => {
         const llmInputs = store.getConnectedInputs("llmGenerate-1");
         expect(llmInputs.text).toBe(userPrompt);
 
-        // nanoBanana should receive the LLM output
-        const bananaInputs = store.getConnectedInputs("nanoBanana-1");
-        expect(bananaInputs.text).toBe(llmOutput);
+        // generateImage should receive the LLM output
+        const genImageInputs = store.getConnectedInputs("generateImage-1");
+        expect(genImageInputs.text).toBe(llmOutput);
       });
     });
 
@@ -1472,20 +1472,20 @@ describe("workflowStore integration tests", () => {
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: testImage }),
             createTestNode("prompt-1", "prompt", { prompt: testPrompt }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image"),
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
-        const inputs = store.getConnectedInputs("nanoBanana-1");
+        const inputs = store.getConnectedInputs("generateImage-1");
 
         expect(inputs.images).toHaveLength(1);
         expect(inputs.images[0]).toBe(testImage);
@@ -1498,63 +1498,63 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
               status: "idle",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
         await store.executeWorkflow();
 
-        const nanoBananaNode = useWorkflowStore.getState().nodes.find(n => n.id === "nanoBanana-1");
-        expect(nanoBananaNode?.data).toHaveProperty("status", "complete");
+        const generateImageNode = useWorkflowStore.getState().nodes.find(n => n.id === "generateImage-1");
+        expect(generateImageNode?.data).toHaveProperty("status", "complete");
       });
 
       it("should populate outputImage after successful generation", async () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
               outputImage: null,
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
         await store.executeWorkflow();
 
-        const nanoBananaNode = useWorkflowStore.getState().nodes.find(n => n.id === "nanoBanana-1");
-        expect(nanoBananaNode?.data).toHaveProperty("outputImage", "data:image/png;base64,generatedImage");
+        const generateImageNode = useWorkflowStore.getState().nodes.find(n => n.id === "generateImage-1");
+        expect(generateImageNode?.data).toHaveProperty("outputImage", "data:image/png;base64,generatedImage");
       });
     });
   });
 
   describe("Error handling and edge cases", () => {
     describe("Missing input errors", () => {
-      it("should set error status when nanoBanana has no text input", async () => {
+      it("should set error status when generateImage has no text input", async () => {
         // Mock fetch to track if it was called
         const mockFetch = vi.fn();
         vi.stubGlobal("fetch", mockFetch);
 
         useWorkflowStore.setState({
           nodes: [
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
               status: "idle",
             }),
           ],
@@ -1564,9 +1564,9 @@ describe("workflowStore integration tests", () => {
         const store = useWorkflowStore.getState();
         await store.executeWorkflow();
 
-        const nanoBananaNode = useWorkflowStore.getState().nodes.find(n => n.id === "nanoBanana-1");
-        expect(nanoBananaNode?.data).toHaveProperty("status", "error");
-        expect(nanoBananaNode?.data).toHaveProperty("error");
+        const generateImageNode = useWorkflowStore.getState().nodes.find(n => n.id === "generateImage-1");
+        expect(generateImageNode?.data).toHaveProperty("status", "error");
+        expect(generateImageNode?.data).toHaveProperty("error");
 
         vi.unstubAllGlobals();
       });
@@ -1602,25 +1602,25 @@ describe("workflowStore integration tests", () => {
 
         useWorkflowStore.setState({
           nodes: [
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
               status: "idle",
             }),
             createTestNode("output-1", "output", { status: "idle" }),
           ],
           edges: [
-            createTestEdge("nanoBanana-1", "output-1", "image", "image"),
+            createTestEdge("generateImage-1", "output-1", "image", "image"),
           ],
         });
 
         const store = useWorkflowStore.getState();
         await store.executeWorkflow();
 
-        // nanoBanana should have error (no text input)
-        const nanoBananaNode = useWorkflowStore.getState().nodes.find(n => n.id === "nanoBanana-1");
-        expect(nanoBananaNode?.data).toHaveProperty("status", "error");
+        // generateImage should have error (no text input)
+        const generateImageNode = useWorkflowStore.getState().nodes.find(n => n.id === "generateImage-1");
+        expect(generateImageNode?.data).toHaveProperty("status", "error");
 
         // Workflow should have stopped running
         expect(useWorkflowStore.getState().isRunning).toBe(false);
@@ -1642,23 +1642,23 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
               status: "idle",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
         await store.executeWorkflow();
 
-        const nanoBananaNode = useWorkflowStore.getState().nodes.find(n => n.id === "nanoBanana-1");
-        expect(nanoBananaNode?.data).toHaveProperty("status", "error");
+        const generateImageNode = useWorkflowStore.getState().nodes.find(n => n.id === "generateImage-1");
+        expect(generateImageNode?.data).toHaveProperty("status", "error");
         expect(useWorkflowStore.getState().isRunning).toBe(false);
 
         vi.unstubAllGlobals();
@@ -1670,24 +1670,24 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
               status: "idle",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
         const store = useWorkflowStore.getState();
         await store.executeWorkflow();
 
-        const nanoBananaNode = useWorkflowStore.getState().nodes.find(n => n.id === "nanoBanana-1");
-        expect(nanoBananaNode?.data).toHaveProperty("status", "error");
-        expect((nanoBananaNode?.data as Record<string, unknown>).error).toContain("Network error");
+        const generateImageNode = useWorkflowStore.getState().nodes.find(n => n.id === "generateImage-1");
+        expect(generateImageNode?.data).toHaveProperty("status", "error");
+        expect((generateImageNode?.data as Record<string, unknown>).error).toContain("Network error");
         expect(useWorkflowStore.getState().isRunning).toBe(false);
 
         vi.unstubAllGlobals();
@@ -1699,14 +1699,14 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
@@ -1736,14 +1736,14 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
@@ -1766,14 +1766,14 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
@@ -1795,14 +1795,14 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
           ],
         });
 
@@ -1826,23 +1826,23 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
               outputImage: "data:image/png;base64,existing", // Already has output
             }),
             createTestNode("output-1", "output", {}),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-            createTestEdge("nanoBanana-1", "output-1", "image", "image"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+            createTestEdge("generateImage-1", "output-1", "image", "image"),
           ],
         });
 
         const store = useWorkflowStore.getState();
 
-        // Start from output node (should skip prompt and nanoBanana)
+        // Start from output node (should skip prompt and generateImage)
         await store.executeWorkflow("output-1");
 
         expect(useWorkflowStore.getState().isRunning).toBe(false);
@@ -1862,25 +1862,25 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: "test" }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               aspectRatio: "1:1",
               resolution: "1K",
-              model: "nano-banana",
+              model: "gemini-flash",
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text", true), // Pause edge
+            createTestEdge("prompt-1", "generateImage-1", "text", "text", true), // Pause edge
           ],
         });
 
         const store = useWorkflowStore.getState();
 
-        // First execution should pause at nanoBanana-1
+        // First execution should pause at generateImage-1
         await store.executeWorkflow();
-        expect(useWorkflowStore.getState().pausedAtNodeId).toBe("nanoBanana-1");
+        expect(useWorkflowStore.getState().pausedAtNodeId).toBe("generateImage-1");
 
         // Resume from paused node
-        await store.executeWorkflow("nanoBanana-1");
+        await store.executeWorkflow("generateImage-1");
         expect(useWorkflowStore.getState().pausedAtNodeId).toBeNull();
 
         vi.unstubAllGlobals();
@@ -1898,12 +1898,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: testImage }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("imageInput-1", "nanoBanana-1", "image", "image")],
+          edges: [createTestEdge("imageInput-1", "generateImage-1", "image", "image")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
         expect(result.images).toContain(testImage);
       });
 
@@ -1914,12 +1914,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: testPrompt }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("prompt-1", "nanoBanana-1", "text", "text")],
+          edges: [createTestEdge("prompt-1", "generateImage-1", "text", "text")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
         expect(result.text).toBe(testPrompt);
       });
 
@@ -2009,36 +2009,36 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: testImage }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               inputSchema: [
                 { name: "image_input", type: "image", required: false, label: "Image Input" },
               ],
             }),
           ],
           edges: [
-            createTestEdge("imageInput-1", "nanoBanana-1", "image", "image-0"),
+            createTestEdge("imageInput-1", "generateImage-1", "image", "image-0"),
           ],
         });
 
-        const resultIndexed = store.getConnectedInputs("nanoBanana-1");
+        const resultIndexed = store.getConnectedInputs("generateImage-1");
         expect(resultIndexed.dynamicInputs).toHaveProperty("image_input", testImage);
 
         // Test with legacy handle ID (image) - what old edges may have
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-2", "imageInput", { image: testImage }),
-            createTestNode("nanoBanana-2", "nanoBanana", {
+            createTestNode("generateImage-2", "generateImage", {
               inputSchema: [
                 { name: "image_input", type: "image", required: false, label: "Image Input" },
               ],
             }),
           ],
           edges: [
-            createTestEdge("imageInput-2", "nanoBanana-2", "image", "image"),
+            createTestEdge("imageInput-2", "generateImage-2", "image", "image"),
           ],
         });
 
-        const resultLegacy = store.getConnectedInputs("nanoBanana-2");
+        const resultLegacy = store.getConnectedInputs("generateImage-2");
         expect(resultLegacy.dynamicInputs).toHaveProperty("image_input", testImage);
       });
 
@@ -2051,36 +2051,36 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-1", "prompt", { prompt: testPrompt }),
-            createTestNode("nanoBanana-1", "nanoBanana", {
+            createTestNode("generateImage-1", "generateImage", {
               inputSchema: [
                 { name: "prompt", type: "text", required: true, label: "Prompt" },
               ],
             }),
           ],
           edges: [
-            createTestEdge("prompt-1", "nanoBanana-1", "text", "text-0"),
+            createTestEdge("prompt-1", "generateImage-1", "text", "text-0"),
           ],
         });
 
-        const resultIndexed = store.getConnectedInputs("nanoBanana-1");
+        const resultIndexed = store.getConnectedInputs("generateImage-1");
         expect(resultIndexed.dynamicInputs).toHaveProperty("prompt", testPrompt);
 
         // Test with legacy handle ID (text)
         useWorkflowStore.setState({
           nodes: [
             createTestNode("prompt-2", "prompt", { prompt: testPrompt }),
-            createTestNode("nanoBanana-2", "nanoBanana", {
+            createTestNode("generateImage-2", "generateImage", {
               inputSchema: [
                 { name: "prompt", type: "text", required: true, label: "Prompt" },
               ],
             }),
           ],
           edges: [
-            createTestEdge("prompt-2", "nanoBanana-2", "text", "text"),
+            createTestEdge("prompt-2", "generateImage-2", "text", "text"),
           ],
         });
 
-        const resultLegacy = store.getConnectedInputs("nanoBanana-2");
+        const resultLegacy = store.getConnectedInputs("generateImage-2");
         expect(resultLegacy.dynamicInputs).toHaveProperty("prompt", testPrompt);
       });
     });
@@ -2091,14 +2091,14 @@ describe("workflowStore integration tests", () => {
 
         useWorkflowStore.setState({
           nodes: [
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [
-            createTestEdge("deleted-node", "nanoBanana-1", "image", "image"),
+            createTestEdge("deleted-node", "generateImage-1", "image", "image"),
           ],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
         expect(result.images).toHaveLength(0);
       });
 
@@ -2108,12 +2108,12 @@ describe("workflowStore integration tests", () => {
         useWorkflowStore.setState({
           nodes: [
             createTestNode("imageInput-1", "imageInput", { image: null }),
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
-          edges: [createTestEdge("imageInput-1", "nanoBanana-1", "image", "image")],
+          edges: [createTestEdge("imageInput-1", "generateImage-1", "image", "image")],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
         expect(result.images).toHaveLength(0);
       });
 
@@ -2122,12 +2122,12 @@ describe("workflowStore integration tests", () => {
 
         useWorkflowStore.setState({
           nodes: [
-            createTestNode("nanoBanana-1", "nanoBanana", {}),
+            createTestNode("generateImage-1", "generateImage", {}),
           ],
           edges: [],
         });
 
-        const result = store.getConnectedInputs("nanoBanana-1");
+        const result = store.getConnectedInputs("generateImage-1");
         expect(result.images).toEqual([]);
         expect(result.text).toBeNull();
         expect(result.dynamicInputs).toEqual({});
@@ -2328,14 +2328,14 @@ describe("workflowStore integration tests", () => {
       useWorkflowStore.setState({
         nodes: [
           createTestNode("prompt-1", "prompt", { prompt: "test" }),
-          createTestNode("nanoBanana-1", "nanoBanana", {
+          createTestNode("generateImage-1", "generateImage", {
             aspectRatio: "1:1",
             resolution: "1K",
-            model: "nano-banana",
+            model: "gemini-flash",
           }),
         ],
         edges: [
-          createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+          createTestEdge("prompt-1", "generateImage-1", "text", "text"),
         ],
       });
 
@@ -2346,7 +2346,7 @@ describe("workflowStore integration tests", () => {
       const p2 = store.executeWorkflow();
       await Promise.all([p1, p2]);
 
-      // Only one execution should have reached fetch (one nanoBanana node)
+      // Only one execution should have reached fetch (one generateImage node)
       expect(mockFetch).toHaveBeenCalledTimes(1);
     });
 
@@ -2354,14 +2354,14 @@ describe("workflowStore integration tests", () => {
       useWorkflowStore.setState({
         nodes: [
           createTestNode("prompt-1", "prompt", { prompt: "test" }),
-          createTestNode("nanoBanana-1", "nanoBanana", {
+          createTestNode("generateImage-1", "generateImage", {
             aspectRatio: "1:1",
             resolution: "1K",
-            model: "nano-banana",
+            model: "gemini-flash",
           }),
         ],
         edges: [
-          createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+          createTestEdge("prompt-1", "generateImage-1", "text", "text"),
         ],
       });
 
@@ -2379,24 +2379,24 @@ describe("workflowStore integration tests", () => {
       useWorkflowStore.setState({
         nodes: [
           createTestNode("prompt-1", "prompt", { prompt: "test" }),
-          createTestNode("nanoBanana-1", "nanoBanana", {
+          createTestNode("generateImage-1", "generateImage", {
             aspectRatio: "1:1",
             resolution: "1K",
-            model: "nano-banana",
+            model: "gemini-flash",
             inputImages: [],
             outputImage: "data:image/png;base64,previous",
           }),
         ],
         edges: [
-          createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
+          createTestEdge("prompt-1", "generateImage-1", "text", "text"),
         ],
       });
 
       const store = useWorkflowStore.getState();
 
       // Fire two calls back-to-back — second should be blocked by isRunning
-      const p1 = store.regenerateNode("nanoBanana-1");
-      const p2 = store.regenerateNode("nanoBanana-1");
+      const p1 = store.regenerateNode("generateImage-1");
+      const p2 = store.regenerateNode("generateImage-1");
       await Promise.all([p1, p2]);
 
       expect(mockFetch).toHaveBeenCalledTimes(1);
@@ -2408,33 +2408,33 @@ describe("workflowStore integration tests", () => {
           createTestNode("prompt-1", "prompt", { prompt: "a" }),
           createTestNode("prompt-2", "prompt", { prompt: "b" }),
           createTestNode("prompt-3", "prompt", { prompt: "c" }),
-          createTestNode("nanoBanana-1", "nanoBanana", {
+          createTestNode("generateImage-1", "generateImage", {
             aspectRatio: "1:1",
             resolution: "1K",
-            model: "nano-banana",
+            model: "gemini-flash",
           }),
-          createTestNode("nanoBanana-2", "nanoBanana", {
+          createTestNode("generateImage-2", "generateImage", {
             aspectRatio: "1:1",
             resolution: "1K",
-            model: "nano-banana",
+            model: "gemini-flash",
           }),
-          createTestNode("nanoBanana-3", "nanoBanana", {
+          createTestNode("generateImage-3", "generateImage", {
             aspectRatio: "1:1",
             resolution: "1K",
-            model: "nano-banana",
+            model: "gemini-flash",
           }),
         ],
         edges: [
-          createTestEdge("prompt-1", "nanoBanana-1", "text", "text"),
-          createTestEdge("prompt-2", "nanoBanana-2", "text", "text"),
-          createTestEdge("prompt-3", "nanoBanana-3", "text", "text"),
+          createTestEdge("prompt-1", "generateImage-1", "text", "text"),
+          createTestEdge("prompt-2", "generateImage-2", "text", "text"),
+          createTestEdge("prompt-3", "generateImage-3", "text", "text"),
         ],
       });
 
       const store = useWorkflowStore.getState();
       await store.executeWorkflow();
 
-      // Exactly 3 fetch calls — one per nanoBanana node
+      // Exactly 3 fetch calls — one per generateImage node
       expect(mockFetch).toHaveBeenCalledTimes(3);
     });
   });

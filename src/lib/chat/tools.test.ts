@@ -16,7 +16,7 @@ vi.mock("@/store/utils/nodeDefaults", () => ({
     switch (type) {
       case "prompt":
         return { prompt: "" };
-      case "nanoBanana":
+      case "generateImage":
         return { inputImages: [], status: "idle" };
       default:
         return {};
@@ -27,7 +27,7 @@ vi.mock("@/store/utils/nodeDefaults", () => ({
     annotation: { width: 300, height: 280 },
     prompt: { width: 320, height: 220 },
     promptConstructor: { width: 340, height: 280 },
-    nanoBanana: { width: 300, height: 300 },
+    generateImage: { width: 300, height: 300 },
     generateVideo: { width: 300, height: 300 },
     llmGenerate: { width: 320, height: 360 },
     splitGrid: { width: 300, height: 320 },
@@ -70,7 +70,7 @@ function createTestEdge(
 function buildSimpleContext(): WorkflowContext {
   const nodes: WorkflowNode[] = [
     createTestNode("prompt-1", "prompt", { prompt: "sunset" }),
-    createTestNode("gen-1", "nanoBanana", {
+    createTestNode("gen-1", "generateImage", {
       inputImages: [],
       outputImage: null,
       aspectRatio: "1:1",
@@ -91,11 +91,11 @@ function buildSimpleContext(): WorkflowContext {
 
 describe("buildEditSystemPrompt", () => {
   describe("basic prompt structure", () => {
-    it("returns string containing Node Banana domain expertise", () => {
+    it("returns string containing PlotAI domain expertise", () => {
       const context = buildWorkflowContext([], []);
       const prompt = buildEditSystemPrompt(context);
 
-      expect(prompt).toContain("Node Banana");
+      expect(prompt).toContain("PlotAI");
     });
 
     it("contains CURRENT WORKFLOW section", () => {
@@ -163,7 +163,7 @@ describe("buildEditSystemPrompt", () => {
       const context = buildSimpleContext();
       const restSummary: SubgraphResult["restSummary"] = {
         nodeCount: 3,
-        typeBreakdown: { prompt: 1, nanoBanana: 2 },
+        typeBreakdown: { prompt: 1, generateImage: 2 },
         boundaryConnections: [
           {
             direction: "incoming",

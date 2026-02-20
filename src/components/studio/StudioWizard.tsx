@@ -10,7 +10,7 @@ import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import type {
   ImageInputNodeData,
   AnnotationNodeData,
-  NanoBananaNodeData,
+  GenerateImageNodeData,
   GenerateVideoNodeData,
 } from "@/types";
 
@@ -64,18 +64,18 @@ export function StudioWizard() {
         return !!(mapAnnotation?.outputImage && streetAnnotation?.outputImage);
       }
       case 2: {
-        const mapFrame1 = getNodeData(STUDIO_NODES.generateMap) as NanoBananaNodeData | undefined;
+        const mapFrame1 = getNodeData(STUDIO_NODES.generateMap) as GenerateImageNodeData | undefined;
         return mapFrame1?.status === "complete";
       }
       case 3: {
-        const fullBuilding = getNodeData(STUDIO_NODES.generateFullBuilding) as NanoBananaNodeData | undefined;
+        const fullBuilding = getNodeData(STUDIO_NODES.generateFullBuilding) as GenerateImageNodeData | undefined;
         return fullBuilding?.status === "complete";
       }
       case 4: {
         // Building Angles: any angle complete
-        const aerial = getNodeData(STUDIO_NODES.generateAngleAerialDrone) as NanoBananaNodeData | undefined;
-        const balcony = getNodeData(STUDIO_NODES.generateAngleBalcony) as NanoBananaNodeData | undefined;
-        const interior = getNodeData(STUDIO_NODES.generateAngleInterior) as NanoBananaNodeData | undefined;
+        const aerial = getNodeData(STUDIO_NODES.generateAngleAerialDrone) as GenerateImageNodeData | undefined;
+        const balcony = getNodeData(STUDIO_NODES.generateAngleBalcony) as GenerateImageNodeData | undefined;
+        const interior = getNodeData(STUDIO_NODES.generateAngleInterior) as GenerateImageNodeData | undefined;
         return aerial?.status === "complete" || balcony?.status === "complete" || interior?.status === "complete";
       }
       case 5: {
@@ -117,7 +117,7 @@ export function StudioWizard() {
           onPrimary: goNext,
         };
       case 2: {
-        const mapFrame1 = getNodeData(STUDIO_NODES.generateMap) as NanoBananaNodeData | undefined;
+        const mapFrame1 = getNodeData(STUDIO_NODES.generateMap) as GenerateImageNodeData | undefined;
         return {
           primaryLabel: "Next",
           primaryDisabled: mapFrame1?.status !== "complete",
@@ -125,7 +125,7 @@ export function StudioWizard() {
         };
       }
       case 3: {
-        const fullBuilding = getNodeData(STUDIO_NODES.generateFullBuilding) as NanoBananaNodeData | undefined;
+        const fullBuilding = getNodeData(STUDIO_NODES.generateFullBuilding) as GenerateImageNodeData | undefined;
         if (fullBuilding?.status === "complete") {
           return {
             primaryLabel: "Next",

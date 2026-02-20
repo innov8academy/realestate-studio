@@ -36,7 +36,7 @@ export interface CommunityWorkflowMeta {
 export interface ProposedNode {
   /** Temporary ID like "node-1" */
   id: string;
-  /** Node type: imageInput, prompt, nanoBanana, etc. */
+  /** Node type: imageInput, prompt, generateImage, etc. */
   type: NodeType;
   /** Human-readable description of this node's role */
   purpose: string;
@@ -44,9 +44,9 @@ export interface ProposedNode {
   suggestedTitle: string;
   /** For prompt nodes: the suggested prompt text */
   suggestedPrompt?: string;
-  /** For nanoBanana/generateVideo: the suggested model */
+  /** For generateImage/generateVideo: the suggested model */
   suggestedModel?: string;
-  /** For nanoBanana/generateVideo: suggested settings like aspectRatio */
+  /** For generateImage/generateVideo: suggested settings like aspectRatio */
   suggestedSettings?: Record<string, unknown>;
 }
 

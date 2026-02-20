@@ -37,7 +37,7 @@ describe("nodeDefaults utilities", () => {
         "imageInput",
         "annotation",
         "prompt",
-        "nanoBanana",
+        "generateImage",
         "generateVideo",
         "llmGenerate",
         "splitGrid",
@@ -117,8 +117,8 @@ describe("nodeDefaults utilities", () => {
       expect(data).toHaveProperty("prompt", "");
     });
 
-    it("creates correct structure for nanoBanana", () => {
-      const data = createDefaultNodeData("nanoBanana");
+    it("creates correct structure for generateImage", () => {
+      const data = createDefaultNodeData("generateImage");
 
       expect(data).toHaveProperty("inputImages");
       expect(data).toHaveProperty("inputPrompt", null);
@@ -182,27 +182,27 @@ describe("nodeDefaults utilities", () => {
       expect(data).toHaveProperty("image", null);
     });
 
-    it("uses stored defaults for nanoBanana when available", () => {
+    it("uses stored defaults for generateImage when available", () => {
       const customSettings = {
         aspectRatio: "16:9",
         resolution: "2K",
-        model: "nano-banana",
+        model: "gemini-flash",
         useGoogleSearch: true,
       };
       localStorageMock.setItem(
-        "node-banana-nanoBanana-defaults",
+        "plotai-generateImage-defaults",
         JSON.stringify(customSettings)
       );
 
-      const data = createDefaultNodeData("nanoBanana");
+      const data = createDefaultNodeData("generateImage");
 
       expect((data as any).aspectRatio).toBe("16:9");
       expect((data as any).resolution).toBe("2K");
-      expect((data as any).model).toBe("nano-banana");
+      expect((data as any).model).toBe("gemini-flash");
       expect((data as any).useGoogleSearch).toBe(true);
     });
 
-    it("uses node defaults selectedModel for nanoBanana when set", () => {
+    it("uses node defaults selectedModel for generateImage when set", () => {
       const nodeDefaultsConfig = {
         generateImage: {
           selectedModel: { provider: "fal", modelId: "flux-pro", displayName: "Flux Pro" },
@@ -211,11 +211,11 @@ describe("nodeDefaults utilities", () => {
         },
       };
       localStorageMock.setItem(
-        "node-banana-node-defaults",
+        "plotai-node-defaults",
         JSON.stringify(nodeDefaultsConfig)
       );
 
-      const data = createDefaultNodeData("nanoBanana");
+      const data = createDefaultNodeData("generateImage");
 
       expect((data as any).selectedModel).toEqual({
         provider: "fal",
@@ -233,7 +233,7 @@ describe("nodeDefaults utilities", () => {
         },
       };
       localStorageMock.setItem(
-        "node-banana-node-defaults",
+        "plotai-node-defaults",
         JSON.stringify(nodeDefaultsConfig)
       );
 
@@ -262,7 +262,7 @@ describe("nodeDefaults utilities", () => {
         },
       };
       localStorageMock.setItem(
-        "node-banana-node-defaults",
+        "plotai-node-defaults",
         JSON.stringify(nodeDefaultsConfig)
       );
 
@@ -290,7 +290,7 @@ describe("nodeDefaults utilities", () => {
         },
       };
       localStorageMock.setItem(
-        "node-banana-node-defaults",
+        "plotai-node-defaults",
         JSON.stringify(nodeDefaultsConfig)
       );
 

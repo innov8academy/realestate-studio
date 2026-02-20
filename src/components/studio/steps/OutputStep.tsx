@@ -7,7 +7,7 @@ import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { getPresetTemplate } from "@/lib/quickstart/templates";
 import { clearStudioState } from "@/lib/studio/persistence";
 import { DownloadButton } from "../shared/DownloadButton";
-import type { NanoBananaNodeData, GenerateVideoNodeData } from "@/types";
+import type { GenerateImageNodeData, GenerateVideoNodeData } from "@/types";
 
 const IMAGE_ITEMS = [
   { nodeId: STUDIO_NODES.generateMap, label: "Clean Map" },
@@ -38,7 +38,7 @@ export function OutputStep() {
 
   // Collect available images
   const availableImages = IMAGE_ITEMS.map((item) => {
-    const data = nodes.find((n) => n.id === item.nodeId)?.data as NanoBananaNodeData | undefined;
+    const data = nodes.find((n) => n.id === item.nodeId)?.data as GenerateImageNodeData | undefined;
     return { ...item, url: data?.outputImage || null };
   }).filter((item) => item.url);
 

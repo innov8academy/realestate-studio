@@ -20,9 +20,13 @@ export function QuickstartInitialView({
         <div className="flex-1 flex flex-col">
           <div className="mb-4">
             <div className="flex items-center gap-2">
-              <img src="/banana_icon.png" alt="" className="w-7 h-7" />
+              <svg width="26" height="26" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2L30 16L16 30L2 16Z" stroke="white" strokeWidth="2" strokeLinejoin="round" fill="none"/>
+                <rect x="10" y="10" width="12" height="12" rx="1.5" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
+                <circle cx="16" cy="16" r="2" fill="white"/>
+              </svg>
               <h1 className="text-2xl font-medium text-neutral-100">
-                Node Banana
+                PlotAI
               </h1>
             </div>
           </div>
@@ -33,7 +37,7 @@ export function QuickstartInitialView({
 
           <div className="flex flex-col gap-2.5 mt-auto">
             <a
-              href="https://node-banana-docs.vercel.app/"
+              href="https://plotai-docs.vercel.app/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-neutral-400 hover:text-neutral-200 transition-colors"

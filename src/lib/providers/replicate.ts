@@ -23,7 +23,7 @@ import {
 } from "@/lib/providers";
 
 const REPLICATE_API_BASE = "https://api.replicate.com/v1";
-const PROVIDER_SETTINGS_KEY = "node-banana-provider-settings";
+const PROVIDER_SETTINGS_KEY = "plotai-provider-settings";
 
 /**
  * Response schema from Replicate's list models endpoint

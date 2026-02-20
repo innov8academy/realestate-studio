@@ -9,7 +9,7 @@ import {
   useReactFlow,
 } from "@xyflow/react";
 import { useWorkflowStore } from "@/store/workflowStore";
-import { NanoBananaNodeData, WorkflowEdgeData } from "@/types";
+import { GenerateImageNodeData, WorkflowEdgeData } from "@/types";
 
 interface EdgeData extends WorkflowEdgeData {
   offsetX?: number;
@@ -64,8 +64,8 @@ export function EditableEdge({
   // Check if target node is a Generate node that's currently loading
   const isTargetLoading = useMemo(() => {
     const targetNode = nodes.find((n) => n.id === target);
-    if (targetNode?.type === "nanoBanana") {
-      const nodeData = targetNode.data as NanoBananaNodeData;
+    if (targetNode?.type === "generateImage") {
+      const nodeData = targetNode.data as GenerateImageNodeData;
       return nodeData.status === "loading";
     }
     return false;

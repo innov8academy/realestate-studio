@@ -9,7 +9,7 @@ import { PROMPTS } from "@/lib/quickstart/templates";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
-import type { NanoBananaNodeData } from "@/types";
+import type { GenerateImageNodeData } from "@/types";
 
 const ASPECT_RATIOS = [
   { value: "3:2", label: "3:2", recommended: true },
@@ -58,13 +58,13 @@ export function EnhanceMapStep() {
 
   // Frame 1: Clean map (no text)
   const frame1Data = nodes.find((n) => n.id === STUDIO_NODES.generateMap)
-    ?.data as NanoBananaNodeData | undefined;
+    ?.data as GenerateImageNodeData | undefined;
   const frame1Image = frame1Data?.outputImage || null;
   const frame1Status = frame1Data?.status || "idle";
 
   // Frame 2: Map with area text
   const frame2Data = nodes.find((n) => n.id === STUDIO_NODES.generateMapFrame2)
-    ?.data as NanoBananaNodeData | undefined;
+    ?.data as GenerateImageNodeData | undefined;
   const frame2Image = frame2Data?.outputImage || null;
   const frame2Status = frame2Data?.status || "idle";
 

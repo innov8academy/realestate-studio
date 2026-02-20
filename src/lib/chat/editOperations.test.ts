@@ -15,14 +15,14 @@ vi.mock("@/store/utils/nodeDefaults", () => ({
     switch (type) {
       case "prompt":
         return { prompt: "" };
-      case "nanoBanana":
+      case "generateImage":
         return {
           inputImages: [],
           inputPrompt: null,
           outputImage: null,
           aspectRatio: "1:1",
           resolution: "1K",
-          model: "nano-banana",
+          model: "gemini-flash",
           useGoogleSearch: false,
           status: "idle",
           error: null,
@@ -54,7 +54,7 @@ vi.mock("@/store/utils/nodeDefaults", () => ({
     annotation: { width: 300, height: 280 },
     prompt: { width: 320, height: 220 },
     promptConstructor: { width: 340, height: 280 },
-    nanoBanana: { width: 300, height: 300 },
+    generateImage: { width: 300, height: 300 },
     generateVideo: { width: 300, height: 300 },
     llmGenerate: { width: 320, height: 360 },
     splitGrid: { width: 300, height: 320 },
@@ -105,7 +105,7 @@ describe("applyEditOperations", () => {
   beforeEach(() => {
     baseNodes = [
       createTestNode("prompt-1", "prompt", { prompt: "sunset photo" }),
-      createTestNode("gen-1", "nanoBanana", {
+      createTestNode("gen-1", "generateImage", {
         inputImages: [],
         outputImage: null,
         status: "idle",
@@ -178,7 +178,7 @@ describe("applyEditOperations", () => {
 
     it("sets measured dimensions from defaultNodeDimensions", () => {
       const ops: EditOperation[] = [
-        { type: "addNode", nodeType: "nanoBanana" },
+        { type: "addNode", nodeType: "generateImage" },
       ];
 
       const result = applyEditOperations(ops, { nodes: [], edges: [] });
@@ -289,7 +289,7 @@ describe("applyEditOperations", () => {
     it("preserves other node data fields not in update", () => {
       // Add a node with multiple data fields
       const nodesWithExtra = [
-        createTestNode("gen-1", "nanoBanana", {
+        createTestNode("gen-1", "generateImage", {
           inputImages: [],
           outputImage: null,
           aspectRatio: "16:9",
@@ -572,7 +572,7 @@ describe("narrateOperations", () => {
 
   it("joins multiple operations with newlines", () => {
     const ops: EditOperation[] = [
-      { type: "addNode", nodeType: "nanoBanana" },
+      { type: "addNode", nodeType: "generateImage" },
       { type: "addEdge", source: "img-1", target: "gen-1" },
       { type: "removeNode", nodeId: "old-node" },
     ];
@@ -581,7 +581,7 @@ describe("narrateOperations", () => {
     const lines = result.split("\n");
 
     expect(lines).toHaveLength(3);
-    expect(lines[0]).toBe("Added a nanoBanana node");
+    expect(lines[0]).toBe("Added a generateImage node");
     expect(lines[1]).toBe("Connected img-1 to gen-1");
     expect(lines[2]).toBe("Removed node old-node");
   });

@@ -756,7 +756,7 @@ export function ProjectSetupModal({
                     </>
                   ) : (
                     <>
-                      <span className="text-xs text-neutral-500">System default (Gemini nano-banana-pro)</span>
+                      <span className="text-xs text-neutral-500">System default (Gemini gemini-pro)</span>
                       <button
                         type="button"
                         onClick={() => setShowImageModelDialog(true)}

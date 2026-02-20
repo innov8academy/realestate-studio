@@ -57,10 +57,10 @@ describe("CostIndicator", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
@@ -111,14 +111,14 @@ describe("CostIndicator", () => {
   });
 
   describe("Non-zero Cost Display", () => {
-    it("should format cost correctly for nano-banana model", () => {
+    it("should format cost correctly for gemini-flash model", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
@@ -130,18 +130,18 @@ describe("CostIndicator", () => {
 
       render(<CostIndicator />);
 
-      // nano-banana costs $0.039/image
+      // gemini-flash costs $0.039/image
       expect(screen.getByText("$0.04")).toBeInTheDocument();
     });
 
-    it("should format cost correctly for nano-banana-pro model", () => {
+    it("should format cost correctly for gemini-pro model", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana-pro",
+            model: "gemini-pro",
             resolution: "1K",
           },
         },
@@ -153,7 +153,7 @@ describe("CostIndicator", () => {
 
       render(<CostIndicator />);
 
-      // nano-banana-pro 1K costs $0.134/image
+      // gemini-pro 1K costs $0.134/image
       expect(screen.getByText("$0.13")).toBeInTheDocument();
     });
 
@@ -161,10 +161,10 @@ describe("CostIndicator", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana-pro",
+            model: "gemini-pro",
             resolution: "4K",
           },
         },
@@ -176,7 +176,7 @@ describe("CostIndicator", () => {
 
       render(<CostIndicator />);
 
-      // nano-banana-pro 4K costs $0.24/image
+      // gemini-pro 4K costs $0.24/image
       expect(screen.getByText("$0.24")).toBeInTheDocument();
     });
 
@@ -184,19 +184,19 @@ describe("CostIndicator", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
         {
           id: "node-2",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 100, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
@@ -218,10 +218,10 @@ describe("CostIndicator", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
@@ -243,10 +243,10 @@ describe("CostIndicator", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
@@ -271,10 +271,10 @@ describe("CostIndicator", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
@@ -288,7 +288,7 @@ describe("CostIndicator", () => {
 
       fireEvent.click(screen.getByTitle("View cost details"));
 
-      // nano-banana costs $0.039
+      // gemini-flash costs $0.039
       expect(screen.getByTestId("dialog-predicted-cost")).toHaveTextContent("$0.04");
     });
 
@@ -296,10 +296,10 @@ describe("CostIndicator", () => {
       const nodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
@@ -322,10 +322,10 @@ describe("CostIndicator", () => {
       const initialNodes: WorkflowNode[] = [
         {
           id: "node-1",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 0, y: 0 },
           data: {
-            model: "nano-banana",
+            model: "gemini-flash",
             resolution: "1K",
           },
         },
@@ -345,10 +345,10 @@ describe("CostIndicator", () => {
         ...initialNodes,
         {
           id: "node-2",
-          type: "nanoBanana",
+          type: "generateImage",
           position: { x: 100, y: 0 },
           data: {
-            model: "nano-banana-pro",
+            model: "gemini-pro",
             resolution: "4K",
           },
         },
@@ -397,7 +397,7 @@ describe("CostIndicator", () => {
             isConfigured: true,
             targetCount: 4,
             generateSettings: {
-              model: "nano-banana",
+              model: "gemini-flash",
               resolution: "1K",
             },
           },
@@ -424,7 +424,7 @@ describe("CostIndicator", () => {
             isConfigured: false,
             targetCount: 0,
             generateSettings: {
-              model: "nano-banana",
+              model: "gemini-flash",
               resolution: "1K",
             },
           },

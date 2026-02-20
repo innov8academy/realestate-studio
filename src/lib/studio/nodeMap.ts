@@ -36,26 +36,26 @@ export const STUDIO_NODES = {
   annotationStreet: "annotation-street",
 
   // Step 2: Enhance Map (Frame 1 + Frame 2)
-  generateMap: "nanoBanana-map",
-  generateMapFrame2: "nanoBanana-map-frame2",
+  generateMap: "generateImage-map",
+  generateMapFrame2: "generateImage-map-frame2",
   promptMapFrame1: "prompt-map-enhance",
   promptMapFrame2: "prompt-map-enhance-frame2",
 
   // Step 3: Generate Building (runs sequentially)
   promptStreetEnhance: "prompt-street-enhance",
-  generateStreet: "nanoBanana-street",
+  generateStreet: "generateImage-street",
   promptHalfBuilding: "prompt-half-building",
-  generateHalfBuilding: "nanoBanana-half-building",
+  generateHalfBuilding: "generateImage-half-building",
   promptFullBuilding: "prompt-full-building",
-  generateFullBuilding: "nanoBanana-full-building",
+  generateFullBuilding: "generateImage-full-building",
 
   // Step 4: Building Angles (3 parallel)
   promptAngleAerialDrone: "prompt-angle-front",
-  generateAngleAerialDrone: "nanoBanana-angle-front",
+  generateAngleAerialDrone: "generateImage-angle-front",
   promptAngleBalcony: "prompt-angle-aerial",
-  generateAngleBalcony: "nanoBanana-angle-aerial",
+  generateAngleBalcony: "generateImage-angle-aerial",
   promptAngleInterior: "prompt-angle-corner",
-  generateAngleInterior: "nanoBanana-angle-corner",
+  generateAngleInterior: "generateImage-angle-corner",
 
   // Step 5: Map Videos
   promptVideoV0: "prompt-video-map-area",
@@ -90,7 +90,7 @@ export const STUDIO_NODES = {
  * Call this after loading the template AND after the user enters
  * an API key in the setup screen.
  *
- * This is needed because the template defaults all nanoBanana nodes
+ * This is needed because the template defaults all generateImage nodes
  * to provider "gemini", but the user may only have a Kie API key.
  *
  * @param updateNodeData - the store's updateNodeData function
@@ -111,14 +111,14 @@ export function configureNodesForProvider(
     updateNodeData(nodeId, {
       selectedModel: {
         provider,
-        modelId: provider === "kie" ? "gpt-image/1.5-image-to-image" : "nano-banana-pro",
-        displayName: provider === "kie" ? "GPT Image 1.5" : "Nano Banana Pro",
+        modelId: provider === "kie" ? "gpt-image/1.5-image-to-image" : "gemini-pro",
+        displayName: provider === "kie" ? "GPT Image 1.5" : "Gemini Pro",
       },
     });
   }
 
-  // Other image generation nodes use nano-banana-pro
-  const nanoBananaNodeIds = [
+  // Other image generation nodes use gemini-pro
+  const generateImageNodeIds = [
     STUDIO_NODES.generateHalfBuilding,
     STUDIO_NODES.generateFullBuilding,
     STUDIO_NODES.generateAngleAerialDrone,
@@ -126,12 +126,12 @@ export function configureNodesForProvider(
     STUDIO_NODES.generateAngleInterior,
   ];
 
-  for (const nodeId of nanoBananaNodeIds) {
+  for (const nodeId of generateImageNodeIds) {
     updateNodeData(nodeId, {
       selectedModel: {
         provider,
-        modelId: "nano-banana-pro",
-        displayName: "Nano Banana Pro",
+        modelId: "gemini-pro",
+        displayName: "Gemini Pro",
       },
     });
   }

@@ -141,8 +141,8 @@ const KIE_MODELS: ProviderModel[] = [
     pageUrl: "https://kie.ai/flux-2",
   },
   {
-    id: "nano-banana-pro",
-    name: "Nano Banana Pro",
+    id: "gemini-pro",
+    name: "Gemini Pro",
     description: "Google Gemini 3 Pro image generation via Kie.ai. Supports text-to-image and image-to-image with up to 8 input images.",
     provider: "kie",
     capabilities: ["text-to-image", "image-to-image"],
@@ -366,8 +366,8 @@ const KIE_MODELS: ProviderModel[] = [
 // Gemini image models (hardcoded - these don't come from an external API)
 const GEMINI_IMAGE_MODELS: ProviderModel[] = [
   {
-    id: "nano-banana",
-    name: "Nano Banana",
+    id: "gemini-flash",
+    name: "Gemini Flash",
     description: "Fast image generation with Gemini 2.5 Flash. Supports text-to-image and image-to-image with aspect ratio control.",
     provider: "gemini",
     capabilities: ["text-to-image", "image-to-image"],
@@ -375,8 +375,8 @@ const GEMINI_IMAGE_MODELS: ProviderModel[] = [
     pricing: { type: "per-run", amount: 0.039, currency: "USD" },
   },
   {
-    id: "nano-banana-pro",
-    name: "Nano Banana Pro",
+    id: "gemini-pro",
+    name: "Gemini Pro",
     description: "High-quality image generation with Gemini 3 Pro. Supports text-to-image, image-to-image, resolution control (1K/2K/4K), and Google Search grounding.",
     provider: "gemini",
     capabilities: ["text-to-image", "image-to-image"],

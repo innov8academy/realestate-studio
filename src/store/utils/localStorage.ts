@@ -10,12 +10,12 @@ import {
 } from "@/types";
 
 // Storage keys
-export const STORAGE_KEY = "node-banana-workflow-configs";
-export const COST_DATA_STORAGE_KEY = "node-banana-workflow-costs";
-export const GENERATE_IMAGE_DEFAULTS_KEY = "node-banana-nanoBanana-defaults";
-export const PROVIDER_SETTINGS_KEY = "node-banana-provider-settings";
-export const RECENT_MODELS_KEY = "node-banana-recent-models";
-export const NODE_DEFAULTS_KEY = "node-banana-node-defaults";
+export const STORAGE_KEY = "plotai-workflow-configs";
+export const COST_DATA_STORAGE_KEY = "plotai-workflow-costs";
+export const GENERATE_IMAGE_DEFAULTS_KEY = "plotai-generateImage-defaults";
+export const PROVIDER_SETTINGS_KEY = "plotai-provider-settings";
+export const RECENT_MODELS_KEY = "plotai-recent-models";
+export const NODE_DEFAULTS_KEY = "plotai-node-defaults";
 
 // Maximum recent models to store (show 4 in UI, keep 8 for persistence)
 export const MAX_RECENT_MODELS = 8;
@@ -31,7 +31,7 @@ export interface GenerateImageDefaults {
 const DEFAULT_GENERATE_IMAGE_SETTINGS: GenerateImageDefaults = {
   aspectRatio: "1:1",
   resolution: "1K",
-  model: "nano-banana-pro",
+  model: "gemini-pro",
   useGoogleSearch: false,
 };
 
@@ -195,17 +195,3 @@ export const getLLMDefaults = (): LLMNodeDefaults | undefined => {
 export const generateWorkflowId = (): string =>
   `wf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-/**
- * @deprecated Backward-compatible alias. Use `GenerateImageDefaults` instead.
- */
-export type NanoBananaDefaults = GenerateImageDefaults;
-
-/**
- * @deprecated Backward-compatible alias. Use `loadGenerateImageDefaults` instead.
- */
-export const loadNanoBananaDefaults = loadGenerateImageDefaults;
-
-/**
- * @deprecated Backward-compatible alias. Use `saveGenerateImageDefaults` instead.
- */
-export const saveNanoBananaDefaults = saveGenerateImageDefaults;

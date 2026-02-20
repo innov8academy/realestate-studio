@@ -8,7 +8,7 @@ import { PROMPTS } from "@/lib/quickstart/templates";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
-import type { NanoBananaNodeData, NodeStatus } from "@/types";
+import type { GenerateImageNodeData, NodeStatus } from "@/types";
 
 const ASPECT_RATIOS = [
   { value: "3:2", label: "3:2", recommended: true },
@@ -38,7 +38,7 @@ function GenerationCard({ label, nodeId, promptNodeId, showRegenerate = true, as
   const updateNodeData = useWorkflowStore((s) => s.updateNodeData);
   const currentNodeIds = useWorkflowStore((s) => s.currentNodeIds);
 
-  const nodeData = nodes.find((n) => n.id === nodeId)?.data as NanoBananaNodeData | undefined;
+  const nodeData = nodes.find((n) => n.id === nodeId)?.data as GenerateImageNodeData | undefined;
   const status: NodeStatus = nodeData?.status || "idle";
   const outputImage = nodeData?.outputImage;
   const error = nodeData?.error;
@@ -129,7 +129,7 @@ export function GenerateBuildingStep() {
 
   const fullBuildingData = nodes.find(
     (n) => n.id === STUDIO_NODES.generateFullBuilding
-  )?.data as NanoBananaNodeData | undefined;
+  )?.data as GenerateImageNodeData | undefined;
 
   const hasResult = fullBuildingData?.status === "complete";
 

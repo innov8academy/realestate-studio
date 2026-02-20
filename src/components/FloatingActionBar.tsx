@@ -115,9 +115,9 @@ function GenerateComboButton() {
       {isOpen && (
         <div className="absolute bottom-full left-0 mb-2 bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl overflow-hidden min-w-[140px]">
           <button
-            onClick={() => handleAddNode("nanoBanana")}
+            onClick={() => handleAddNode("generateImage")}
             draggable
-            onDragStart={(e) => handleDragStart(e, "nanoBanana")}
+            onDragStart={(e) => handleDragStart(e, "generateImage")}
             className="w-full px-3 py-2 text-left text-[11px] font-medium text-neutral-300 hover:bg-neutral-700 hover:text-neutral-100 transition-colors flex items-center gap-2 cursor-grab active:cursor-grabbing"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

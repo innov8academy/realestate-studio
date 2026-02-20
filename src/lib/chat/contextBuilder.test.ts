@@ -90,14 +90,14 @@ describe("stripBinaryData", () => {
     });
   });
 
-  describe("nanoBanana nodes", () => {
+  describe("generateImage nodes", () => {
     it("strips inputImages array and outputImage, preserves parameters", () => {
-      const node = createTestNode("gen-1", "nanoBanana", {
+      const node = createTestNode("gen-1", "generateImage", {
         inputImages: [FAKE_BASE64_PNG, FAKE_BASE64_PNG],
         outputImage: FAKE_BASE64_PNG,
         aspectRatio: "16:9",
         resolution: "2K",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         selectedModel: {
           provider: "gemini",
           modelId: "gemini-3-pro-image-preview",
@@ -108,7 +108,7 @@ describe("stripBinaryData", () => {
         status: "complete",
         error: null,
         imageHistory: [
-          { id: "h1", timestamp: 123, prompt: "test", aspectRatio: "16:9", model: "nano-banana-pro" },
+          { id: "h1", timestamp: 123, prompt: "test", aspectRatio: "16:9", model: "gemini-pro" },
         ],
         selectedHistoryIndex: 0,
       });
@@ -129,12 +129,12 @@ describe("stripBinaryData", () => {
     });
 
     it("handles empty inputImages array", () => {
-      const node = createTestNode("gen-1", "nanoBanana", {
+      const node = createTestNode("gen-1", "generateImage", {
         inputImages: [],
         outputImage: null,
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana",
+        model: "gemini-flash",
         status: "idle",
         error: null,
         imageHistory: [],
@@ -148,14 +148,14 @@ describe("stripBinaryData", () => {
     });
 
     it("removes imageRef and inputImageRefs fields", () => {
-      const node = createTestNode("gen-1", "nanoBanana", {
+      const node = createTestNode("gen-1", "generateImage", {
         inputImages: [],
         inputImageRefs: ["ref-1", "ref-2"],
         outputImage: null,
         outputImageRef: "ref-3",
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana",
+        model: "gemini-flash",
         status: "idle",
         error: null,
         imageHistory: [],
@@ -237,7 +237,7 @@ describe("stripBinaryData", () => {
         generateSettings: {
           aspectRatio: "1:1",
           resolution: "1K",
-          model: "nano-banana",
+          model: "gemini-flash",
           useGoogleSearch: false,
         },
         childNodeIds: [],
@@ -256,7 +256,7 @@ describe("stripBinaryData", () => {
       expect(stripped.data.generateSettings).toEqual({
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana",
+        model: "gemini-flash",
         useGoogleSearch: false,
       });
       expect(stripped.data.sourceImage).toMatch(/\[image:.*KB\]/);
@@ -339,12 +339,12 @@ describe("stripBinaryData", () => {
           outputImage: FAKE_BASE64_PNG,
           annotations: [],
         }),
-        createTestNode("gen-1", "nanoBanana", {
+        createTestNode("gen-1", "generateImage", {
           inputImages: [FAKE_BASE64_PNG],
           outputImage: FAKE_BASE64_PNG,
           aspectRatio: "1:1",
           resolution: "1K",
-          model: "nano-banana",
+          model: "gemini-flash",
           status: "complete",
           error: null,
           imageHistory: [],
@@ -373,7 +373,7 @@ describe("stripBinaryData", () => {
           sourceImage: FAKE_BASE64_PNG,
           targetCount: 4,
           defaultPrompt: "test",
-          generateSettings: { aspectRatio: "1:1", resolution: "1K", model: "nano-banana", useGoogleSearch: false },
+          generateSettings: { aspectRatio: "1:1", resolution: "1K", model: "gemini-flash", useGoogleSearch: false },
           childNodeIds: [],
           gridRows: 2,
           gridCols: 2,
@@ -411,10 +411,10 @@ describe("buildWorkflowContext", () => {
 
   it("includes full node parameters in context", () => {
     const nodes: WorkflowNode[] = [
-      createTestNode("gen-1", "nanoBanana", {
+      createTestNode("gen-1", "generateImage", {
         aspectRatio: "16:9",
         resolution: "2K",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         selectedModel: {
           provider: "gemini",
           modelId: "gemini-3-pro-image-preview",
@@ -459,12 +459,12 @@ describe("buildWorkflowContext", () => {
   it("includes connection details with source/target handles", () => {
     const nodes: WorkflowNode[] = [
       createTestNode("prompt-1", "prompt", { prompt: "test" }),
-      createTestNode("gen-1", "nanoBanana", {
+      createTestNode("gen-1", "generateImage", {
         inputImages: [],
         outputImage: null,
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana",
+        model: "gemini-flash",
         status: "idle",
         error: null,
         imageHistory: [],
@@ -517,11 +517,11 @@ describe("formatContextForPrompt", () => {
         customTitle: "My Prompt",
         prompt: "sunset",
       }),
-      createTestNode("gen-1", "nanoBanana", {
+      createTestNode("gen-1", "generateImage", {
         customTitle: "Generator",
         aspectRatio: "16:9",
         resolution: "2K",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         inputImages: [],
         outputImage: null,
         status: "idle",
@@ -544,12 +544,12 @@ describe("formatContextForPrompt", () => {
   it("includes connection information", () => {
     const nodes: WorkflowNode[] = [
       createTestNode("prompt-1", "prompt", { prompt: "test" }),
-      createTestNode("gen-1", "nanoBanana", {
+      createTestNode("gen-1", "generateImage", {
         inputImages: [],
         outputImage: null,
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana",
+        model: "gemini-flash",
         status: "idle",
         error: null,
         imageHistory: [],

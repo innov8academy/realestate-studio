@@ -15,8 +15,8 @@ const TARGET_COUNT_OPTIONS = [4, 5, 6, 8, 9, 10] as const;
 const ASPECT_RATIOS: AspectRatio[] = ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"];
 const RESOLUTIONS: Resolution[] = ["1K", "2K", "4K"];
 const MODELS: { value: ModelType; label: string }[] = [
-  { value: "nano-banana", label: "Nano Banana" },
-  { value: "nano-banana-pro", label: "Nano Banana Pro" },
+  { value: "gemini-flash", label: "Gemini Flash" },
+  { value: "gemini-pro", label: "Gemini Pro" },
 ];
 
 // Calculate grid dimensions from target count
@@ -47,7 +47,7 @@ export function SplitGridSettingsModal({
   const [useGoogleSearch, setUseGoogleSearch] = useState(nodeData.generateSettings.useGoogleSearch);
 
   const { rows, cols } = getGridDimensions(targetCount);
-  const isNanoBananaPro = model === "nano-banana-pro";
+  const isGenerateImagePro = model === "gemini-pro";
 
   const handleCreate = useCallback(() => {
     const splitNode = getNodeById(nodeId);
@@ -58,15 +58,15 @@ export function SplitGridSettingsModal({
     const imageInputHeight = 280;
     const promptWidth = 320;
     const promptHeight = 220;
-    const nanoBananaWidth = 300;
-    const nanoBananaHeight = 300;
+    const generateImageWidth = 300;
+    const generateImageHeight = 300;
     const horizontalGap = 40;
     const verticalGap = 30;
 
     // Calculate cluster dimensions
-    // Layout: imageInput on left, nanoBanana on right, prompt below imageInput
-    const clusterWidth = imageInputWidth + horizontalGap + nanoBananaWidth;
-    const clusterHeight = Math.max(imageInputHeight, nanoBananaHeight) + verticalGap + promptHeight;
+    // Layout: imageInput on left, generateImage on right, prompt below imageInput
+    const clusterWidth = imageInputWidth + horizontalGap + generateImageWidth;
+    const clusterHeight = Math.max(imageInputHeight, generateImageHeight) + verticalGap + promptHeight;
     const clusterGap = 60;
 
     // Start position to the right of the split node
@@ -90,14 +90,14 @@ export function SplitGridSettingsModal({
         y: clusterY,
       });
 
-      // Create nanoBanana node (to the right of imageInput)
-      const nanoBananaId = addNode("nanoBanana", {
+      // Create generateImage node (to the right of imageInput)
+      const generateImageId = addNode("generateImage", {
         x: clusterX + imageInputWidth + horizontalGap,
         y: clusterY,
       });
 
-      // Update nanoBanana settings
-      updateNodeData(nanoBananaId, {
+      // Update generateImage settings
+      updateNodeData(generateImageId, {
         aspectRatio,
         resolution,
         model,
@@ -107,24 +107,24 @@ export function SplitGridSettingsModal({
       // Create prompt node (below imageInput)
       const promptId = addNode("prompt", {
         x: clusterX,
-        y: clusterY + Math.max(imageInputHeight, nanoBananaHeight) + verticalGap,
+        y: clusterY + Math.max(imageInputHeight, generateImageHeight) + verticalGap,
       });
 
       // Update prompt with default text
       updateNodeData(promptId, { prompt: defaultPrompt });
 
-      // Create connections: imageInput -> nanoBanana, prompt -> nanoBanana
+      // Create connections: imageInput -> generateImage, prompt -> generateImage
       onConnect({
         source: imageInputId,
         sourceHandle: "image",
-        target: nanoBananaId,
+        target: generateImageId,
         targetHandle: "image",
       });
 
       onConnect({
         source: promptId,
         sourceHandle: "text",
-        target: nanoBananaId,
+        target: generateImageId,
         targetHandle: "text",
       });
 
@@ -139,7 +139,7 @@ export function SplitGridSettingsModal({
       childNodeIds.push({
         imageInput: imageInputId,
         prompt: promptId,
-        nanoBanana: nanoBananaId,
+        generateImage: generateImageId,
       });
     }
 
@@ -280,7 +280,7 @@ export function SplitGridSettingsModal({
                 </select>
               </div>
 
-              {isNanoBananaPro && (
+              {isGenerateImagePro && (
                 <>
                   <div>
                     <label className="block text-xs text-neutral-500 mb-1">

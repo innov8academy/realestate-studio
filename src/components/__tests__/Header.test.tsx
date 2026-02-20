@@ -68,14 +68,13 @@ describe("Header", () => {
   describe("Basic Rendering", () => {
     it("should render the app title", () => {
       render(<Header />);
-      expect(screen.getByText("Node Banana")).toBeInTheDocument();
+      expect(screen.getByText("PlotAI")).toBeInTheDocument();
     });
 
-    it("should render the banana icon", () => {
+    it("should render the PlotAI logo icon", () => {
       render(<Header />);
-      const icon = screen.getByAltText("Banana");
+      const icon = document.querySelector("svg[aria-label='PlotAI']");
       expect(icon).toBeInTheDocument();
-      expect(icon).toHaveAttribute("src", "/banana_icon.png");
     });
 
     it("should render 'Made by Willie' link", () => {

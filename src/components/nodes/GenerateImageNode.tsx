@@ -5,9 +5,9 @@ import { Handle, Position, NodeProps, Node, useReactFlow } from "@xyflow/react";
 import { BaseNode } from "./BaseNode";
 import { useCommentNavigation } from "@/hooks/useCommentNavigation";
 import { ModelParameters } from "./ModelParameters";
-import { useWorkflowStore, saveNanoBananaDefaults, useProviderApiKeys } from "@/store/workflowStore";
+import { useWorkflowStore, saveGenerateImageDefaults, useProviderApiKeys } from "@/store/workflowStore";
 import { deduplicatedFetch } from "@/utils/deduplicatedFetch";
-import { NanoBananaNodeData, AspectRatio, Resolution, ModelType, ProviderType, SelectedModel, ModelInputDef } from "@/types";
+import { GenerateImageNodeData, AspectRatio, Resolution, ModelType, ProviderType, SelectedModel, ModelInputDef } from "@/types";
 import { ProviderModel, ModelCapability } from "@/lib/providers/types";
 import { ModelSearchDialog } from "@/components/modals/ModelSearchDialog";
 import { useToast } from "@/components/Toast";
@@ -51,21 +51,21 @@ function ProviderBadge({ provider }: { provider: ProviderType }) {
 // All 10 aspect ratios supported by both models
 const ASPECT_RATIOS: AspectRatio[] = ["1:1", "2:3", "3:2", "3:4", "4:3", "4:5", "5:4", "9:16", "16:9", "21:9"];
 
-// Resolutions only for Nano Banana Pro (gemini-3-pro-image-preview)
+// Resolutions only for Gemini Pro (gemini-3-pro-image-preview)
 const RESOLUTIONS: Resolution[] = ["1K", "2K", "4K"];
 
 // Hardcoded Gemini image models (always available)
 const GEMINI_IMAGE_MODELS: { value: ModelType; label: string }[] = [
-  { value: "nano-banana", label: "Nano Banana" },
-  { value: "nano-banana-pro", label: "Nano Banana Pro" },
+  { value: "gemini-flash", label: "Gemini Flash" },
+  { value: "gemini-pro", label: "Gemini Pro" },
 ];
 
 // Image generation capabilities
 const IMAGE_CAPABILITIES: ModelCapability[] = ["text-to-image", "image-to-image"];
 
-type NanoBananaNodeType = Node<NanoBananaNodeData, "nanoBanana">;
+type GenerateImageNodeType = Node<GenerateImageNodeData, "generateImage">;
 
-export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNodeType>) {
+export function GenerateImageNode({ id, data, selected }: NodeProps<GenerateImageNodeType>) {
   const nodeData = data;
   const commentNavigation = useCommentNavigation(id);
   const updateNodeData = useWorkflowStore((state) => state.updateNodeData);
@@ -112,7 +112,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
   // Migrate legacy data: derive selectedModel from model field if missing
   useEffect(() => {
     if (nodeData.model && !nodeData.selectedModel) {
-      const displayName = nodeData.model === "nano-banana" ? "Nano Banana" : "Nano Banana Pro";
+      const displayName = nodeData.model === "gemini-flash" ? "Gemini Flash" : "Gemini Pro";
       const newSelectedModel: SelectedModel = {
         provider: "gemini",
         modelId: nodeData.model,
@@ -181,8 +181,8 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
         // Reset to Gemini default
         const newSelectedModel: SelectedModel = {
           provider: "gemini",
-          modelId: nodeData.model || "nano-banana-pro",
-          displayName: GEMINI_IMAGE_MODELS.find(m => m.value === (nodeData.model || "nano-banana-pro"))?.label || "Nano Banana Pro",
+          modelId: nodeData.model || "gemini-pro",
+          displayName: GEMINI_IMAGE_MODELS.find(m => m.value === (nodeData.model || "gemini-pro"))?.label || "Gemini Pro",
         };
         // Clear parameters when switching providers (different providers have different schemas)
         updateNodeData(id, { selectedModel: newSelectedModel, parameters: {} });
@@ -222,7 +222,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const aspectRatio = e.target.value as AspectRatio;
       updateNodeData(id, { aspectRatio });
-      saveNanoBananaDefaults({ aspectRatio });
+      saveGenerateImageDefaults({ aspectRatio });
     },
     [id, updateNodeData]
   );
@@ -231,7 +231,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const resolution = e.target.value as Resolution;
       updateNodeData(id, { resolution });
-      saveNanoBananaDefaults({ resolution });
+      saveGenerateImageDefaults({ resolution });
     },
     [id, updateNodeData]
   );
@@ -240,7 +240,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const model = e.target.value as ModelType;
       updateNodeData(id, { model });
-      saveNanoBananaDefaults({ model });
+      saveGenerateImageDefaults({ model });
 
       // Also update selectedModel for consistency
       const newSelectedModel: SelectedModel = {
@@ -257,7 +257,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const useGoogleSearch = e.target.checked;
       updateNodeData(id, { useGoogleSearch });
-      saveNanoBananaDefaults({ useGoogleSearch });
+      saveGenerateImageDefaults({ useGoogleSearch });
     },
     [id, updateNodeData]
   );
@@ -424,7 +424,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
   }, [isGeminiOnly]);
   // Use selectedModel.modelId for Gemini models, fallback to legacy model field
   const currentModelId = isGeminiProvider ? (nodeData.selectedModel?.modelId || nodeData.model) : null;
-  const isNanoBananaPro = currentModelId === "nano-banana-pro";
+  const isGenerateImagePro = currentModelId === "gemini-pro";
   const hasCarouselImages = (nodeData.imageHistory || []).length > 1;
 
   // Track previous status to detect error transitions
@@ -726,7 +726,7 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
                 </option>
               ))}
             </select>
-            {isNanoBananaPro && (
+            {isGenerateImagePro && (
               <select
                 value={nodeData.resolution}
                 onChange={handleResolutionChange}
@@ -742,8 +742,8 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
           </div>
         )}
 
-        {/* Google Search toggle - only for Nano Banana Pro */}
-        {currentProvider === "gemini" && isNanoBananaPro && (
+        {/* Google Search toggle - only for Gemini Pro */}
+        {currentProvider === "gemini" && isGenerateImagePro && (
           <label className="flex items-center gap-1.5 text-[10px] text-neutral-300 shrink-0 cursor-pointer">
             <input
               type="checkbox"
@@ -774,4 +774,4 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<NanoBananaNo
  * @deprecated Use `GenerateImageNode` instead. This alias is kept for backward compatibility
  * with existing workflows but will be removed in a future version.
  */
-export { GenerateImageNode as NanoBananaNode };
+export { GenerateImageNode as GenerateImageNode };

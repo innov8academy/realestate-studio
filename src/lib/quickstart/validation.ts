@@ -15,7 +15,7 @@ const VALID_NODE_TYPES: NodeType[] = [
   "imageInput",
   "annotation",
   "prompt",
-  "nanoBanana",
+  "generateImage",
   "generateVideo",
   "llmGenerate",
   "splitGrid",
@@ -31,7 +31,7 @@ const DEFAULT_DIMENSIONS: Record<NodeType, { width: number; height: number }> = 
   annotation: { width: 300, height: 280 },
   prompt: { width: 320, height: 220 },
   promptConstructor: { width: 340, height: 280 },
-  nanoBanana: { width: 300, height: 300 },
+  generateImage: { width: 300, height: 300 },
   generateVideo: { width: 300, height: 300 },
   llmGenerate: { width: 320, height: 360 },
   splitGrid: { width: 300, height: 320 },
@@ -229,14 +229,14 @@ function createDefaultNodeDataInner(type: NodeType): Record<string, unknown> {
         outputText: null,
         unresolvedVars: [],
       };
-    case "nanoBanana":
+    case "generateImage":
       return {
         inputImages: [],
         inputPrompt: null,
         outputImage: null,
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         useGoogleSearch: false,
         status: "idle",
         error: null,
@@ -274,7 +274,7 @@ function createDefaultNodeDataInner(type: NodeType): Record<string, unknown> {
         generateSettings: {
           aspectRatio: "1:1",
           resolution: "1K",
-          model: "nano-banana-pro",
+          model: "gemini-pro",
           useGoogleSearch: false,
         },
         childNodeIds: [],

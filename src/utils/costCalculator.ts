@@ -1,13 +1,13 @@
-import { ModelType, Resolution, NanoBananaNodeData, GenerateVideoNodeData, SplitGridNodeData, WorkflowNode, ProviderType } from "@/types";
+import { ModelType, Resolution, GenerateImageNodeData, GenerateVideoNodeData, SplitGridNodeData, WorkflowNode, ProviderType } from "@/types";
 
 // Pricing in USD per image (Gemini API)
 export const PRICING = {
-  "nano-banana": {
+  "gemini-flash": {
     "1K": 0.039,
-    "2K": 0.039, // nano-banana only supports 1K
+    "2K": 0.039, // gemini-flash only supports 1K
     "4K": 0.039,
   },
-  "nano-banana-pro": {
+  "gemini-pro": {
     "1K": 0.134,
     "2K": 0.134,
     "4K": 0.24,
@@ -15,11 +15,11 @@ export const PRICING = {
 } as const;
 
 export function calculateGenerationCost(model: ModelType, resolution: Resolution): number {
-  // nano-banana only supports 1K resolution
-  if (model === "nano-banana") {
-    return PRICING["nano-banana"]["1K"];
+  // gemini-flash only supports 1K resolution
+  if (model === "gemini-flash") {
+    return PRICING["gemini-flash"]["1K"];
   }
-  return PRICING["nano-banana-pro"][resolution];
+  return PRICING["gemini-pro"][resolution];
 }
 
 /**
@@ -79,7 +79,7 @@ export interface LegacyCostBreakdownItem {
 
 /**
  * Calculate predicted cost for all generation nodes in the workflow.
- * Handles nanoBanana (image) and generateVideo (video) nodes.
+ * Handles generateImage (image) and generateVideo (video) nodes.
  *
  * @param nodes - Workflow nodes to analyze
  * @param modelPricing - Optional map of modelId -> pricing for external providers.
@@ -146,12 +146,12 @@ export function calculatePredictedCost(
 
     // Fallback to hardcoded Gemini pricing for legacy models
     if (provider === "gemini") {
-      if (modelId === "nano-banana" || modelId === "gemini-2.5-flash-preview-image-generation") {
-        return { unitCost: PRICING["nano-banana"]["1K"], unit: "image" };
+      if (modelId === "gemini-flash" || modelId === "gemini-2.5-flash-preview-image-generation") {
+        return { unitCost: PRICING["gemini-flash"]["1K"], unit: "image" };
       }
-      if (modelId === "nano-banana-pro" || modelId === "gemini-3-pro-image-preview") {
+      if (modelId === "gemini-pro" || modelId === "gemini-3-pro-image-preview") {
         const res = resolution || "1K";
-        return { unitCost: PRICING["nano-banana-pro"][res], unit: "image" };
+        return { unitCost: PRICING["gemini-pro"][res], unit: "image" };
       }
     }
 
@@ -160,9 +160,9 @@ export function calculatePredictedCost(
   }
 
   nodes.forEach((node) => {
-    // Handle nanoBanana (image generation) nodes
-    if (node.type === "nanoBanana") {
-      const data = node.data as NanoBananaNodeData;
+    // Handle generateImage (image generation) nodes
+    if (node.type === "generateImage") {
+      const data = node.data as GenerateImageNodeData;
 
       // Determine provider and model info
       let provider: ProviderType;
@@ -178,10 +178,10 @@ export function calculatePredictedCost(
         // Legacy Gemini-only model
         provider = "gemini";
         modelId = data.model;
-        modelName = data.model === "nano-banana" ? "Nano Banana" : "Nano Banana Pro";
+        modelName = data.model === "gemini-flash" ? "Gemini Flash" : "Gemini Pro";
       }
 
-      const resolution = data.model === "nano-banana" ? "1K" : data.resolution;
+      const resolution = data.model === "gemini-flash" ? "1K" : data.resolution;
       const pricing = getPricing(provider, modelId, resolution);
       const unitCost = pricing?.unitCost ?? null;
       const unit = pricing?.unit ?? "image";
@@ -207,15 +207,15 @@ export function calculatePredictedCost(
       }
     }
 
-    // SplitGrid nodes create child nanoBanana nodes - count those from settings
+    // SplitGrid nodes create child generateImage nodes - count those from settings
     // Note: child nodes are in the nodes array, but we count from splitGrid settings
     // to show what WILL be generated when the grid runs
     if (node.type === "splitGrid") {
       const data = node.data as SplitGridNodeData;
       if (data.isConfigured && data.targetCount > 0) {
         const model = data.generateSettings.model;
-        const resolution = model === "nano-banana" ? "1K" : data.generateSettings.resolution;
-        const modelName = model === "nano-banana" ? "Nano Banana" : "Nano Banana Pro";
+        const resolution = model === "gemini-flash" ? "1K" : data.generateSettings.resolution;
+        const modelName = model === "gemini-flash" ? "Gemini Flash" : "Gemini Pro";
 
         const pricing = getPricing("gemini", model, resolution);
         const unitCost = pricing?.unitCost ?? null;

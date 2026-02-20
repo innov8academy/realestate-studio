@@ -13,9 +13,9 @@ export interface GenerateRequest {
   images: string[]; // Now supports multiple images
   prompt: string;
   aspectRatio?: AspectRatio;
-  resolution?: Resolution; // Only for Nano Banana Pro
+  resolution?: Resolution; // Only for Gemini Pro
   model?: ModelType;
-  useGoogleSearch?: boolean; // Only for Nano Banana Pro
+  useGoogleSearch?: boolean; // Only for Gemini Pro
   mediaType?: "image" | "video"; // Indicates expected output type for provider routing
 }
 

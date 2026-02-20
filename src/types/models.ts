@@ -5,7 +5,7 @@
  * aspect ratios, resolutions, and model identifiers.
  */
 
-// Aspect Ratios (supported by both Nano Banana and Nano Banana Pro)
+// Aspect Ratios (supported by both Gemini Flash and Gemini Pro)
 export type AspectRatio =
   | "1:1"
   | "2:3"
@@ -18,8 +18,8 @@ export type AspectRatio =
   | "16:9"
   | "21:9";
 
-// Resolution Options (only supported by Nano Banana Pro)
+// Resolution Options (only supported by Gemini Pro)
 export type Resolution = "1K" | "2K" | "4K";
 
 // Image Generation Model Options
-export type ModelType = "nano-banana" | "nano-banana-pro";
+export type ModelType = "gemini-flash" | "gemini-pro";

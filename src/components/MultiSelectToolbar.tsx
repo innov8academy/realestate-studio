@@ -7,7 +7,7 @@ import JSZip from "jszip";
 import type {
   ImageInputNodeData,
   AnnotationNodeData,
-  NanoBananaNodeData,
+  GenerateImageNodeData,
   OutputNodeData,
 } from "@/types";
 
@@ -177,8 +177,8 @@ export function MultiSelectToolbar() {
         case "annotation":
           imageData = (node.data as AnnotationNodeData).outputImage;
           break;
-        case "nanoBanana":
-          imageData = (node.data as NanoBananaNodeData).outputImage;
+        case "generateImage":
+          imageData = (node.data as GenerateImageNodeData).outputImage;
           break;
         case "output":
           imageData = (node.data as OutputNodeData).image;

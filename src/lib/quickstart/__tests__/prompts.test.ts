@@ -29,7 +29,7 @@ describe("prompts", () => {
       const prompt = buildQuickstartPrompt("test", "minimal");
       expect(prompt).toContain("imageInput");
       expect(prompt).toContain("prompt");
-      expect(prompt).toContain("nanoBanana");
+      expect(prompt).toContain("generateImage");
       expect(prompt).toContain("llmGenerate");
       expect(prompt).toContain("annotation");
       expect(prompt).toContain("output");
@@ -62,7 +62,7 @@ describe("prompts", () => {
       const prompt = buildQuickstartPrompt("test", "minimal");
       expect(prompt).toContain("imageInput: { width: 300, height: 280 }");
       expect(prompt).toContain("prompt: { width: 320, height: 220 }");
-      expect(prompt).toContain("nanoBanana: { width: 300, height: 300 }");
+      expect(prompt).toContain("generateImage: { width: 300, height: 300 }");
     });
 
     it("should include node ID format instructions", () => {
@@ -83,7 +83,7 @@ describe("prompts", () => {
       expect(prompt).toMatch(/wf_\d+_quickstart/);
     });
 
-    it("should emphasize nanoBanana requirements", () => {
+    it("should emphasize generateImage requirements", () => {
       const prompt = buildQuickstartPrompt("test", "minimal");
       expect(prompt).toContain("REQUIRES both image AND text inputs");
     });
@@ -119,7 +119,7 @@ describe("prompts", () => {
       const prompt = buildSimplePrompt("test");
       expect(prompt).toContain("imageInput");
       expect(prompt).toContain("prompt");
-      expect(prompt).toContain("nanoBanana");
+      expect(prompt).toContain("generateImage");
       expect(prompt).toContain("llmGenerate");
       expect(prompt).toContain("annotation");
       expect(prompt).toContain("output");
@@ -131,9 +131,9 @@ describe("prompts", () => {
       expect(prompt).toContain("text to text");
     });
 
-    it("should include nanoBanana requirements", () => {
+    it("should include generateImage requirements", () => {
       const prompt = buildSimplePrompt("test");
-      expect(prompt).toContain("nanoBanana NEEDS both image and text inputs");
+      expect(prompt).toContain("generateImage NEEDS both image and text inputs");
     });
 
     it("should include node ID format", () => {

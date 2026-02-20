@@ -66,12 +66,12 @@ describe("templates", () => {
       });
     });
 
-    it("each template should have at least one nanoBanana node", () => {
+    it("each template should have at least one generateImage node", () => {
       PRESET_TEMPLATES.forEach((template) => {
-        const nanoBananaNodes = template.workflow.nodes.filter(
-          (n) => n.type === "nanoBanana"
+        const generateImageNodes = template.workflow.nodes.filter(
+          (n) => n.type === "generateImage"
         );
-        expect(nanoBananaNodes.length).toBeGreaterThanOrEqual(1);
+        expect(generateImageNodes.length).toBeGreaterThanOrEqual(1);
       });
     });
 

@@ -3,7 +3,7 @@ export { AudioInputNode } from "./AudioInputNode";
 export { AnnotationNode } from "./AnnotationNode";
 export { PromptNode } from "./PromptNode";
 export { PromptConstructorNode } from "./PromptConstructorNode";
-export { GenerateImageNode, NanoBananaNode } from "./GenerateImageNode";
+export { GenerateImageNode, GenerateImageNode } from "./GenerateImageNode";
 export { GenerateVideoNode } from "./GenerateVideoNode";
 export { LLMGenerateNode } from "./LLMGenerateNode";
 export { SplitGridNode } from "./SplitGridNode";

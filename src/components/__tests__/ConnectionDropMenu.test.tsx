@@ -131,13 +131,13 @@ describe("ConnectionDropMenu", () => {
       expect(mockOnSelect).toHaveBeenCalledWith({ type: "splitGridImmediate", isAction: true });
     });
 
-    it("should call onSelect with nanoBanana type for Generate Image", () => {
+    it("should call onSelect with generateImage type for Generate Image", () => {
       render(<ConnectionDropMenu {...defaultProps} handleType="text" connectionType="source" />);
 
       const generateButton = screen.getByText("Generate Image");
       fireEvent.click(generateButton);
 
-      expect(mockOnSelect).toHaveBeenCalledWith({ type: "nanoBanana", isAction: false });
+      expect(mockOnSelect).toHaveBeenCalledWith({ type: "generateImage", isAction: false });
     });
   });
 
@@ -220,13 +220,13 @@ describe("ConnectionDropMenu", () => {
       // Press Enter
       fireEvent.keyDown(document, { key: "Enter" });
 
-      expect(mockOnSelect).toHaveBeenCalledWith({ type: "nanoBanana", isAction: false });
+      expect(mockOnSelect).toHaveBeenCalledWith({ type: "generateImage", isAction: false });
     });
 
     it("should wrap around when navigating past last item", () => {
       render(<ConnectionDropMenu {...defaultProps} handleType="text" connectionType="source" />);
 
-      // Text target options: Prompt, Prompt Constructor, nanoBanana, generateVideo, llmGenerate (5 items)
+      // Text target options: Prompt, Prompt Constructor, generateImage, generateVideo, llmGenerate (5 items)
       // Navigate down 5 times to wrap to first
       fireEvent.keyDown(document, { key: "ArrowDown" });
       fireEvent.keyDown(document, { key: "ArrowDown" });

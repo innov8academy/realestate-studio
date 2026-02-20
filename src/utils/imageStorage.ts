@@ -150,8 +150,8 @@ async function externalizeNodeImages(
       break;
     }
 
-    case "nanoBanana": {
-      const d = data as import("@/types").NanoBananaNodeData;
+    case "generateImage": {
+      const d = data as import("@/types").GenerateImageNodeData;
       let outputImageRef = d.outputImageRef;
       let outputImage = d.outputImage;
       let inputImageRefs = d.inputImageRefs ? [...d.inputImageRefs] : [];
@@ -435,8 +435,8 @@ async function hydrateNodeImages(
       break;
     }
 
-    case "nanoBanana": {
-      const d = data as import("@/types").NanoBananaNodeData;
+    case "generateImage": {
+      const d = data as import("@/types").GenerateImageNodeData;
       let outputImage = d.outputImage;
       const inputImages = [...(d.inputImages || [])];
 

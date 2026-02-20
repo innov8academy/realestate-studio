@@ -8,7 +8,7 @@
  * that exceed localStorage's ~5 MB limit.
  */
 
-const DB_NAME = "node-banana-workflow";
+const DB_NAME = "plotai-workflow";
 const DB_VERSION = 1;
 const STORE_NAME = "state";
 

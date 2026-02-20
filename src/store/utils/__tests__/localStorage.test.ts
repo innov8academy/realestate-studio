@@ -165,7 +165,7 @@ describe("localStorage utilities", () => {
       expect(result).toEqual({
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         useGoogleSearch: false,
       });
     });
@@ -174,7 +174,7 @@ describe("localStorage utilities", () => {
       const customSettings = {
         aspectRatio: "16:9",
         resolution: "2K",
-        model: "nano-banana",
+        model: "gemini-flash",
         useGoogleSearch: true,
       };
       localStorageMock.setItem(
@@ -193,7 +193,7 @@ describe("localStorage utilities", () => {
       expect(result).toEqual({
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         useGoogleSearch: false,
       });
     });
@@ -204,7 +204,7 @@ describe("localStorage utilities", () => {
       const existing = {
         aspectRatio: "1:1",
         resolution: "1K",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         useGoogleSearch: false,
       };
       localStorageMock.setItem(
@@ -341,7 +341,7 @@ describe("localStorage utilities", () => {
     it("returns stored generateImage defaults when configured", () => {
       const config = {
         generateImage: {
-          selectedModel: { provider: "gemini", modelId: "nano-banana-pro", displayName: "Nano Banana Pro" },
+          selectedModel: { provider: "gemini", modelId: "gemini-pro", displayName: "Gemini Pro" },
           aspectRatio: "4:3",
           useGoogleSearch: true,
         },

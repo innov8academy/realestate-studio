@@ -5,7 +5,7 @@ import {
   AnnotationNodeData,
   PromptNodeData,
   PromptConstructorNodeData,
-  NanoBananaNodeData,
+  GenerateImageNodeData,
   GenerateVideoNodeData,
   LLMGenerateNodeData,
   SplitGridNodeData,
@@ -29,7 +29,7 @@ export const defaultNodeDimensions: Record<NodeType, { width: number; height: nu
   annotation: { width: 300, height: 280 },
   prompt: { width: 320, height: 220 },
   promptConstructor: { width: 340, height: 280 },
-  nanoBanana: { width: 300, height: 300 },
+  generateImage: { width: 300, height: 300 },
   generateVideo: { width: 300, height: 300 },
   llmGenerate: { width: 320, height: 360 },
   splitGrid: { width: 300, height: 320 },
@@ -93,7 +93,7 @@ export const createDefaultNodeData = (type: NodeType): WorkflowNodeData => {
         outputText: null,
         unresolvedVars: [],
       } as PromptConstructorNodeData;
-    case "nanoBanana": {
+    case "generateImage": {
       const nodeDefaults = loadNodeDefaults();
       const legacyDefaults = loadGenerateImageDefaults();
 
@@ -102,7 +102,7 @@ export const createDefaultNodeData = (type: NodeType): WorkflowNodeData => {
       if (nodeDefaults.generateImage?.selectedModel) {
         selectedModel = nodeDefaults.generateImage.selectedModel;
       } else {
-        const modelDisplayName = legacyDefaults.model === "nano-banana" ? "Nano Banana" : "Nano Banana Pro";
+        const modelDisplayName = legacyDefaults.model === "gemini-flash" ? "Gemini Flash" : "Gemini Pro";
         selectedModel = {
           provider: "gemini",
           modelId: legacyDefaults.model,
@@ -128,7 +128,7 @@ export const createDefaultNodeData = (type: NodeType): WorkflowNodeData => {
         error: null,
         imageHistory: [],
         selectedHistoryIndex: 0,
-      } as NanoBananaNodeData;
+      } as GenerateImageNodeData;
     }
     case "generateVideo": {
       const nodeDefaults = loadNodeDefaults();
@@ -166,7 +166,7 @@ export const createDefaultNodeData = (type: NodeType): WorkflowNodeData => {
         generateSettings: {
           aspectRatio: "1:1",
           resolution: "1K",
-          model: "nano-banana-pro",
+          model: "gemini-pro",
           useGoogleSearch: false,
         },
         childNodeIds: [],

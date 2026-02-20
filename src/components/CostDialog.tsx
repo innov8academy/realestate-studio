@@ -74,6 +74,10 @@ function getModelUrl(provider: ProviderType, modelId: string): string | null {
     // modelId format: "wavespeed-ai/model-name"
     return `https://wavespeed.ai`;
   }
+  if (provider === "kie") {
+    // Use the pageUrl from the model registry when available; fall back to pricing page
+    return `https://kie.ai/pricing`;
+  }
   return null;
 }
 

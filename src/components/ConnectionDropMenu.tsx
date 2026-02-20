@@ -25,7 +25,7 @@ const IMAGE_TARGET_OPTIONS: MenuOption[] = [
     ),
   },
   {
-    type: "nanoBanana",
+    type: "generateImage",
     label: "Generate Image",
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -110,7 +110,7 @@ const TEXT_TARGET_OPTIONS: MenuOption[] = [
     ),
   },
   {
-    type: "nanoBanana",
+    type: "generateImage",
     label: "Generate Image",
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -159,7 +159,7 @@ const IMAGE_SOURCE_OPTIONS: MenuOption[] = [
     ),
   },
   {
-    type: "nanoBanana",
+    type: "generateImage",
     label: "Generate Image",
     icon: (
       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

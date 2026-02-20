@@ -11,7 +11,7 @@
 
 ### 1.1 Product Summary
 
-A web-based, node-based workflow application for creating annotated images and generating AI images using Nano Banana Pro (Google Gemini 3 Pro Image). Users connect nodes on a canvas to build image generation pipelines, annotate images in a full-screen editor, and chain multiple generation steps together.
+A web-based, node-based workflow application for creating annotated images and generating AI images using PlotAI (Google Gemini 3 Pro Image). Users connect nodes on a canvas to build image generation pipelines, annotate images in a full-screen editor, and chain multiple generation steps together.
 
 ### 1.2 Problem Statement
 
@@ -26,13 +26,13 @@ Users need a middle ground: visual workflow building with intuitive annotation t
 - Designers exploring AI-assisted image creation
 - Content creators iterating on visual concepts
 - Developers prototyping generative image workflows
-- Anyone experimenting with Nano Banana Pro's image editing capabilities
+- Anyone experimenting with PlotAI's image editing capabilities
 
 ### 1.4 Success Criteria
 
 - User can build a workflow from image input to generated output in under 2 minutes
 - User can chain 3+ generation steps in a single workflow
-- Annotations correctly flatten and pass to Nano Banana Pro API
+- Annotations correctly flatten and pass to PlotAI API
 - Generated images can feed back into subsequent workflow nodes
 
 ---
@@ -76,7 +76,7 @@ Users need a middle ground: visual workflow building with intuitive annotation t
 Image Input Node    → [image output]
 Annotation Node     → [image input] [image output]  
 Prompt Node         → [text output]
-Nano Banana Node    → [image input] [prompt input] [image output]
+PlotAI Node    → [image input] [prompt input] [image output]
 Output Node         → [image input]
 ```
 
@@ -135,9 +135,9 @@ Output Node         → [image input]
 
 ---
 
-#### 3.2.4 Nano Banana Node
+#### 3.2.4 PlotAI Node
 
-**Purpose:** Send image + prompt to Nano Banana Pro API and receive generated image.
+**Purpose:** Send image + prompt to PlotAI API and receive generated image.
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
@@ -173,7 +173,7 @@ Output Node         → [image input]
 
 **"Send to Node" Flow:**
 1. User clicks "Send to Node" on Output Node
-2. User clicks on target node (Annotation Node or Nano Banana Node)
+2. User clicks on target node (Annotation Node or PlotAI Node)
 3. Image is connected/passed to that node's image input
 4. Visual confirmation of transfer
 
@@ -276,7 +276,7 @@ Output Node         → [image input]
 1. Image Input Node → outputs image
 2. Annotation Node → receives image, outputs flattened annotated image
 3. Prompt Node → outputs prompt text
-4. Nano Banana Node → receives image + prompt, calls API, outputs generated image
+4. PlotAI Node → receives image + prompt, calls API, outputs generated image
 5. Output Node → receives and displays generated image
 ```
 
@@ -289,7 +289,7 @@ Output Node         → [image input]
 
 ### 3.6 API Integration
 
-**Description:** Integration with Google AI Studio API for Nano Banana Pro.
+**Description:** Integration with Google AI Studio API for PlotAI.
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
@@ -378,7 +378,7 @@ The following are explicitly **not included** in v1:
 - User authentication and accounts
 - Cloud storage of workflows or images
 - Save/load workflow functionality
-- Multiple AI model support (only Nano Banana Pro)
+- Multiple AI model support (only PlotAI)
 - Real-time collaboration
 - Undo/redo at workflow level (node deletion, etc.)
 - Keyboard shortcuts for node creation
@@ -533,7 +533,7 @@ interface OutputNodeData {
 
 ## 10. Appendix
 
-### 10.1 Nano Banana Pro API Reference
+### 10.1 PlotAI API Reference
 
 **Model:** `gemini-3-pro-image-preview`
 

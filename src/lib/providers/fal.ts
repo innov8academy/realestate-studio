@@ -26,7 +26,7 @@ import {
 } from "@/lib/providers";
 
 const FAL_API_BASE = "https://api.fal.ai/v1";
-const PROVIDER_SETTINGS_KEY = "node-banana-provider-settings";
+const PROVIDER_SETTINGS_KEY = "plotai-provider-settings";
 
 /**
  * Categories we care about for image/video generation

@@ -51,8 +51,8 @@ describe("CostDialog", () => {
     breakdown: [
       {
         provider: "gemini",
-        modelId: "nano-banana",
-        modelName: "Nano Banana",
+        modelId: "gemini-flash",
+        modelName: "Gemini Flash",
         count: 5,
         unitCost: 0.039,
         unit: "image",
@@ -60,8 +60,8 @@ describe("CostDialog", () => {
       },
       {
         provider: "gemini",
-        modelId: "nano-banana-pro",
-        modelName: "Nano Banana Pro",
+        modelId: "gemini-pro",
+        modelName: "Gemini Pro",
         count: 2,
         unitCost: 0.134,
         unit: "image",
@@ -81,8 +81,8 @@ describe("CostDialog", () => {
     breakdown: [
       {
         provider: "gemini",
-        modelId: "nano-banana",
-        modelName: "Nano Banana",
+        modelId: "gemini-flash",
+        modelName: "Gemini Flash",
         count: 3,
         unitCost: 0.039,
         unit: "image",
@@ -213,8 +213,8 @@ describe("CostDialog", () => {
         />
       );
 
-      expect(screen.getByText(/5x Nano Banana$/)).toBeInTheDocument();
-      expect(screen.getByText(/2x Nano Banana Pro/)).toBeInTheDocument();
+      expect(screen.getByText(/5x Gemini Flash$/)).toBeInTheDocument();
+      expect(screen.getByText(/2x Gemini Pro/)).toBeInTheDocument();
     });
 
     it("should display subtotal for each model type", () => {

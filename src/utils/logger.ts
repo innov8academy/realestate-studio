@@ -1,5 +1,5 @@
 /**
- * Centralized logging utility for Node Banana
+ * Centralized logging utility for PlotAI
  *
  * Features:
  * - Session-based logging (one log file per workflow execution)

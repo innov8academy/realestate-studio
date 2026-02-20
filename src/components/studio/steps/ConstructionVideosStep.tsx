@@ -7,7 +7,7 @@ import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
-import type { NanoBananaNodeData, GenerateVideoNodeData } from "@/types";
+import type { GenerateImageNodeData, GenerateVideoNodeData } from "@/types";
 
 function VideoCard({
   title,
@@ -109,9 +109,9 @@ export function ConstructionVideosStep() {
   const nodes = useWorkflowStore((s) => s.nodes);
 
   // Check prerequisites
-  const streetData = nodes.find((n) => n.id === STUDIO_NODES.generateStreet)?.data as NanoBananaNodeData | undefined;
-  const halfData = nodes.find((n) => n.id === STUDIO_NODES.generateHalfBuilding)?.data as NanoBananaNodeData | undefined;
-  const fullData = nodes.find((n) => n.id === STUDIO_NODES.generateFullBuilding)?.data as NanoBananaNodeData | undefined;
+  const streetData = nodes.find((n) => n.id === STUDIO_NODES.generateStreet)?.data as GenerateImageNodeData | undefined;
+  const halfData = nodes.find((n) => n.id === STUDIO_NODES.generateHalfBuilding)?.data as GenerateImageNodeData | undefined;
+  const fullData = nodes.find((n) => n.id === STUDIO_NODES.generateFullBuilding)?.data as GenerateImageNodeData | undefined;
 
   const hasStreet = streetData?.status === "complete";
   const hasHalf = halfData?.status === "complete";

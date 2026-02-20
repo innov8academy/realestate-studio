@@ -468,7 +468,7 @@ describe("ModelSearchDialog", () => {
       fireEvent.click(modelCard!);
 
       expect(mockAddNode).toHaveBeenCalledWith(
-        "nanoBanana",
+        "generateImage",
         expect.any(Object),
         expect.objectContaining({
           selectedModel: {

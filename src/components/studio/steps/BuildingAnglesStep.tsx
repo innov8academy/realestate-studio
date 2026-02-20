@@ -7,7 +7,7 @@ import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
-import type { NanoBananaNodeData } from "@/types";
+import type { GenerateImageNodeData } from "@/types";
 
 const ASPECT_RATIOS = [
   { value: "3:2", label: "3:2", recommended: true },
@@ -56,12 +56,12 @@ export function BuildingAnglesStep() {
   // Check prerequisite: full building must be complete
   const fullBuildingData = nodes.find(
     (n) => n.id === STUDIO_NODES.generateFullBuilding
-  )?.data as NanoBananaNodeData | undefined;
+  )?.data as GenerateImageNodeData | undefined;
   const hasBuilding = fullBuildingData?.status === "complete";
 
   // Check if any angle is complete
   const anyComplete = ANGLE_CONFIGS.some((cfg) => {
-    const data = nodes.find((n) => n.id === cfg.generateId)?.data as NanoBananaNodeData | undefined;
+    const data = nodes.find((n) => n.id === cfg.generateId)?.data as GenerateImageNodeData | undefined;
     return data?.status === "complete";
   });
 
@@ -171,7 +171,7 @@ export function BuildingAnglesStep() {
       )}
 
       {ANGLE_CONFIGS.map((cfg) => {
-        const data = nodes.find((n) => n.id === cfg.generateId)?.data as NanoBananaNodeData | undefined;
+        const data = nodes.find((n) => n.id === cfg.generateId)?.data as GenerateImageNodeData | undefined;
         const status = data?.status || "idle";
         const outputImage = data?.outputImage;
         const isNodeRunning = useWorkflowStore.getState().currentNodeIds.includes(cfg.generateId);

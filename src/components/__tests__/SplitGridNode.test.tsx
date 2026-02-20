@@ -66,7 +66,7 @@ describe("SplitGridNode", () => {
     generateSettings: {
       aspectRatio: "1:1",
       resolution: "1K",
-      model: "nano-banana",
+      model: "gemini-flash",
       useGoogleSearch: false,
     },
     childNodeIds: [],
@@ -308,9 +308,9 @@ describe("SplitGridNode", () => {
           <SplitGridNode {...createNodeProps({
             isConfigured: true,
             childNodeIds: [
-              { imageInput: "1", prompt: "2", nanoBanana: "3" },
-              { imageInput: "4", prompt: "5", nanoBanana: "6" },
-              { imageInput: "7", prompt: "8", nanoBanana: "9" },
+              { imageInput: "1", prompt: "2", generateImage: "3" },
+              { imageInput: "4", prompt: "5", generateImage: "6" },
+              { imageInput: "7", prompt: "8", generateImage: "9" },
             ]
           })} />
         </TestWrapper>

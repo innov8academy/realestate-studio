@@ -60,7 +60,7 @@ const NODE_DIMENSIONS = {
   annotation: { width: 300, height: 280 },
   prompt: { width: 320, height: 220 },
   promptConstructor: { width: 350, height: 260 },
-  nanoBanana: { width: 300, height: 300 },
+  generateImage: { width: 300, height: 300 },
   llmGenerate: { width: 320, height: 360 },
   generateVideo: { width: 320, height: 360 },
   imageCompare: { width: 320, height: 320 },
@@ -78,13 +78,13 @@ const createPromptData = (prompt: string = "") => ({
   prompt,
 });
 
-const createNanoBananaData = () => ({
+const createGenerateImageData = () => ({
   inputImages: [],
   inputPrompt: null,
   outputImage: null,
   aspectRatio: "3:2" as const,
   resolution: "1K" as const,
-  model: "nano-banana-pro" as const,
+  model: "gemini-pro" as const,
   useGoogleSearch: false,
   status: "idle" as const,
   error: null,
@@ -173,19 +173,19 @@ export const PROMPTS = {
 
   // --- Stage 3: Half-Constructed Building (WITH reference image) ---
   halfBuilding:
-    "You are given TWO images: the FIRST image is the enhanced street-level view of the plot (use this as the base environment and camera angle). The SECOND image is a REFERENCE BUILDING — you MUST replicate this reference building's exact architectural style, design, proportions, facade, floor count, roof shape, window style, balcony design, and materials as the blueprint. Generate a photorealistic visualization showing THIS SPECIFIC building under construction on the marked plot. The building should be only HALF CONSTRUCTED — show exposed concrete structure, partially built floors, visible rebar and columns, scaffolding around the structure, construction materials on site. The foundation and first 1-2 floors should be mostly complete, upper floors showing bare structural framework. The half-built structure must clearly be the SAME building from the reference, just in a half-constructed state. Match the exact camera angle and perspective of the street view. Blend the construction naturally into the surrounding environment with consistent lighting and shadows. Photorealistic quality — this should look like an actual construction site photograph.",
+    "You are given TWO images. IMPORTANT — these two images serve completely different purposes:\n\nImage 1 is the BASE LOCATION. This is the real plot. Keep the ENTIRE environment from Image 1 exactly as-is in the output: the road, the pavement, the trees, neighboring buildings, sky, ground, lighting, and all surrounding context. DO NOT remove, replace, or alter anything outside the building footprint. DO NOT use the background, surroundings, or environment from Image 2.\n\nImage 2 is the ARCHITECTURAL STYLE REFERENCE only. Extract ONLY these design elements: the number of floors, the facade layout, window sizes and style, balcony design, roof shape, and exterior material palette. COMPLETELY IGNORE Image 2's background, trees, road, sky, neighboring buildings, and location — those are irrelevant.\n\nYour task: Show a building under construction rising naturally from the plot in Image 1. The construction should occupy only the plot boundary shown in Image 1. The building's structural design should be inspired by the style in Image 2 — half-built at this stage: concrete skeleton visible, exposed columns, scaffolding, partially built upper floors, construction materials on the ground. The finished first floor or two may be taking shape. The construction blends naturally into Image 1's environment with matching lighting and shadows. Everything outside the building footprint must look identical to Image 1. Photorealistic construction site photograph quality.",
 
   // --- Stage 3: Half-Constructed Building (NO reference image) ---
   halfBuildingNoRef:
-    "You are given ONE image: the enhanced street-level view of the empty plot (use this as the base environment and camera angle). Generate a photorealistic visualization showing a contemporary residential building under construction on this plot. The building should be only HALF CONSTRUCTED — show exposed concrete structure, partially built floors, visible rebar and columns, scaffolding around the structure, construction materials on site. The foundation and first 1-2 floors should be mostly complete, upper floors showing bare structural framework. Design a modern multi-storey residential building appropriate for the plot size and neighborhood context. Match the exact camera angle and perspective of the street view. Blend the construction naturally into the surrounding environment with consistent lighting and shadows. Photorealistic quality — this should look like an actual construction site photograph.",
+    "You are given ONE image: the enhanced street-level view of the empty plot. Keep the ENTIRE surrounding environment exactly as-is: the road, trees, neighboring buildings, sky, ground, and all context. Your task: place a modern multi-storey residential building under construction on the marked plot. The building occupies only the plot boundary. Show it HALF CONSTRUCTED — exposed concrete structure, scaffolding, partially complete floors, visible rebar and columns, construction materials on site. The construction blends naturally into the existing environment with consistent lighting and shadows. Everything outside the building footprint is identical to the input image. Photorealistic construction site photograph quality.",
 
   // --- Stage 4: Fully Constructed Building (WITH reference image) ---
   fullBuilding:
-    "You are given TWO images: the FIRST image is the half-constructed building on the plot. The SECOND image is a REFERENCE BUILDING — you MUST match this reference building's exact architectural style, facade design, window placement, balcony design, roof style, colors, materials, and proportions in the final result. Transform the half-constructed building into a FULLY COMPLETED building that looks identical to the reference. Complete all floors with finished exterior walls, windows, balconies, and roof matching the reference exactly. Include finished landscaping — compound wall, gate, driveway, garden with plants and trees. Add exterior lighting fixtures. The building should look move-in ready and professionally photographed. Keep the EXACT same camera angle, perspective, and surrounding environment. Consistent lighting and shadows with the scene. Photorealistic architectural visualization quality.",
+    "You are given TWO images. IMPORTANT — these two images serve completely different purposes:\n\nImage 1 is the BASE SCENE — it shows a half-built construction on the actual plot. Keep the ENTIRE environment from Image 1 exactly as-is: the road, trees, neighboring buildings, sky, ground, and all surroundings must appear unchanged in the output. DO NOT import any background, scenery, trees, roads, or surroundings from Image 2.\n\nImage 2 is the ARCHITECTURAL FINISH REFERENCE only. Extract ONLY these design details: facade cladding material, window frame style, balcony railing design, roof style, wall colors, and exterior finish. COMPLETELY IGNORE Image 2's background, neighborhood, location, trees, road, and environment.\n\nYour task: Complete the half-built structure in Image 1 into a fully finished building. The building's exterior finish should reflect the style from Image 2. It sits naturally on the same plot, same camera angle. Everything outside the building footprint remains IDENTICAL to Image 1 — do not alter the road, trees, neighboring buildings, or sky. Add a compound wall, gate, driveway, and garden planting that naturally fits the Image 1 environment and does not look imported. Soft natural lighting matching the scene. Move-in ready, photorealistic architectural visualization quality.",
 
   // --- Stage 4: Fully Constructed Building (NO reference image) ---
   fullBuildingNoRef:
-    "You are given ONE image: the half-constructed building on the plot. Transform the half-constructed building into a FULLY COMPLETED contemporary residential building. Complete all floors with finished exterior walls, windows, balconies, and roof consistent with the partially built structure visible. Include finished landscaping — compound wall, gate, driveway, garden with plants and trees. Add exterior lighting fixtures. The building should look move-in ready and professionally photographed. Keep the EXACT same camera angle, perspective, and surrounding environment. Consistent lighting and shadows with the scene. Photorealistic architectural visualization quality.",
+    "You are given ONE image: a half-constructed building on a real plot. Keep the ENTIRE surrounding environment exactly as-is. Your task: complete the building into a fully finished contemporary residential structure. The finished exterior should be consistent with the visible structural style. Add compound wall, gate, driveway, and garden that naturally fit the existing environment. Everything outside the building footprint remains identical to the input. Soft natural lighting matching the scene. Move-in ready, photorealistic architectural visualization quality.",
 
   // --- Stage 5: Multiple Angle Prompts ---
   angleFront:
@@ -366,13 +366,13 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: createPromptData(""),
           style: NODE_DIMENSIONS.prompt,
         },
-        // NanoBanana: Enhanced map with clean annotation (Frame 1 — no text)
+        // GenerateImage: Enhanced map with clean annotation (Frame 1 — no text)
         {
-          id: "nanoBanana-map",
-          type: "nanoBanana",
+          id: "generateImage-map",
+          type: "generateImage",
           position: { x: COL.mapGen, y: ROW.mapRow },
-          data: createNanoBananaData(),
-          style: NODE_DIMENSIONS.nanoBanana,
+          data: createGenerateImageData(),
+          style: NODE_DIMENSIONS.generateImage,
         },
         // Prompt: Map enhancement with area text (Frame 2)
         {
@@ -382,13 +382,13 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: createPromptData(""),
           style: NODE_DIMENSIONS.prompt,
         },
-        // NanoBanana: Enhanced map WITH area text overlay (Frame 2)
+        // GenerateImage: Enhanced map WITH area text overlay (Frame 2)
         {
-          id: "nanoBanana-map-frame2",
-          type: "nanoBanana",
+          id: "generateImage-map-frame2",
+          type: "generateImage",
           position: { x: COL.mapGen, y: ROW.mapRow + 350 },
-          data: createNanoBananaData(),
-          style: NODE_DIMENSIONS.nanoBanana,
+          data: createGenerateImageData(),
+          style: NODE_DIMENSIONS.generateImage,
         },
 
         // ==========================================
@@ -419,13 +419,13 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: createPromptData(""),
           style: NODE_DIMENSIONS.prompt,
         },
-        // NanoBanana: Enhanced street view
+        // GenerateImage: Enhanced street view
         {
-          id: "nanoBanana-street",
-          type: "nanoBanana",
+          id: "generateImage-street",
+          type: "generateImage",
           position: { x: COL.streetGen, y: ROW.streetRow },
-          data: createNanoBananaData(),
-          style: NODE_DIMENSIONS.nanoBanana,
+          data: createGenerateImageData(),
+          style: NODE_DIMENSIONS.generateImage,
         },
 
         // ==========================================
@@ -448,13 +448,13 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: createPromptData(""),
           style: NODE_DIMENSIONS.prompt,
         },
-        // NanoBanana: Generate half-constructed building
+        // GenerateImage: Generate half-constructed building
         {
-          id: "nanoBanana-half-building",
-          type: "nanoBanana",
+          id: "generateImage-half-building",
+          type: "generateImage",
           position: { x: COL.halfBuildGen, y: ROW.streetRow },
-          data: createNanoBananaData(),
-          style: NODE_DIMENSIONS.nanoBanana,
+          data: createGenerateImageData(),
+          style: NODE_DIMENSIONS.generateImage,
         },
 
         // ==========================================
@@ -469,13 +469,13 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: createPromptData(""),
           style: NODE_DIMENSIONS.prompt,
         },
-        // NanoBanana: Generate fully constructed building
+        // GenerateImage: Generate fully constructed building
         {
-          id: "nanoBanana-full-building",
-          type: "nanoBanana",
+          id: "generateImage-full-building",
+          type: "generateImage",
           position: { x: COL.fullBuildGen, y: ROW.streetRow },
-          data: createNanoBananaData(),
-          style: NODE_DIMENSIONS.nanoBanana,
+          data: createGenerateImageData(),
+          style: NODE_DIMENSIONS.generateImage,
         },
 
         // ==========================================
@@ -490,13 +490,13 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: createPromptData(""),
           style: NODE_DIMENSIONS.prompt,
         },
-        // NanoBanana: Front angle shot
+        // GenerateImage: Front angle shot
         {
-          id: "nanoBanana-angle-front",
-          type: "nanoBanana",
+          id: "generateImage-angle-front",
+          type: "generateImage",
           position: { x: COL.angles + 370, y: ROW.mapRow - 50 },
-          data: createNanoBananaData(),
-          style: NODE_DIMENSIONS.nanoBanana,
+          data: createGenerateImageData(),
+          style: NODE_DIMENSIONS.generateImage,
         },
 
         // Prompt: Aerial angle
@@ -507,13 +507,13 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: createPromptData(""),
           style: NODE_DIMENSIONS.prompt,
         },
-        // NanoBanana: Aerial angle shot
+        // GenerateImage: Aerial angle shot
         {
-          id: "nanoBanana-angle-aerial",
-          type: "nanoBanana",
+          id: "generateImage-angle-aerial",
+          type: "generateImage",
           position: { x: COL.angles + 370, y: ROW.mapRow + 280 },
-          data: createNanoBananaData(),
-          style: NODE_DIMENSIONS.nanoBanana,
+          data: createGenerateImageData(),
+          style: NODE_DIMENSIONS.generateImage,
         },
 
         // Prompt: Corner angle
@@ -524,13 +524,13 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           data: createPromptData(""),
           style: NODE_DIMENSIONS.prompt,
         },
-        // NanoBanana: Corner angle shot
+        // GenerateImage: Corner angle shot
         {
-          id: "nanoBanana-angle-corner",
-          type: "nanoBanana",
+          id: "generateImage-angle-corner",
+          type: "generateImage",
           position: { x: COL.angles + 370, y: ROW.streetRow + 210 },
-          data: createNanoBananaData(),
-          style: NODE_DIMENSIONS.nanoBanana,
+          data: createGenerateImageData(),
+          style: NODE_DIMENSIONS.generateImage,
         },
 
         // ==========================================
@@ -703,30 +703,30 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           id: "e-map-annotate-to-gen",
           source: "annotation-map",
           sourceHandle: "image",
-          target: "nanoBanana-map",
+          target: "generateImage-map",
           targetHandle: "image",
         },
         {
           id: "e-map-prompt-to-gen",
           source: "prompt-map-enhance",
           sourceHandle: "text",
-          target: "nanoBanana-map",
+          target: "generateImage-map",
           targetHandle: "text",
         },
 
         // Frame 2: Map with area text (chained from Frame 1 output, not original annotation)
         {
           id: "e-map-frame1-to-gen-frame2",
-          source: "nanoBanana-map",
+          source: "generateImage-map",
           sourceHandle: "image",
-          target: "nanoBanana-map-frame2",
+          target: "generateImage-map-frame2",
           targetHandle: "image",
         },
         {
           id: "e-map-prompt-frame2-to-gen",
           source: "prompt-map-enhance-frame2",
           sourceHandle: "text",
-          target: "nanoBanana-map-frame2",
+          target: "generateImage-map-frame2",
           targetHandle: "text",
         },
 
@@ -744,14 +744,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
           id: "e-street-annotate-to-gen",
           source: "annotation-street",
           sourceHandle: "image",
-          target: "nanoBanana-street",
+          target: "generateImage-street",
           targetHandle: "image",
         },
         {
           id: "e-street-prompt-to-gen",
           source: "prompt-street-enhance",
           sourceHandle: "text",
-          target: "nanoBanana-street",
+          target: "generateImage-street",
           targetHandle: "text",
         },
 
@@ -763,23 +763,23 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // ==========================================
         {
           id: "e-street-to-halfbuild",
-          source: "nanoBanana-street",
+          source: "generateImage-street",
           sourceHandle: "image",
-          target: "nanoBanana-half-building",
+          target: "generateImage-half-building",
           targetHandle: "image",
         },
         {
           id: "e-buildref-to-halfbuild",
           source: "imageInput-building-ref",
           sourceHandle: "image",
-          target: "nanoBanana-half-building",
+          target: "generateImage-half-building",
           targetHandle: "image",
         },
         {
           id: "e-halfbuild-prompt",
           source: "prompt-half-building",
           sourceHandle: "text",
-          target: "nanoBanana-half-building",
+          target: "generateImage-half-building",
           targetHandle: "text",
         },
 
@@ -791,23 +791,23 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // ==========================================
         {
           id: "e-half-to-fullbuild",
-          source: "nanoBanana-half-building",
+          source: "generateImage-half-building",
           sourceHandle: "image",
-          target: "nanoBanana-full-building",
+          target: "generateImage-full-building",
           targetHandle: "image",
         },
         {
           id: "e-buildref-to-fullbuild",
           source: "imageInput-building-ref",
           sourceHandle: "image",
-          target: "nanoBanana-full-building",
+          target: "generateImage-full-building",
           targetHandle: "image",
         },
         {
           id: "e-fullbuild-prompt",
           source: "prompt-full-building",
           sourceHandle: "text",
-          target: "nanoBanana-full-building",
+          target: "generateImage-full-building",
           targetHandle: "text",
         },
 
@@ -820,16 +820,16 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Front angle
         {
           id: "e-full-to-angle-front",
-          source: "nanoBanana-full-building",
+          source: "generateImage-full-building",
           sourceHandle: "image",
-          target: "nanoBanana-angle-front",
+          target: "generateImage-angle-front",
           targetHandle: "image",
         },
         {
           id: "e-angle-front-prompt",
           source: "prompt-angle-front",
           sourceHandle: "text",
-          target: "nanoBanana-angle-front",
+          target: "generateImage-angle-front",
           targetHandle: "text",
         },
 
@@ -837,23 +837,23 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Gets BOTH full-building output AND aerial drone shot output for consistency
         {
           id: "e-full-to-angle-aerial",
-          source: "nanoBanana-full-building",
+          source: "generateImage-full-building",
           sourceHandle: "image",
-          target: "nanoBanana-angle-aerial",
+          target: "generateImage-angle-aerial",
           targetHandle: "image",
         },
         {
           id: "e-angle-front-to-aerial",
-          source: "nanoBanana-angle-front",
+          source: "generateImage-angle-front",
           sourceHandle: "image",
-          target: "nanoBanana-angle-aerial",
+          target: "generateImage-angle-aerial",
           targetHandle: "image",
         },
         {
           id: "e-angle-aerial-prompt",
           source: "prompt-angle-aerial",
           sourceHandle: "text",
-          target: "nanoBanana-angle-aerial",
+          target: "generateImage-angle-aerial",
           targetHandle: "text",
         },
 
@@ -861,23 +861,23 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Gets BOTH full-building output AND aerial drone shot output for consistent aesthetic
         {
           id: "e-full-to-angle-corner",
-          source: "nanoBanana-full-building",
+          source: "generateImage-full-building",
           sourceHandle: "image",
-          target: "nanoBanana-angle-corner",
+          target: "generateImage-angle-corner",
           targetHandle: "image",
         },
         {
           id: "e-angle-front-to-corner",
-          source: "nanoBanana-angle-front",
+          source: "generateImage-angle-front",
           sourceHandle: "image",
-          target: "nanoBanana-angle-corner",
+          target: "generateImage-angle-corner",
           targetHandle: "image",
         },
         {
           id: "e-angle-corner-prompt",
           source: "prompt-angle-corner",
           sourceHandle: "text",
-          target: "nanoBanana-angle-corner",
+          target: "generateImage-angle-corner",
           targetHandle: "text",
         },
 
@@ -888,14 +888,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Video 0: Area text popup (clean map → map with area text)
         {
           id: "e-map-frame1-to-vidarea",
-          source: "nanoBanana-map",
+          source: "generateImage-map",
           sourceHandle: "image",
           target: "generateVideo-map-area",
           targetHandle: "image-0",  // First Frame (image_url)
         },
         {
           id: "e-map-frame2-to-vidarea",
-          source: "nanoBanana-map-frame2",
+          source: "generateImage-map-frame2",
           sourceHandle: "image",
           target: "generateVideo-map-area",
           targetHandle: "image-1",  // Last Frame (tail_image_url)
@@ -911,14 +911,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Video 1: Map Frame 2 (with area text) → Street view enhanced
         {
           id: "e-map-to-vid1",
-          source: "nanoBanana-map-frame2",
+          source: "generateImage-map-frame2",
           sourceHandle: "image",
           target: "generateVideo-1",
           targetHandle: "image-0",  // First Frame
         },
         {
           id: "e-street-to-vid1",
-          source: "nanoBanana-street",
+          source: "generateImage-street",
           sourceHandle: "image",
           target: "generateVideo-1",
           targetHandle: "image-1",  // Last Frame
@@ -934,14 +934,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Video 2: Street view → Half building
         {
           id: "e-street-to-vid2",
-          source: "nanoBanana-street",
+          source: "generateImage-street",
           sourceHandle: "image",
           target: "generateVideo-2",
           targetHandle: "image-0",  // First Frame
         },
         {
           id: "e-half-to-vid2",
-          source: "nanoBanana-half-building",
+          source: "generateImage-half-building",
           sourceHandle: "image",
           target: "generateVideo-2",
           targetHandle: "image-1",  // Last Frame
@@ -957,14 +957,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Video 3: Half building → Full building
         {
           id: "e-halfbuild-to-vid3",
-          source: "nanoBanana-half-building",
+          source: "generateImage-half-building",
           sourceHandle: "image",
           target: "generateVideo-3",
           targetHandle: "image-0",  // First Frame
         },
         {
           id: "e-fullbuild-to-vid3",
-          source: "nanoBanana-full-building",
+          source: "generateImage-full-building",
           sourceHandle: "image",
           target: "generateVideo-3",
           targetHandle: "image-1",  // Last Frame
@@ -980,14 +980,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Video 4: Full building → Multiple angles (front as representative)
         {
           id: "e-fullbuild-to-vid4",
-          source: "nanoBanana-full-building",
+          source: "generateImage-full-building",
           sourceHandle: "image",
           target: "generateVideo-4",
           targetHandle: "image-0",  // First Frame
         },
         {
           id: "e-angle-front-to-vid4",
-          source: "nanoBanana-angle-front",
+          source: "generateImage-angle-front",
           sourceHandle: "image",
           target: "generateVideo-4",
           targetHandle: "image-1",  // Last Frame
@@ -1003,14 +1003,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Video 5: Aerial Drone → Balcony Close-up
         {
           id: "e-angle-front-to-vid5",
-          source: "nanoBanana-angle-front",
+          source: "generateImage-angle-front",
           sourceHandle: "image",
           target: "generateVideo-5",
           targetHandle: "image-0",  // First Frame
         },
         {
           id: "e-angle-aerial-to-vid5",
-          source: "nanoBanana-angle-aerial",
+          source: "generateImage-angle-aerial",
           sourceHandle: "image",
           target: "generateVideo-5",
           targetHandle: "image-1",  // Last Frame
@@ -1026,14 +1026,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // Video 6: Balcony Close-up → Interior Room
         {
           id: "e-angle-aerial-to-vid6",
-          source: "nanoBanana-angle-aerial",
+          source: "generateImage-angle-aerial",
           sourceHandle: "image",
           target: "generateVideo-6",
           targetHandle: "image-0",  // First Frame
         },
         {
           id: "e-angle-corner-to-vid6",
-          source: "nanoBanana-angle-corner",
+          source: "generateImage-angle-corner",
           sourceHandle: "image",
           target: "generateVideo-6",
           targetHandle: "image-1",  // Last Frame
@@ -1104,14 +1104,14 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         // ==========================================
         {
           id: "e-fullbuild-to-output1",
-          source: "nanoBanana-full-building",
+          source: "generateImage-full-building",
           sourceHandle: "image",
           target: "output-1",
           targetHandle: "image",
         },
         {
           id: "e-angle-front-to-output2",
-          source: "nanoBanana-angle-front",
+          source: "generateImage-angle-front",
           sourceHandle: "image",
           target: "output-2",
           targetHandle: "image",

@@ -9,7 +9,7 @@ import { ProviderType, RecentModel } from "@/types";
 import { ProviderModel, ModelCapability } from "@/lib/providers/types";
 
 // localStorage cache for models (persists across dev server restarts)
-const MODELS_CACHE_KEY = "node-banana-models-cache";
+const MODELS_CACHE_KEY = "plotai-models-cache";
 const MODELS_CACHE_TTL = 48 * 60 * 60 * 1000; // 48 hours
 
 interface ModelsCacheEntry {
@@ -270,7 +270,7 @@ export function ModelSearchDialog({
       // Clear localStorage model cache
       localStorage.removeItem(MODELS_CACHE_KEY);
       // Clear localStorage schema cache (keep in sync with ModelParameters.tsx)
-      localStorage.removeItem("node-banana-schema-cache");
+      localStorage.removeItem("plotai-schema-cache");
       // Clear in-memory deduplicatedFetch cache
       clearFetchCache();
       // Re-fetch with cache bypass
@@ -316,7 +316,7 @@ export function ModelSearchDialog({
         (cap) => cap === "text-to-video" || cap === "image-to-video"
       );
 
-      const nodeType = isVideoModel ? "generateVideo" : "nanoBanana";
+      const nodeType = isVideoModel ? "generateVideo" : "generateImage";
 
       addNode(nodeType, position, {
         selectedModel: {

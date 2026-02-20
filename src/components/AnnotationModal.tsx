@@ -28,6 +28,43 @@ const COLORS = [
 
 const STROKE_WIDTHS = [2, 4, 8];
 
+// ── SVG icon helpers (mobile toolbar) ──────────────────────────────────────
+function IconSelect() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-5.4 1.8 1.8-5.4L19.5 4.5a2.121 2.121 0 013 3L15 15z" />
+    </svg>
+  );
+}
+function IconRect() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <rect x="3" y="5" width="18" height="14" rx="1.5" />
+    </svg>
+  );
+}
+function IconDraw() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 3.487a2.25 2.25 0 113.182 3.182L7.5 19.213l-4 1 1-4L16.862 3.487z" />
+    </svg>
+  );
+}
+function IconUndo() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
+    </svg>
+  );
+}
+function IconTrash() {
+  return (
+    <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+    </svg>
+  );
+}
+
 export function AnnotationModal() {
   const {
     isModalOpen,
@@ -67,8 +104,17 @@ export function AnnotationModal() {
   const textInputCreatedAt = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Track container size with ResizeObserver for responsive Stage dimensions
+  // Detect mobile
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Track container size with ResizeObserver
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
@@ -88,9 +134,8 @@ export function AnnotationModal() {
       img.onload = () => {
         setImage(img);
         if (containerRef.current) {
-          // Use less padding on mobile screens
-          const isMobile = window.innerWidth < 768;
-          const padding = isMobile ? 16 : 100;
+          const mobile = window.innerWidth < 768;
+          const padding = mobile ? 8 : 80;
           const containerWidth = containerRef.current.clientWidth - padding;
           const containerHeight = containerRef.current.clientHeight - padding;
           const scaleX = containerWidth / img.width;
@@ -140,11 +185,8 @@ export function AnnotationModal() {
       if (e.ctrlKey || e.metaKey) {
         if (e.key === "z") {
           e.preventDefault();
-          if (e.shiftKey) {
-            redo();
-          } else {
-            undo();
-          }
+          if (e.shiftKey) redo();
+          else undo();
         }
       }
     };
@@ -161,17 +203,9 @@ export function AnnotationModal() {
     return transform.point(pos);
   }, []);
 
-  const handleMouseDown = useCallback(
-    (e: Konva.KonvaEventObject<MouseEvent>) => {
-      if (currentTool === "select") {
-        const clickedOnEmpty = e.target === e.target.getStage() || e.target.getClassName() === "Image";
-        if (clickedOnEmpty) {
-          selectShape(null);
-        }
-        return;
-      }
-
-      const pos = getRelativePointerPosition();
+  const startDrawing = useCallback(
+    (pos: { x: number; y: number }) => {
+      if (currentTool === "select") return;
       setIsDrawing(true);
       setDrawStart(pos);
 
@@ -186,7 +220,6 @@ export function AnnotationModal() {
       };
 
       let newShape: AnnotationShape | null = null;
-
       switch (currentTool) {
         case "rectangle":
           newShape = { ...baseShape, type: "rectangle", width: 0, height: 0, fill: toolOptions.fillColor } as RectangleShape;
@@ -201,7 +234,6 @@ export function AnnotationModal() {
           newShape = { ...baseShape, type: "freehand", points: [0, 0] } as FreehandShape;
           break;
         case "text": {
-          // Calculate screen position for the input
           const stage = stageRef.current;
           if (stage) {
             const container = stage.container();
@@ -220,10 +252,22 @@ export function AnnotationModal() {
           return;
         }
       }
-
       if (newShape) setCurrentShape(newShape);
     },
-    [currentTool, toolOptions, getRelativePointerPosition, selectShape, addAnnotation, scale, position]
+    [currentTool, toolOptions, scale, position]
+  );
+
+  const handleMouseDown = useCallback(
+    (e: Konva.KonvaEventObject<MouseEvent>) => {
+      if (currentTool === "select") {
+        const clickedOnEmpty = e.target === e.target.getStage() || e.target.getClassName() === "Image";
+        if (clickedOnEmpty) selectShape(null);
+        return;
+      }
+      const pos = getRelativePointerPosition();
+      startDrawing(pos);
+    },
+    [currentTool, getRelativePointerPosition, startDrawing, selectShape]
   );
 
   const handleMouseMove = useCallback(() => {
@@ -276,69 +320,85 @@ export function AnnotationModal() {
     setCurrentShape(null);
   }, [isDrawing, currentShape, addAnnotation]);
 
-  const handleWheel = useCallback((e: Konva.KonvaEventObject<WheelEvent>) => {
-    e.evt.preventDefault();
-    const scaleBy = 1.1;
-    const oldScale = scale;
-    const newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy;
-    setScale(Math.min(Math.max(newScale, 0.1), 5));
-  }, [scale]);
+  // ── Touch handlers — properly set pointer positions before reading them ──
 
-  // Pinch-to-zoom for mobile
+  const handleTouchStart = useCallback(
+    (e: Konva.KonvaEventObject<TouchEvent>) => {
+      const touches = e.evt.touches;
+      if (touches.length === 1) {
+        if (currentTool !== "select") {
+          e.evt.preventDefault();
+          // Critical: update Konva's internal pointer tracker from the touch event
+          const stage = stageRef.current;
+          if (stage) stage.setPointersPositions(e.evt);
+          const pos = getRelativePointerPosition();
+          startDrawing(pos);
+        }
+        // select mode: let Konva handle tap selection naturally
+      }
+      // 2-finger: handled in handleTouchMove (pinch/zoom)
+    },
+    [currentTool, getRelativePointerPosition, startDrawing]
+  );
+
   const lastPinchDist = useRef<number | null>(null);
   const lastPinchCenter = useRef<{ x: number; y: number } | null>(null);
 
-  const handleTouchMove = useCallback((e: Konva.KonvaEventObject<TouchEvent>) => {
-    const touch = e.evt.touches;
-    if (touch.length === 2) {
-      // Pinch gesture — zoom
-      e.evt.preventDefault();
-      const dx = touch[0].clientX - touch[1].clientX;
-      const dy = touch[0].clientY - touch[1].clientY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+  const handleTouchMove = useCallback(
+    (e: Konva.KonvaEventObject<TouchEvent>) => {
+      const touch = e.evt.touches;
+      if (touch.length === 2) {
+        e.evt.preventDefault();
+        const dx = touch[0].clientX - touch[1].clientX;
+        const dy = touch[0].clientY - touch[1].clientY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (lastPinchDist.current !== null) {
-        const delta = dist / lastPinchDist.current;
-        const newScale = Math.min(Math.max(scale * delta, 0.1), 5);
-        setScale(newScale);
-      }
-      lastPinchDist.current = dist;
+        if (lastPinchDist.current !== null) {
+          const delta = dist / lastPinchDist.current;
+          setScale((s) => Math.min(Math.max(s * delta, 0.1), 5));
+        }
+        lastPinchDist.current = dist;
 
-      // Pan with two fingers
-      const centerX = (touch[0].clientX + touch[1].clientX) / 2;
-      const centerY = (touch[0].clientY + touch[1].clientY) / 2;
-      if (lastPinchCenter.current) {
-        setPosition((prev) => ({
-          x: prev.x + (centerX - lastPinchCenter.current!.x),
-          y: prev.y + (centerY - lastPinchCenter.current!.y),
-        }));
+        const centerX = (touch[0].clientX + touch[1].clientX) / 2;
+        const centerY = (touch[0].clientY + touch[1].clientY) / 2;
+        if (lastPinchCenter.current) {
+          setPosition((prev) => ({
+            x: prev.x + (centerX - lastPinchCenter.current!.x),
+            y: prev.y + (centerY - lastPinchCenter.current!.y),
+          }));
+        }
+        lastPinchCenter.current = { x: centerX, y: centerY };
+      } else if (touch.length === 1 && isDrawing) {
+        e.evt.preventDefault();
+        // Update pointer position from touch before reading it
+        const stage = stageRef.current;
+        if (stage) stage.setPointersPositions(e.evt);
+        handleMouseMove();
       }
-      lastPinchCenter.current = { x: centerX, y: centerY };
-    } else if (touch.length === 1 && isDrawing) {
-      // Single finger drawing — prevent scroll, delegate to mouse handler
-      e.evt.preventDefault();
-      handleMouseMove();
-    }
-  }, [scale, isDrawing, handleMouseMove]);
+    },
+    [isDrawing, handleMouseMove]
+  );
 
   const handleTouchEnd = useCallback(() => {
     lastPinchDist.current = null;
     lastPinchCenter.current = null;
-    if (isDrawing) {
-      handleMouseUp();
-    }
+    if (isDrawing) handleMouseUp();
   }, [isDrawing, handleMouseUp]);
+
+  const handleWheel = useCallback((e: Konva.KonvaEventObject<WheelEvent>) => {
+    e.evt.preventDefault();
+    const scaleBy = 1.1;
+    const newScale = e.evt.deltaY > 0 ? scale / scaleBy : scale * scaleBy;
+    setScale(Math.min(Math.max(newScale, 0.1), 5));
+  }, [scale]);
 
   const flattenImage = useCallback((): string => {
     const stage = stageRef.current;
     if (!stage || !image) return "";
 
-    const tempStage = new Konva.Stage({
-      container: document.createElement("div"),
-      width: image.width,
-      height: image.height,
-    });
-
+    const container = document.createElement("div");
+    document.body.appendChild(container);
+    const tempStage = new Konva.Stage({ container, width: image.width, height: image.height });
     const tempLayer = new Konva.Layer();
     tempStage.add(tempLayer);
 
@@ -380,6 +440,7 @@ export function AnnotationModal() {
     tempLayer.draw();
     const dataUrl = tempStage.toDataURL({ pixelRatio: 1 });
     tempStage.destroy();
+    document.body.removeChild(container);
     return dataUrl;
   }, [image, annotations]);
 
@@ -431,15 +492,10 @@ export function AnnotationModal() {
               const node = e.target;
               const scaleX = node.scaleX();
               const scaleY = node.scaleY();
-              // Reset scale and apply it to fontSize instead
               node.scaleX(1);
               node.scaleY(1);
               const newFontSize = Math.round(text.fontSize * Math.max(scaleX, scaleY));
-              updateAnnotation(shape.id, {
-                x: node.x(),
-                y: node.y(),
-                fontSize: newFontSize,
-              });
+              updateAnnotation(shape.id, { x: node.x(), y: node.y(), fontSize: newFontSize });
             }}
             onDblClick={() => {
               if (currentTool === "select") {
@@ -462,20 +518,213 @@ export function AnnotationModal() {
 
   if (!isModalOpen) return null;
 
-  const tools: { type: ToolType; label: string }[] = [
-    { type: "select", label: "Select" },
-    { type: "rectangle", label: "Rect" },
-    { type: "circle", label: "Circle" },
-    { type: "arrow", label: "Arrow" },
-    { type: "freehand", label: "Draw" },
-    { type: "text", label: "Text" },
+  // ── Shared canvas ────────────────────────────────────────────────────────
+  const canvas = (
+    <div ref={containerRef} className="flex-1 overflow-hidden bg-neutral-900" style={{ touchAction: "none" }}>
+      <Stage
+        ref={stageRef}
+        width={containerSize.width}
+        height={containerSize.height}
+        scaleX={scale}
+        scaleY={scale}
+        x={position.x}
+        y={position.y}
+        draggable={currentTool === "select"}
+        onDragEnd={(e) => { if (e.target === stageRef.current) setPosition({ x: e.target.x(), y: e.target.y() }); }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onWheel={handleWheel}
+      >
+        <Layer>
+          {image && <KonvaImage image={image} width={stageSize.width} height={stageSize.height} />}
+          {annotations.map((shape) => renderShape(shape))}
+          {currentShape && renderShape(currentShape, true)}
+          <Transformer ref={transformerRef} />
+        </Layer>
+      </Stage>
+    </div>
+  );
+
+  // ── Text input overlay (shared) ──────────────────────────────────────────
+  const textOverlay = editingTextId && textInputPosition && (
+    <input
+      ref={textInputRef}
+      type="text"
+      autoFocus
+      defaultValue={editingTextId === "new" ? "" : (annotations.find((a) => a.id === editingTextId) as TextShape)?.text || ""}
+      className="fixed z-[110] bg-transparent border-none outline-none"
+      style={{
+        left: textInputPosition.x,
+        top: textInputPosition.y,
+        fontSize: `${toolOptions.fontSize * scale}px`,
+        color: editingTextId === "new" ? toolOptions.strokeColor : ((annotations.find((a) => a.id === editingTextId) as TextShape)?.fill || toolOptions.strokeColor),
+        minWidth: "100px",
+        caretColor: "white",
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          const value = (e.target as HTMLInputElement).value;
+          if (value.trim()) {
+            if (editingTextId === "new" && pendingTextPosition) {
+              const newShape: TextShape = { id: `shape-${Date.now()}`, type: "text", x: pendingTextPosition.x, y: pendingTextPosition.y, text: value, fontSize: toolOptions.fontSize, fill: toolOptions.strokeColor, stroke: toolOptions.strokeColor, strokeWidth: toolOptions.strokeWidth, opacity: toolOptions.opacity };
+              addAnnotation(newShape);
+            } else {
+              updateAnnotation(editingTextId, { text: value });
+            }
+          } else if (editingTextId !== "new") {
+            deleteAnnotation(editingTextId);
+          }
+          setEditingTextId(null); setTextInputPosition(null); setPendingTextPosition(null);
+        }
+        if (e.key === "Escape") {
+          if (editingTextId !== "new") {
+            const currentText = (annotations.find((a) => a.id === editingTextId) as TextShape)?.text;
+            if (!currentText) deleteAnnotation(editingTextId);
+          }
+          setEditingTextId(null); setTextInputPosition(null); setPendingTextPosition(null);
+        }
+      }}
+      onBlur={(e) => {
+        if (Date.now() - textInputCreatedAt.current < 200) { e.target.focus(); return; }
+        const value = e.target.value;
+        if (value.trim()) {
+          if (editingTextId === "new" && pendingTextPosition) {
+            const newShape: TextShape = { id: `shape-${Date.now()}`, type: "text", x: pendingTextPosition.x, y: pendingTextPosition.y, text: value, fontSize: toolOptions.fontSize, fill: toolOptions.strokeColor, stroke: toolOptions.strokeColor, strokeWidth: toolOptions.strokeWidth, opacity: toolOptions.opacity };
+            addAnnotation(newShape);
+          } else {
+            updateAnnotation(editingTextId, { text: value });
+          }
+        } else if (editingTextId !== "new") {
+          deleteAnnotation(editingTextId);
+        }
+        setEditingTextId(null); setTextInputPosition(null); setPendingTextPosition(null);
+      }}
+    />
+  );
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // MOBILE LAYOUT — full-screen, thumb-friendly
+  // ══════════════════════════════════════════════════════════════════════════
+  if (isMobile) {
+    const mobileTools: { type: ToolType; icon: React.ReactNode; label: string }[] = [
+      { type: "select",    icon: <IconSelect />,  label: "Select" },
+      { type: "rectangle", icon: <IconRect />,    label: "Rect"   },
+      { type: "freehand",  icon: <IconDraw />,    label: "Draw"   },
+    ];
+
+    return (
+      <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+        {/* Top bar: Cancel | title | Done */}
+        <div className="flex-shrink-0 h-14 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-4">
+          <button onClick={closeModal} className="text-sm text-neutral-400 active:text-white px-2 py-2">Cancel</button>
+          <span className="text-sm font-medium text-neutral-200">Mark Plot Boundary</span>
+          <button onClick={handleDone} className="text-sm font-semibold text-white bg-neutral-700 active:bg-neutral-600 px-4 py-2 rounded-lg">Done</button>
+        </div>
+
+        {/* Hint bar */}
+        <div className="flex-shrink-0 bg-neutral-950 px-4 py-1.5 flex items-center justify-between">
+          <span className="text-xs text-neutral-500">
+            {currentTool === "select" ? "Tap a shape to select" : currentTool === "freehand" ? "Drag to draw freely" : "Drag to draw a rectangle"}
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-neutral-600">{Math.round(scale * 100)}%</span>
+          </div>
+        </div>
+
+        {/* Canvas */}
+        {canvas}
+
+        {/* Bottom toolbar: colors + stroke size */}
+        <div className="flex-shrink-0 bg-neutral-900 border-t border-neutral-800">
+          {/* Color row */}
+          <div className="h-12 flex items-center gap-2 px-4">
+            {COLORS.map((color) => (
+              <button
+                key={color}
+                onTouchEnd={(e) => { e.preventDefault(); setToolOptions({ strokeColor: color }); }}
+                onClick={() => setToolOptions({ strokeColor: color })}
+                className={`w-8 h-8 rounded-full flex-shrink-0 transition-transform active:scale-95 ${toolOptions.strokeColor === color ? "ring-2 ring-white ring-offset-1 ring-offset-neutral-900 scale-110" : ""}`}
+                style={{ backgroundColor: color }}
+              />
+            ))}
+            <div className="flex-1" />
+            <button onTouchEnd={(e) => { e.preventDefault(); undo(); }} onClick={undo} className="p-2 text-neutral-400 active:text-white">
+              <IconUndo />
+            </button>
+            <button onTouchEnd={(e) => { e.preventDefault(); if (annotations.length > 0) { if (window.confirm("Clear all drawings?")) clearAnnotations(); } }} onClick={() => { if (annotations.length > 0 && window.confirm("Clear all drawings?")) clearAnnotations(); }} className="p-2 text-neutral-400 active:text-red-400">
+              <IconTrash />
+            </button>
+          </div>
+          {/* Stroke width + tools row */}
+          <div className="h-16 flex items-center gap-3 px-4 border-t border-neutral-800/50">
+            {/* Stroke widths */}
+            <div className="flex items-center gap-2">
+              {STROKE_WIDTHS.map((width) => (
+                <button
+                  key={width}
+                  onTouchEnd={(e) => { e.preventDefault(); setToolOptions({ strokeWidth: width }); }}
+                  onClick={() => setToolOptions({ strokeWidth: width })}
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center active:scale-95 transition-all ${toolOptions.strokeWidth === width ? "bg-neutral-700 ring-1 ring-neutral-500" : "bg-neutral-800"}`}
+                >
+                  <div className="bg-white rounded-full" style={{ width: width * 2, height: width * 2 }} />
+                </button>
+              ))}
+            </div>
+
+            <div className="w-px h-8 bg-neutral-700 mx-1" />
+
+            {/* Tool selector */}
+            <div className="flex items-center gap-2 flex-1">
+              {mobileTools.map((tool) => (
+                <button
+                  key={tool.type}
+                  onTouchEnd={(e) => { e.preventDefault(); setCurrentTool(tool.type); }}
+                  onClick={() => setCurrentTool(tool.type)}
+                  className={`flex-1 h-10 flex flex-col items-center justify-center gap-0.5 rounded-xl active:scale-95 transition-all ${currentTool === tool.type ? "bg-white text-neutral-900" : "bg-neutral-800 text-neutral-400"}`}
+                >
+                  {tool.icon}
+                  <span className="text-[9px] font-medium leading-none">{tool.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Fill toggle */}
+            <button
+              onTouchEnd={(e) => { e.preventDefault(); setToolOptions({ fillColor: toolOptions.fillColor ? null : toolOptions.strokeColor }); }}
+              onClick={() => setToolOptions({ fillColor: toolOptions.fillColor ? null : toolOptions.strokeColor })}
+              className={`h-10 px-3 rounded-xl text-xs font-medium active:scale-95 transition-all ${toolOptions.fillColor ? "bg-neutral-700 text-white ring-1 ring-neutral-500" : "bg-neutral-800 text-neutral-500"}`}
+            >
+              Fill
+            </button>
+          </div>
+        </div>
+
+        {textOverlay}
+      </div>
+    );
+  }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // DESKTOP LAYOUT — original compact layout
+  // ══════════════════════════════════════════════════════════════════════════
+  const desktopTools: { type: ToolType; label: string }[] = [
+    { type: "select",    label: "Select"  },
+    { type: "rectangle", label: "Rect"   },
+    { type: "circle",    label: "Circle" },
+    { type: "arrow",     label: "Arrow"  },
+    { type: "freehand",  label: "Draw"   },
+    { type: "text",      label: "Text"   },
   ];
 
   return (
     <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col">
-      {/* Top Bar — responsive: scrollable tools on mobile */}
+      {/* Top Bar */}
       <div className="flex-shrink-0 bg-neutral-900 border-b border-neutral-800">
-        {/* Row 1: Cancel / Done + Undo/Redo/Clear */}
         <div className="h-11 flex items-center justify-between px-3">
           <div className="flex items-center gap-1">
             <button onClick={undo} className="px-2 py-1 text-xs text-neutral-400 hover:text-white">Undo</button>
@@ -483,25 +732,16 @@ export function AnnotationModal() {
             <button onClick={clearAnnotations} className="px-2 py-1 text-xs text-neutral-400 hover:text-red-400">Clear</button>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={closeModal} className="px-3 py-1 text-xs font-medium text-neutral-400 hover:text-white">
-              Cancel
-            </button>
-            <button onClick={handleDone} className="px-3 py-1 text-xs font-medium bg-white text-neutral-900 rounded hover:bg-neutral-200">
-              Done
-            </button>
+            <button onClick={closeModal} className="px-3 py-1 text-xs font-medium text-neutral-400 hover:text-white">Cancel</button>
+            <button onClick={handleDone} className="px-3 py-1 text-xs font-medium bg-white text-neutral-900 rounded hover:bg-neutral-200">Done</button>
           </div>
         </div>
-        {/* Row 2: Tool selector — horizontally scrollable */}
         <div className="h-10 flex items-center gap-1 px-3 overflow-x-auto scrollbar-none">
-          {tools.map((tool) => (
+          {desktopTools.map((tool) => (
             <button
               key={tool.type}
               onClick={() => setCurrentTool(tool.type)}
-              className={`px-3 py-1 text-xs font-medium rounded whitespace-nowrap transition-colors ${
-                currentTool === tool.type
-                  ? "bg-white text-neutral-900"
-                  : "text-neutral-400 hover:text-white"
-              }`}
+              className={`px-3 py-1 text-xs font-medium rounded whitespace-nowrap transition-colors ${currentTool === tool.type ? "bg-white text-neutral-900" : "text-neutral-400 hover:text-white"}`}
             >
               {tool.label}
             </button>
@@ -509,183 +749,51 @@ export function AnnotationModal() {
         </div>
       </div>
 
-      {/* Canvas Container — touch-action:none prevents browser from stealing touch events */}
-      <div ref={containerRef} className="flex-1 overflow-hidden bg-neutral-900" style={{ touchAction: "none" }}>
-        <Stage
-          ref={stageRef}
-          width={containerSize.width}
-          height={containerSize.height}
-          scaleX={scale}
-          scaleY={scale}
-          x={position.x}
-          y={position.y}
-          draggable={currentTool === "select"}
-          onDragEnd={(e) => { if (e.target === stageRef.current) setPosition({ x: e.target.x(), y: e.target.y() }); }}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          onTouchStart={handleMouseDown as unknown as (e: Konva.KonvaEventObject<TouchEvent>) => void}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-          onWheel={handleWheel}
-        >
-          <Layer>
-            {image && <KonvaImage image={image} width={stageSize.width} height={stageSize.height} />}
-            {annotations.map((shape) => renderShape(shape))}
-            {currentShape && renderShape(currentShape, true)}
-            <Transformer ref={transformerRef} />
-          </Layer>
-        </Stage>
-      </div>
+      {canvas}
 
-      {/* Bottom Options Bar — responsive: 2 rows on mobile, 1 row on desktop */}
-      <div className="bg-neutral-900 border-t border-neutral-800" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-        {/* Row 1: Colors (always visible) */}
+      {/* Bottom Options Bar */}
+      <div className="bg-neutral-900 border-t border-neutral-800">
         <div className="h-11 flex items-center justify-between px-3">
           <div className="flex items-center gap-1.5">
             {COLORS.map((color) => (
               <button
                 key={color}
                 onClick={() => setToolOptions({ strokeColor: color })}
-                className={`w-6 h-6 rounded-full transition-transform flex-shrink-0 ${
-                  toolOptions.strokeColor === color ? "ring-2 ring-white ring-offset-1 ring-offset-neutral-900 scale-110" : "hover:scale-105"
-                }`}
+                className={`w-6 h-6 rounded-full transition-transform flex-shrink-0 ${toolOptions.strokeColor === color ? "ring-2 ring-white ring-offset-1 ring-offset-neutral-900 scale-110" : "hover:scale-105"}`}
                 style={{ backgroundColor: color }}
               />
             ))}
           </div>
-          {/* Zoom — visible on all sizes, pushed to right */}
           <div className="flex items-center gap-1 ml-2 flex-shrink-0">
             <button onClick={() => setScale(Math.max(scale - 0.1, 0.1))} className="w-7 h-7 rounded text-neutral-400 hover:text-white text-sm flex items-center justify-center">−</button>
             <span className="text-[10px] text-neutral-400 w-9 text-center">{Math.round(scale * 100)}%</span>
             <button onClick={() => setScale(Math.min(scale + 0.1, 5))} className="w-7 h-7 rounded text-neutral-400 hover:text-white text-sm flex items-center justify-center">+</button>
           </div>
         </div>
-        {/* Row 2: Size, Fill */}
         <div className="h-9 flex items-center gap-3 px-3 border-t border-neutral-800/50">
-          {/* Stroke Width */}
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-neutral-500 uppercase tracking-wide">Size</span>
             {STROKE_WIDTHS.map((width) => (
               <button
                 key={width}
                 onClick={() => setToolOptions({ strokeWidth: width })}
-                className={`w-7 h-7 rounded flex items-center justify-center transition-colors ${
-                  toolOptions.strokeWidth === width ? "bg-neutral-700" : "hover:bg-neutral-800"
-                }`}
+                className={`w-7 h-7 rounded flex items-center justify-center transition-colors ${toolOptions.strokeWidth === width ? "bg-neutral-700" : "hover:bg-neutral-800"}`}
               >
                 <div className="bg-white rounded-full" style={{ width: width * 1.5, height: width * 1.5 }} />
               </button>
             ))}
           </div>
           <div className="w-px h-5 bg-neutral-700" />
-          {/* Fill Toggle */}
           <button
             onClick={() => setToolOptions({ fillColor: toolOptions.fillColor ? null : toolOptions.strokeColor })}
-            className={`px-2.5 py-1 text-[10px] uppercase tracking-wide rounded transition-colors ${
-              toolOptions.fillColor ? "bg-neutral-700 text-white" : "text-neutral-500 hover:text-white"
-            }`}
+            className={`px-2.5 py-1 text-[10px] uppercase tracking-wide rounded transition-colors ${toolOptions.fillColor ? "bg-neutral-700 text-white" : "text-neutral-500 hover:text-white"}`}
           >
             Fill
           </button>
         </div>
       </div>
 
-      {/* Inline Text Input */}
-      {editingTextId && textInputPosition && (
-        <input
-          ref={textInputRef}
-          type="text"
-          autoFocus
-          defaultValue={editingTextId === "new" ? "" : (annotations.find((a) => a.id === editingTextId) as TextShape)?.text || ""}
-          className="fixed z-[110] bg-transparent border-none outline-none"
-          style={{
-            left: textInputPosition.x,
-            top: textInputPosition.y,
-            fontSize: `${toolOptions.fontSize * scale}px`,
-            color: editingTextId === "new" ? toolOptions.strokeColor : ((annotations.find((a) => a.id === editingTextId) as TextShape)?.fill || toolOptions.strokeColor),
-            minWidth: "100px",
-            caretColor: "white",
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              const value = (e.target as HTMLInputElement).value;
-              if (value.trim()) {
-                if (editingTextId === "new" && pendingTextPosition) {
-                  // Create new text annotation
-                  const newShape: TextShape = {
-                    id: `shape-${Date.now()}`,
-                    type: "text",
-                    x: pendingTextPosition.x,
-                    y: pendingTextPosition.y,
-                    text: value,
-                    fontSize: toolOptions.fontSize,
-                    fill: toolOptions.strokeColor,
-                    stroke: toolOptions.strokeColor,
-                    strokeWidth: toolOptions.strokeWidth,
-                    opacity: toolOptions.opacity,
-                  };
-                  addAnnotation(newShape);
-                } else {
-                  updateAnnotation(editingTextId, { text: value });
-                }
-              } else if (editingTextId !== "new") {
-                deleteAnnotation(editingTextId);
-              }
-              setEditingTextId(null);
-              setTextInputPosition(null);
-              setPendingTextPosition(null);
-            }
-            if (e.key === "Escape") {
-              if (editingTextId !== "new") {
-                const currentText = (annotations.find((a) => a.id === editingTextId) as TextShape)?.text;
-                if (!currentText) {
-                  deleteAnnotation(editingTextId);
-                }
-              }
-              setEditingTextId(null);
-              setTextInputPosition(null);
-              setPendingTextPosition(null);
-            }
-          }}
-          onBlur={(e) => {
-            // Ignore blur events that happen immediately after creation (within 200ms)
-            // This prevents the click that created the input from also triggering blur
-            if (Date.now() - textInputCreatedAt.current < 200) {
-              e.target.focus();
-              return;
-            }
-
-            const value = e.target.value;
-            if (value.trim()) {
-              if (editingTextId === "new" && pendingTextPosition) {
-                // Create new text annotation
-                const newShape: TextShape = {
-                  id: `shape-${Date.now()}`,
-                  type: "text",
-                  x: pendingTextPosition.x,
-                  y: pendingTextPosition.y,
-                  text: value,
-                  fontSize: toolOptions.fontSize,
-                  fill: toolOptions.strokeColor,
-                  stroke: toolOptions.strokeColor,
-                  strokeWidth: toolOptions.strokeWidth,
-                  opacity: toolOptions.opacity,
-                };
-                addAnnotation(newShape);
-              } else {
-                updateAnnotation(editingTextId, { text: value });
-              }
-            } else if (editingTextId !== "new") {
-              deleteAnnotation(editingTextId);
-            }
-            setEditingTextId(null);
-            setTextInputPosition(null);
-            setPendingTextPosition(null);
-          }}
-        />
-      )}
+      {textOverlay}
     </div>
   );
 }

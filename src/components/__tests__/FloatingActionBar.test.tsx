@@ -305,7 +305,7 @@ describe("FloatingActionBar", () => {
       expect(screen.getByText("Text (LLM)")).toBeInTheDocument();
     });
 
-    it("should add nanoBanana node when Image option is clicked", async () => {
+    it("should add generateImage node when Image option is clicked", async () => {
       render(
         <TestWrapper>
           <FloatingActionBar />
@@ -323,7 +323,7 @@ describe("FloatingActionBar", () => {
       const imageOption = screen.getByText("Image", { selector: "button.w-full" });
       fireEvent.click(imageOption);
 
-      expect(mockAddNode).toHaveBeenCalledWith("nanoBanana", expect.any(Object));
+      expect(mockAddNode).toHaveBeenCalledWith("generateImage", expect.any(Object));
     });
 
     it("should add generateVideo node when Video option is clicked", async () => {

@@ -185,9 +185,13 @@ export function Header() {
       />
       <header className="h-11 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-4 shrink-0">
         <div className="flex items-center gap-2">
-          <img src="/banana_icon.png" alt="Banana" className="w-6 h-6" />
-          <h1 className="text-2xl font-semibold text-neutral-100 tracking-tight">
-            Node Banana
+          <svg width="22" height="22" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="PlotAI">
+            <path d="M16 2L30 16L16 30L2 16Z" stroke="white" strokeWidth="2" strokeLinejoin="round" fill="none"/>
+            <rect x="10" y="10" width="12" height="12" rx="1.5" fill="white" fillOpacity="0.15" stroke="white" strokeWidth="1.5"/>
+            <circle cx="16" cy="16" r="2" fill="white"/>
+          </svg>
+          <h1 className="text-sm font-semibold text-neutral-100 tracking-tight">
+            PlotAI
           </h1>
 
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-neutral-700">

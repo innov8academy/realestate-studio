@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { GenerateImageNode } from "@/components/nodes/GenerateImageNode";
 import { ReactFlowProvider } from "@xyflow/react";
-import { NanoBananaNodeData, ProviderSettings } from "@/types";
+import { GenerateImageNodeData, ProviderSettings } from "@/types";
 
 // Mock deduplicatedFetch to pass through to global fetch (avoids caching issues in tests)
 vi.mock("@/utils/deduplicatedFetch", () => ({
@@ -34,7 +34,7 @@ vi.mock("@/store/workflowStore", () => ({
     replicateEnabled: false,
     kieEnabled: false,
   }),
-  saveNanoBananaDefaults: vi.fn(),
+  saveGenerateImageDefaults: vi.fn(),
 }));
 
 // Mock useReactFlow
@@ -128,13 +128,13 @@ describe("GenerateImageNode", () => {
     vi.restoreAllMocks();
   });
 
-  const createNodeData = (overrides: Partial<NanoBananaNodeData> = {}): NanoBananaNodeData => ({
+  const createNodeData = (overrides: Partial<GenerateImageNodeData> = {}): GenerateImageNodeData => ({
     inputImages: [],
     inputPrompt: null,
     outputImage: null,
     aspectRatio: "1:1",
     resolution: "1K",
-    model: "nano-banana-pro",
+    model: "gemini-pro",
     useGoogleSearch: false,
     status: "idle",
     error: null,
@@ -143,9 +143,9 @@ describe("GenerateImageNode", () => {
     ...overrides,
   });
 
-  const createNodeProps = (data: Partial<NanoBananaNodeData> = {}) => ({
+  const createNodeProps = (data: Partial<GenerateImageNodeData> = {}) => ({
     id: "test-node-1",
-    type: "nanoBanana" as const,
+    type: "generateImage" as const,
     data: createNodeData(data),
     selected: false,
   });
@@ -166,19 +166,19 @@ describe("GenerateImageNode", () => {
     it("should render the model name as title", () => {
       render(
         <TestWrapper>
-          <GenerateImageNode {...createNodeProps({ model: "nano-banana-pro" })} />
+          <GenerateImageNode {...createNodeProps({ model: "gemini-pro" })} />
         </TestWrapper>
       );
 
       // The title should show the display name
-      expect(screen.getByText("Nano Banana Pro")).toBeInTheDocument();
+      expect(screen.getByText("Gemini Pro")).toBeInTheDocument();
     });
 
     it("should render display name from selectedModel when provided", () => {
       render(
         <TestWrapper>
           <GenerateImageNode {...createNodeProps({
-            model: "nano-banana" as const,
+            model: "gemini-flash" as const,
             selectedModel: { provider: "fal", modelId: "flux/dev", displayName: "FLUX.1 Dev" },
           })} />
         </TestWrapper>
@@ -380,7 +380,7 @@ describe("GenerateImageNode", () => {
         <TestWrapper>
           <GenerateImageNode {...createNodeProps({
             outputImage: "data:image/png;base64,abc123",
-            imageHistory: [{ id: "img1", timestamp: Date.now(), prompt: "test", aspectRatio: "1:1", model: "nano-banana" }],
+            imageHistory: [{ id: "img1", timestamp: Date.now(), prompt: "test", aspectRatio: "1:1", model: "gemini-flash" }],
             selectedHistoryIndex: 0,
           })} />
         </TestWrapper>
@@ -396,8 +396,8 @@ describe("GenerateImageNode", () => {
           <GenerateImageNode {...createNodeProps({
             outputImage: "data:image/png;base64,abc123",
             imageHistory: [
-              { id: "img1", timestamp: Date.now(), prompt: "test1", aspectRatio: "1:1", model: "nano-banana" },
-              { id: "img2", timestamp: Date.now(), prompt: "test2", aspectRatio: "1:1", model: "nano-banana" },
+              { id: "img1", timestamp: Date.now(), prompt: "test1", aspectRatio: "1:1", model: "gemini-flash" },
+              { id: "img2", timestamp: Date.now(), prompt: "test2", aspectRatio: "1:1", model: "gemini-flash" },
             ],
             selectedHistoryIndex: 0,
           })} />
@@ -414,9 +414,9 @@ describe("GenerateImageNode", () => {
           <GenerateImageNode {...createNodeProps({
             outputImage: "data:image/png;base64,abc123",
             imageHistory: [
-              { id: "img1", timestamp: Date.now(), prompt: "test1", aspectRatio: "1:1", model: "nano-banana" },
-              { id: "img2", timestamp: Date.now(), prompt: "test2", aspectRatio: "1:1", model: "nano-banana" },
-              { id: "img3", timestamp: Date.now(), prompt: "test3", aspectRatio: "1:1", model: "nano-banana" },
+              { id: "img1", timestamp: Date.now(), prompt: "test1", aspectRatio: "1:1", model: "gemini-flash" },
+              { id: "img2", timestamp: Date.now(), prompt: "test2", aspectRatio: "1:1", model: "gemini-flash" },
+              { id: "img3", timestamp: Date.now(), prompt: "test3", aspectRatio: "1:1", model: "gemini-flash" },
             ],
             selectedHistoryIndex: 1,
           })} />
@@ -516,7 +516,7 @@ describe("GenerateImageNode", () => {
       const { container } = render(
         <TestWrapper>
           <GenerateImageNode {...createNodeProps({
-            selectedModel: { provider: "gemini", modelId: "nano-banana-pro", displayName: "Nano Banana Pro" },
+            selectedModel: { provider: "gemini", modelId: "gemini-pro", displayName: "Gemini Pro" },
           })} />
         </TestWrapper>
       );
@@ -592,7 +592,7 @@ describe("GenerateImageNode", () => {
       render(
         <TestWrapper>
           <GenerateImageNode {...createNodeProps({
-            model: "nano-banana",
+            model: "gemini-flash",
             selectedModel: undefined,
           })} />
         </TestWrapper>
@@ -603,8 +603,8 @@ describe("GenerateImageNode", () => {
         expect(mockUpdateNodeData).toHaveBeenCalledWith("test-node-1", {
           selectedModel: {
             provider: "gemini",
-            modelId: "nano-banana",
-            displayName: "Nano Banana",
+            modelId: "gemini-flash",
+            displayName: "Gemini Flash",
           },
         });
       });
@@ -757,7 +757,7 @@ describe("GenerateImageNode", () => {
       );
 
       // Click on title to edit
-      const title = screen.getByText("Nano Banana Pro");
+      const title = screen.getByText("Gemini Pro");
       fireEvent.click(title);
 
       // Type new title
@@ -791,7 +791,7 @@ describe("GenerateImageNode", () => {
       render(
         <TestWrapper>
           <GenerateImageNode {...createNodeProps({
-            selectedModel: { provider: "gemini", modelId: "nano-banana-pro", displayName: "Nano Banana Pro" },
+            selectedModel: { provider: "gemini", modelId: "gemini-pro", displayName: "Gemini Pro" },
           })} />
         </TestWrapper>
       );
@@ -831,7 +831,7 @@ describe("GenerateImageNode", () => {
       render(
         <TestWrapper>
           <GenerateImageNode {...createNodeProps({
-            selectedModel: { provider: "gemini", modelId: "nano-banana-pro", displayName: "Nano Banana Pro" },
+            selectedModel: { provider: "gemini", modelId: "gemini-pro", displayName: "Gemini Pro" },
           })} />
         </TestWrapper>
       );

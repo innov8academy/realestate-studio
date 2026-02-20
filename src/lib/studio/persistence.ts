@@ -10,7 +10,7 @@
  *  - "wizardStep" → the current step index (number)
  */
 
-const DB_NAME = "node-banana-studio";
+const DB_NAME = "plotai-studio";
 const DB_VERSION = 1;
 const STORE_NAME = "state";
 

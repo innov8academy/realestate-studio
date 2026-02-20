@@ -32,7 +32,7 @@ const createHistoryItem = (overrides: Partial<ImageHistoryItem> = {}): ImageHist
   timestamp: Date.now(),
   prompt: "A test prompt",
   aspectRatio: "1:1",
-  model: "nano-banana",
+  model: "gemini-flash",
   ...overrides,
 });
 
@@ -323,9 +323,9 @@ describe("GlobalImageHistory", () => {
   });
 
   describe("Model Display", () => {
-    it("should show 'Pro' for nano-banana-pro model in sidebar", () => {
+    it("should show 'Pro' for gemini-pro model in sidebar", () => {
       const history = Array.from({ length: 15 }, (_, i) =>
-        createHistoryItem({ id: `item-${i}`, model: "nano-banana-pro" })
+        createHistoryItem({ id: `item-${i}`, model: "gemini-pro" })
       );
       mockUseWorkflowStore.mockImplementation((selector) => {
         return selector(createDefaultState({ globalImageHistory: history }));
@@ -342,9 +342,9 @@ describe("GlobalImageHistory", () => {
       expect(proLabels.length).toBeGreaterThan(0);
     });
 
-    it("should show 'Standard' for nano-banana model in sidebar", () => {
+    it("should show 'Standard' for gemini-flash model in sidebar", () => {
       const history = Array.from({ length: 15 }, (_, i) =>
-        createHistoryItem({ id: `item-${i}`, model: "nano-banana" })
+        createHistoryItem({ id: `item-${i}`, model: "gemini-flash" })
       );
       mockUseWorkflowStore.mockImplementation((selector) => {
         return selector(createDefaultState({ globalImageHistory: history }));

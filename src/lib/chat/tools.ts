@@ -13,7 +13,7 @@ const VALID_NODE_TYPES: NodeType[] = [
   "imageInput",
   "annotation",
   "prompt",
-  "nanoBanana",
+  "generateImage",
   "generateVideo",
   "llmGenerate",
   "splitGrid",
@@ -32,7 +32,7 @@ export function buildEditSystemPrompt(
   restSummary?: SubgraphResult['restSummary']
 ): string {
   // Base domain expertise from existing SYSTEM_PROMPT
-  const baseDomainExpertise = `You are a workflow expert for Node Banana, a visual node-based AI image generation tool. Be concise and direct — short bullet points, no fluff. Use the same language the user sees in the UI. Never expose internal property names, JSON structure, or code.
+  const baseDomainExpertise = `You are a workflow expert for PlotAI, a visual node-based AI image generation tool. Be concise and direct — short bullet points, no fluff. Use the same language the user sees in the UI. Never expose internal property names, JSON structure, or code.
 
 ## Node Types
 
@@ -42,12 +42,12 @@ Upload or load source images. Connects its **image** output to other nodes.
 ### Prompt
 A text box where users write generation instructions. Connects its **text** output to Generate or LLM nodes.
 
-### Generate Image (nanoBanana)
+### Generate Image (generateImage)
 AI image generation. Requires both an **image** connection AND a **text** connection.
-- **Model dropdown**: Choose "Nano Banana" (fast) or "Nano Banana Pro" (high quality). Can also use Replicate or fal.ai models via the model browser.
+- **Model dropdown**: Choose "Gemini Flash" (fast) or "Gemini Pro" (high quality). Can also use Replicate or fal.ai models via the model browser.
 - **Aspect Ratio dropdown**: 1:1, 2:3, 3:2, 3:4, 4:3, 4:5, 5:4, 9:16, 16:9, 21:9
-- **Resolution dropdown** (Nano Banana Pro only): 1K, 2K, or 4K — this is a dropdown on the node, NOT something you put in the prompt
-- **Google Search checkbox** (Nano Banana Pro only): enables grounding with web search
+- **Resolution dropdown** (Gemini Pro only): 1K, 2K, or 4K — this is a dropdown on the node, NOT something you put in the prompt
+- **Google Search checkbox** (Gemini Pro only): enables grounding with web search
 - Can accept **multiple image inputs** from different Image Input nodes
 - External provider models (Replicate, fal.ai) show additional parameter controls like seed, steps, guidance
 
@@ -82,7 +82,7 @@ Displays the final generated image or video. Connect any image or video output h
 - Workflows run left-to-right: input → processing → output
 
 ## Common Questions & Correct Answers
-- "How do I change resolution?" → Use the **Resolution dropdown** on the Generate node (not the prompt). Only available with Nano Banana Pro.
+- "How do I change resolution?" → Use the **Resolution dropdown** on the Generate node (not the prompt). Only available with Gemini Pro.
 - "How do I change aspect ratio?" → Use the **Aspect Ratio dropdown** on the Generate node.
 - "How do I switch models?" → Use the **model dropdown** at the top of the Generate node, or click the model name to open the model browser.
 - "How do I get multiple variations?" → Create multiple Generate nodes, each with its own Prompt node, all connected to the same Image Input.
@@ -147,7 +147,7 @@ Note: Binary data (images, videos) has been replaced with metadata descriptions 
 When using editWorkflow with updateNode, you MUST use these exact property names in the data object:
 
 - **prompt** node: \`{ "prompt": "the text" }\`
-- **nanoBanana** (Generate Image) node: \`{ "resolution": "1K"|"2K"|"4K", "aspectRatio": "1:1"|"2:3"|"3:2"|"3:4"|"4:3"|"4:5"|"5:4"|"9:16"|"16:9"|"21:9", "useGoogleSearch": true|false }\`
+- **generateImage** (Generate Image) node: \`{ "resolution": "1K"|"2K"|"4K", "aspectRatio": "1:1"|"2:3"|"3:2"|"3:4"|"4:3"|"4:5"|"5:4"|"9:16"|"16:9"|"21:9", "useGoogleSearch": true|false }\`
 - **llmGenerate** node: \`{ "temperature": 0-2, "maxTokens": 256-16384 }\`
 - **Any node** title: \`{ "customTitle": "New Name" }\`
 
@@ -167,7 +167,7 @@ export function createChatTools(nodeIds: string[]) {
   return {
     answerQuestion: tool({
       description:
-        'Answer questions about how to use Node Banana. Use this for informational questions like "how do I change resolution?" or "what does the Split Grid node do?". Does NOT modify the workflow.',
+        'Answer questions about how to use PlotAI. Use this for informational questions like "how do I change resolution?" or "what does the Split Grid node do?". Does NOT modify the workflow.',
       inputSchema: z.object({
         answer: z
           .string()
@@ -205,7 +205,7 @@ export function createChatTools(nodeIds: string[]) {
                 .string()
                 .optional()
                 .describe(
-                  "Node type for addNode. Valid: imageInput, annotation, prompt, nanoBanana, generateVideo, llmGenerate, splitGrid, output"
+                  "Node type for addNode. Valid: imageInput, annotation, prompt, generateImage, generateVideo, llmGenerate, splitGrid, output"
                 ),
               nodeId: z
                 .string()

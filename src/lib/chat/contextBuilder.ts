@@ -4,7 +4,7 @@ import type {
   ImageInputNodeData,
   AnnotationNodeData,
   PromptNodeData,
-  NanoBananaNodeData,
+  GenerateImageNodeData,
   GenerateVideoNodeData,
   LLMGenerateNodeData,
   SplitGridNodeData,
@@ -17,7 +17,7 @@ import type {
 const BINARY_FIELDS_BY_TYPE: Record<string, string[]> = {
   imageInput: ["image"],
   annotation: ["sourceImage", "outputImage"],
-  nanoBanana: ["inputImages", "outputImage"],
+  generateImage: ["inputImages", "outputImage"],
   generateVideo: ["inputImages", "outputVideo"],
   llmGenerate: ["inputImages"],
   splitGrid: ["sourceImage"],
@@ -139,8 +139,8 @@ export function stripBinaryData(nodes: WorkflowNode[]): StrippedNode[] {
         } else {
           // Add context based on node type
           let context: string | undefined;
-          if (node.type === "nanoBanana" || node.type === "generateVideo") {
-            const nodeData = node.data as NanoBananaNodeData | GenerateVideoNodeData;
+          if (node.type === "generateImage" || node.type === "generateVideo") {
+            const nodeData = node.data as GenerateImageNodeData | GenerateVideoNodeData;
             context = nodeData.selectedModel?.displayName;
           } else if (node.type === "imageInput") {
             const nodeData = node.data as ImageInputNodeData;
@@ -244,7 +244,7 @@ function generateNodeTitle(type: string): string {
     imageInput: "Image Input",
     annotation: "Annotation",
     prompt: "Prompt",
-    nanoBanana: "Generate Image",
+    generateImage: "Generate Image",
     generateVideo: "Generate Video",
     llmGenerate: "LLM Generate",
     splitGrid: "Split Grid",

@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to Node Banana will be documented in this file.
+All notable changes to PlotAI will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
@@ -40,7 +40,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Image Input node for loading images
 - Prompt node for text input
 - Annotation node with full-screen drawing tools (rectangles, circles, arrows, freehand, text)
-- NanoBanana node for AI image generation using Gemini
+- GenerateImage node for AI image generation using Gemini
 - LLM Generate node for text generation (Gemini and OpenAI)
 - Output node for displaying results
 - Workflow save/load as JSON files

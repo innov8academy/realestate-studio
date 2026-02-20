@@ -18,7 +18,7 @@ import {
   AnnotationNodeData,
   PromptNodeData,
   PromptConstructorNodeData,
-  NanoBananaNodeData,
+  GenerateImageNodeData,
   GenerateVideoNodeData,
   LLMGenerateNodeData,
   SplitGridNodeData,
@@ -270,7 +270,7 @@ function trackSaveGeneration(
         const currentNode = get().nodes.find((n) => n.id === nodeId);
         if (currentNode) {
           if (historyType === 'image') {
-            const currentData = currentNode.data as NanoBananaNodeData;
+            const currentData = currentNode.data as GenerateImageNodeData;
             const updatedHistory = [...(currentData.imageHistory || [])];
             const entryIndex = updatedHistory.findIndex((h) => h.id === tempId);
             if (entryIndex !== -1) {
@@ -323,7 +323,7 @@ async function waitForPendingImageSyncs(timeout: number = 60000): Promise<void> 
 }
 
 // Concurrency settings
-export const CONCURRENCY_SETTINGS_KEY = "node-banana-concurrency-limit";
+export const CONCURRENCY_SETTINGS_KEY = "plotai-concurrency-limit";
 const DEFAULT_MAX_CONCURRENT_CALLS = 3;
 
 // Load/save concurrency setting from localStorage
@@ -439,7 +439,7 @@ function clearNodeImageRefs(nodes: WorkflowNode[]): WorkflowNode[] {
 }
 
 // Re-export for backward compatibility
-export { generateWorkflowId, saveGenerateImageDefaults, saveNanoBananaDefaults } from "./utils/localStorage";
+export { generateWorkflowId, saveGenerateImageDefaults, saveGenerateImageDefaults } from "./utils/localStorage";
 export { GROUP_COLORS } from "./utils/nodeDefaults";
 
 export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
@@ -933,8 +933,8 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
         return { type: "audio", value: (sourceNode.data as AudioInputNodeData).audioFile };
       } else if (sourceNode.type === "annotation") {
         return { type: "image", value: (sourceNode.data as AnnotationNodeData).outputImage };
-      } else if (sourceNode.type === "nanoBanana") {
-        return { type: "image", value: (sourceNode.data as NanoBananaNodeData).outputImage };
+      } else if (sourceNode.type === "generateImage") {
+        return { type: "image", value: (sourceNode.data as GenerateImageNodeData).outputImage };
       } else if (sourceNode.type === "generateVideo") {
         // Return video type - generateVideo and output nodes handle this appropriately
         return { type: "video", value: (sourceNode.data as GenerateVideoNodeData).outputVideo };
@@ -1020,9 +1020,9 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
       return { valid: false, errors };
     }
 
-    // Check each Nano Banana node has required inputs (text required, image optional)
+    // Check each Gemini Flash node has required inputs (text required, image optional)
     nodes
-      .filter((n) => n.type === "nanoBanana")
+      .filter((n) => n.type === "generateImage")
       .forEach((node) => {
         const textConnected = edges.some(
           (e) => e.target === node.id &&
@@ -1257,7 +1257,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
             break;
           }
 
-          case "nanoBanana": {
+          case "generateImage": {
             const { images, text, dynamicInputs } = getConnectedInputs(node.id);
 
             // For dynamic inputs, check if we have at least a prompt
@@ -1266,7 +1266,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
               : dynamicInputs.prompt;
             const promptText = text || promptFromDynamic || null;
             if (!promptText) {
-              logger.error('node.error', 'nanoBanana node missing text input', {
+              logger.error('node.error', 'generateImage node missing text input', {
                 nodeId: node.id,
               });
               updateNodeData(node.id, {
@@ -1286,7 +1286,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
             try {
               // Get fresh node data from store (not stale data from sorted array)
               const freshNode = get().nodes.find((n) => n.id === node.id);
-              const nodeData = (freshNode?.data || node.data) as NanoBananaNodeData;
+              const nodeData = (freshNode?.data || node.data) as GenerateImageNodeData;
               const providerSettingsState = get().providerSettings;
 
               const requestPayload = {
@@ -1462,7 +1462,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
                 errorMessage = error.message;
               }
 
-              const nodeData = node.data as NanoBananaNodeData;
+              const nodeData = node.data as GenerateImageNodeData;
               const errorProvider = nodeData.selectedModel?.provider || "gemini";
               logger.error('node.error', 'Generate node execution failed', {
                 nodeId: node.id,
@@ -2374,10 +2374,10 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
     });
 
     try {
-      if (node.type === "nanoBanana") {
+      if (node.type === "generateImage") {
         // Get fresh node data from store
         const freshNode = get().nodes.find((n) => n.id === nodeId);
-        const nodeData = (freshNode?.data || node.data) as NanoBananaNodeData;
+        const nodeData = (freshNode?.data || node.data) as GenerateImageNodeData;
         const providerSettingsState = get().providerSettings;
         const provider = nodeData.selectedModel?.provider || "gemini";
 
@@ -3242,12 +3242,12 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
     }, 0);
     groupIdCounter = maxGroupId;
 
-    // Migrate legacy nanoBanana nodes: derive selectedModel from model field if missing
+    // Migrate legacy generateImage nodes: derive selectedModel from model field if missing
     workflow.nodes = workflow.nodes.map((node) => {
-      if (node.type === "nanoBanana") {
-        const data = node.data as NanoBananaNodeData;
+      if (node.type === "generateImage") {
+        const data = node.data as GenerateImageNodeData;
         if (data.model && !data.selectedModel) {
-          const displayName = data.model === "nano-banana" ? "Nano Banana" : "Nano Banana Pro";
+          const displayName = data.model === "gemini-flash" ? "Gemini Flash" : "Gemini Pro";
           return {
             ...node,
             data: {

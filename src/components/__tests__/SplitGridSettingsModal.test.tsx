@@ -22,7 +22,7 @@ const createDefaultNodeData = (): SplitGridNodeData => ({
   generateSettings: {
     aspectRatio: "1:1",
     resolution: "1K",
-    model: "nano-banana",
+    model: "gemini-flash",
     useGoogleSearch: false,
   },
   sourceImage: null,
@@ -200,7 +200,7 @@ describe("SplitGridSettingsModal", () => {
       );
 
       expect(screen.getByText("Model")).toBeInTheDocument();
-      expect(screen.getByText("Nano Banana")).toBeInTheDocument();
+      expect(screen.getByText("Gemini Flash")).toBeInTheDocument();
     });
 
     it("should render aspect ratio select", () => {
@@ -227,12 +227,12 @@ describe("SplitGridSettingsModal", () => {
       // Find model select and change it
       const modelSelects = screen.getAllByRole("combobox");
       const modelSelect = modelSelects[0]; // First select is model
-      fireEvent.change(modelSelect, { target: { value: "nano-banana-pro" } });
+      fireEvent.change(modelSelect, { target: { value: "gemini-pro" } });
 
-      expect(modelSelect).toHaveValue("nano-banana-pro");
+      expect(modelSelect).toHaveValue("gemini-pro");
     });
 
-    it("should show resolution and Google Search options for nano-banana-pro", () => {
+    it("should show resolution and Google Search options for gemini-pro", () => {
       render(
         <SplitGridSettingsModal
           nodeId="test-node"
@@ -241,16 +241,16 @@ describe("SplitGridSettingsModal", () => {
         />
       );
 
-      // Switch to nano-banana-pro
+      // Switch to gemini-pro
       const modelSelects = screen.getAllByRole("combobox");
-      fireEvent.change(modelSelects[0], { target: { value: "nano-banana-pro" } });
+      fireEvent.change(modelSelects[0], { target: { value: "gemini-pro" } });
 
       // Resolution and Google Search should now appear
       expect(screen.getByText("Resolution")).toBeInTheDocument();
       expect(screen.getByText("Google Search")).toBeInTheDocument();
     });
 
-    it("should not show resolution and Google Search for nano-banana", () => {
+    it("should not show resolution and Google Search for gemini-flash", () => {
       render(
         <SplitGridSettingsModal
           nodeId="test-node"
@@ -259,7 +259,7 @@ describe("SplitGridSettingsModal", () => {
         />
       );
 
-      // Default is nano-banana
+      // Default is gemini-flash
       expect(screen.queryByText("Resolution")).not.toBeInTheDocument();
       expect(screen.queryByText("Google Search")).not.toBeInTheDocument();
     });
@@ -289,9 +289,9 @@ describe("SplitGridSettingsModal", () => {
         />
       );
 
-      // Switch to nano-banana-pro first
+      // Switch to gemini-pro first
       const modelSelects = screen.getAllByRole("combobox");
-      fireEvent.change(modelSelects[0], { target: { value: "nano-banana-pro" } });
+      fireEvent.change(modelSelects[0], { target: { value: "gemini-pro" } });
 
       const checkbox = screen.getByRole("checkbox");
       expect(checkbox).not.toBeChecked();
@@ -374,7 +374,7 @@ describe("SplitGridSettingsModal", () => {
 
       fireEvent.click(screen.getByText("Create 6 Generate Sets"));
 
-      // Should create 6 sets of 3 nodes each (imageInput, nanoBanana, prompt)
+      // Should create 6 sets of 3 nodes each (imageInput, generateImage, prompt)
       expect(mockAddNode).toHaveBeenCalledTimes(18); // 6 * 3 nodes
       expect(mockOnConnect).toHaveBeenCalledTimes(12); // 6 * 2 connections per set
       expect(mockAddEdgeWithType).toHaveBeenCalledTimes(6); // 6 reference edges
@@ -445,7 +445,7 @@ describe("SplitGridSettingsModal", () => {
       nodeData.generateSettings = {
         aspectRatio: "16:9",
         resolution: "2K",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         useGoogleSearch: true,
       };
 
@@ -466,7 +466,7 @@ describe("SplitGridSettingsModal", () => {
 
       // Check model
       const modelSelects = screen.getAllByRole("combobox");
-      expect(modelSelects[0]).toHaveValue("nano-banana-pro");
+      expect(modelSelects[0]).toHaveValue("gemini-pro");
 
       // Check aspect ratio
       expect(modelSelects[1]).toHaveValue("16:9");

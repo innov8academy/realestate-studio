@@ -28,7 +28,7 @@ export type NodeType =
   | "annotation"
   | "prompt"
   | "promptConstructor"
-  | "nanoBanana"
+  | "generateImage"
   | "generateVideo"
   | "llmGenerate"
   | "splitGrid"
@@ -134,19 +134,19 @@ export interface ModelInputDef {
 }
 
 /**
- * Nano Banana node - AI image generation
+ * Gemini Flash node - AI image generation
  */
-export interface NanoBananaNodeData extends BaseNodeData {
+export interface GenerateImageNodeData extends BaseNodeData {
   inputImages: string[]; // Now supports multiple images
   inputImageRefs?: string[]; // External image references for storage optimization
   inputPrompt: string | null;
   outputImage: string | null;
   outputImageRef?: string; // External image reference for storage optimization
   aspectRatio: AspectRatio;
-  resolution: Resolution; // Only used by Nano Banana Pro
+  resolution: Resolution; // Only used by Gemini Pro
   model: ModelType;
   selectedModel?: SelectedModel; // Multi-provider model selection (optional for backward compat)
-  useGoogleSearch: boolean; // Only available for Nano Banana Pro
+  useGoogleSearch: boolean; // Only available for Gemini Pro
   parameters?: Record<string, unknown>; // Model-specific parameters for external providers
   inputSchema?: ModelInputDef[]; // Model's input schema for dynamic handles
   status: NodeStatus;
@@ -273,7 +273,7 @@ export interface SplitGridNodeData extends BaseNodeData {
   childNodeIds: Array<{
     imageInput: string;
     prompt: string;
-    nanoBanana: string;
+    generateImage: string;
   }>;
   gridRows: number;
   gridCols: number;
@@ -291,7 +291,7 @@ export type WorkflowNodeData =
   | AnnotationNodeData
   | PromptNodeData
   | PromptConstructorNodeData
-  | NanoBananaNodeData
+  | GenerateImageNodeData
   | GenerateVideoNodeData
   | LLMGenerateNodeData
   | SplitGridNodeData

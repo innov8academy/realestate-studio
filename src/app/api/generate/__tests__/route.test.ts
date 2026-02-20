@@ -114,7 +114,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "A beautiful sunset over mountains",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -144,7 +144,7 @@ describe("/api/generate route", () => {
       const request = createMockPostRequest({
         prompt: "Transform this image to oil painting style",
         images: ["data:image/png;base64,inputImageData"],
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -179,7 +179,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "A landscape photo",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         aspectRatio: "16:9",
       });
 
@@ -197,14 +197,14 @@ describe("/api/generate route", () => {
       );
     });
 
-    it("should apply resolution config for nano-banana-pro model", async () => {
+    it("should apply resolution config for gemini-pro model", async () => {
       process.env.GEMINI_API_KEY = "test-gemini-key";
 
       mockGenerateContent.mockResolvedValueOnce(createGeminiImageResponse());
 
       const request = createMockPostRequest({
         prompt: "High resolution image",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         resolution: "1024x1024",
       });
 
@@ -222,14 +222,14 @@ describe("/api/generate route", () => {
       );
     });
 
-    it("should apply both aspectRatio and resolution for nano-banana-pro", async () => {
+    it("should apply both aspectRatio and resolution for gemini-pro", async () => {
       process.env.GEMINI_API_KEY = "test-gemini-key";
 
       mockGenerateContent.mockResolvedValueOnce(createGeminiImageResponse());
 
       const request = createMockPostRequest({
         prompt: "High resolution landscape",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         aspectRatio: "16:9",
         resolution: "1024x1024",
       });
@@ -251,14 +251,14 @@ describe("/api/generate route", () => {
       );
     });
 
-    it("should apply Google Search tool for nano-banana-pro", async () => {
+    it("should apply Google Search tool for gemini-pro", async () => {
       process.env.GEMINI_API_KEY = "test-gemini-key";
 
       mockGenerateContent.mockResolvedValueOnce(createGeminiImageResponse());
 
       const request = createMockPostRequest({
         prompt: "Latest technology trends",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         useGoogleSearch: true,
       });
 
@@ -274,14 +274,14 @@ describe("/api/generate route", () => {
       );
     });
 
-    it("should NOT apply Google Search tool for nano-banana model", async () => {
+    it("should NOT apply Google Search tool for gemini-flash model", async () => {
       process.env.GEMINI_API_KEY = "test-gemini-key";
 
       mockGenerateContent.mockResolvedValueOnce(createGeminiImageResponse());
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana",
+        model: "gemini-flash",
         useGoogleSearch: true,
       });
 
@@ -290,7 +290,7 @@ describe("/api/generate route", () => {
 
       expect(response.status).toBe(200);
       expect(data.success).toBe(true);
-      // For nano-banana, tools should not be included even if useGoogleSearch is true
+      // For gemini-flash, tools should not be included even if useGoogleSearch is true
       expect(mockGenerateContent).toHaveBeenCalledWith(
         expect.not.objectContaining({
           tools: expect.anything(),
@@ -298,7 +298,7 @@ describe("/api/generate route", () => {
       );
     });
 
-    it("should use nano-banana-pro as default model", async () => {
+    it("should use gemini-pro as default model", async () => {
       process.env.GEMINI_API_KEY = "test-gemini-key";
 
       mockGenerateContent.mockResolvedValueOnce(createGeminiImageResponse());
@@ -314,7 +314,7 @@ describe("/api/generate route", () => {
       expect(data.success).toBe(true);
       expect(mockGenerateContent).toHaveBeenCalledWith(
         expect.objectContaining({
-          model: "gemini-3-pro-image-preview", // nano-banana-pro maps to this
+          model: "gemini-3-pro-image-preview", // gemini-pro maps to this
         })
       );
     });
@@ -327,7 +327,7 @@ describe("/api/generate route", () => {
       const request = createMockPostRequest(
         {
           prompt: "Test prompt",
-          model: "nano-banana-pro",
+          model: "gemini-pro",
         },
         { "X-Gemini-API-Key": "header-gemini-key" }
       );
@@ -348,7 +348,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -366,7 +366,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -386,7 +386,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -406,7 +406,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -426,7 +426,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -453,7 +453,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -479,7 +479,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -497,7 +497,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -508,14 +508,14 @@ describe("/api/generate route", () => {
       expect(data.error).toBe("Internal server error");
     });
 
-    it("should use correct model mapping for nano-banana", async () => {
+    it("should use correct model mapping for gemini-flash", async () => {
       process.env.GEMINI_API_KEY = "test-gemini-key";
 
       mockGenerateContent.mockResolvedValueOnce(createGeminiImageResponse());
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana",
+        model: "gemini-flash",
       });
 
       const response = await POST(request);
@@ -538,7 +538,7 @@ describe("/api/generate route", () => {
       const request = createMockPostRequest({
         prompt: "Edit this JPEG",
         images: ["data:image/jpeg;base64,jpegImageData"],
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -574,7 +574,7 @@ describe("/api/generate route", () => {
       const request = createMockPostRequest({
         prompt: "Edit this image",
         images: ["rawBase64DataWithoutPrefix"],
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -608,7 +608,7 @@ describe("/api/generate route", () => {
       process.env.GEMINI_API_KEY = "test-gemini-key";
 
       const request = createMockPostRequest({
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -626,7 +626,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         images: ["data:image/png;base64,imageOnlyData"],
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -647,7 +647,7 @@ describe("/api/generate route", () => {
         dynamicInputs: {
           prompt: "Dynamic prompt text",
         },
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -667,7 +667,7 @@ describe("/api/generate route", () => {
           first_frame: "data:image/png;base64,firstFrameData",
           last_frame: "data:image/png;base64,lastFrameData",
         },
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -686,7 +686,7 @@ describe("/api/generate route", () => {
         dynamicInputs: {
           image_url: "data:image/png;base64,imageUrlData",
         },
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -708,7 +708,7 @@ describe("/api/generate route", () => {
           "data:image/jpeg;base64,image2Data",
           "data:image/webp;base64,image3Data",
         ],
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -757,7 +757,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -776,7 +776,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Test prompt",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
         selectedModel: {
           provider: "gemini",
           modelId: "gemini-3-pro-image-preview",
@@ -823,7 +823,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Generate a photo",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);
@@ -859,7 +859,7 @@ describe("/api/generate route", () => {
 
       const request = createMockPostRequest({
         prompt: "Generate image",
-        model: "nano-banana-pro",
+        model: "gemini-pro",
       });
 
       const response = await POST(request);

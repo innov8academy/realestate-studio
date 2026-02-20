@@ -7,7 +7,7 @@ import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
-import type { NanoBananaNodeData, GenerateVideoNodeData } from "@/types";
+import type { GenerateImageNodeData, GenerateVideoNodeData } from "@/types";
 
 function VideoCard({
   title,
@@ -109,10 +109,10 @@ export function ShowcaseVideosStep() {
   const nodes = useWorkflowStore((s) => s.nodes);
 
   // Check prerequisites
-  const fullData = nodes.find((n) => n.id === STUDIO_NODES.generateFullBuilding)?.data as NanoBananaNodeData | undefined;
-  const aerialData = nodes.find((n) => n.id === STUDIO_NODES.generateAngleAerialDrone)?.data as NanoBananaNodeData | undefined;
-  const balconyData = nodes.find((n) => n.id === STUDIO_NODES.generateAngleBalcony)?.data as NanoBananaNodeData | undefined;
-  const interiorData = nodes.find((n) => n.id === STUDIO_NODES.generateAngleInterior)?.data as NanoBananaNodeData | undefined;
+  const fullData = nodes.find((n) => n.id === STUDIO_NODES.generateFullBuilding)?.data as GenerateImageNodeData | undefined;
+  const aerialData = nodes.find((n) => n.id === STUDIO_NODES.generateAngleAerialDrone)?.data as GenerateImageNodeData | undefined;
+  const balconyData = nodes.find((n) => n.id === STUDIO_NODES.generateAngleBalcony)?.data as GenerateImageNodeData | undefined;
+  const interiorData = nodes.find((n) => n.id === STUDIO_NODES.generateAngleInterior)?.data as GenerateImageNodeData | undefined;
 
   const hasFull = fullData?.status === "complete";
   const hasAerial = aerialData?.status === "complete";
