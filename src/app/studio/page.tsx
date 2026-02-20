@@ -14,13 +14,23 @@ import {
   type StudioSnapshot,
 } from "@/lib/studio/persistence";
 
-/** Build a WorkflowFile snapshot from the current store state. */
+/** Build a WorkflowFile snapshot from the current store state.
+ *  Strips heavy video output data (blob/base64) so IndexedDB stays
+ *  small and mobile browsers don't OOM on restore.
+ */
 function captureWorkflow(): WorkflowFile {
   const { nodes, edges, edgeStyle, groups } = useWorkflowStore.getState();
   return {
     version: 1,
     name: "studio-session",
-    nodes: nodes.map(({ selected, ...rest }) => rest),
+    nodes: nodes.map(({ selected, ...rest }) => {
+      const d = rest.data as Record<string, unknown> | undefined;
+      // Strip outputVideo from video nodes — too large for IndexedDB
+      if (d && "outputVideo" in d && d.outputVideo) {
+        return { ...rest, data: { ...d, outputVideo: null, status: "idle" } };
+      }
+      return rest;
+    }),
     edges,
     edgeStyle,
     groups: groups && Object.keys(groups).length > 0 ? groups : undefined,

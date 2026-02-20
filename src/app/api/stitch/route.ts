@@ -15,7 +15,16 @@ export async function POST(req: NextRequest) {
   const tempDir = path.join(os.tmpdir(), `stitch-${requestId}`);
 
   try {
-    const formData = await req.formData();
+    let formData: FormData;
+    try {
+      formData = await req.formData();
+    } catch (parseErr) {
+      console.error(`[Stitch:${requestId}] Failed to parse formData:`, parseErr);
+      return NextResponse.json(
+        { error: "Request too large or malformed" },
+        { status: 413 }
+      );
+    }
 
     // Extract video files (video-0, video-1, ...)
     const videoEntries: { index: number; file: File }[] = [];
@@ -30,6 +39,9 @@ export async function POST(req: NextRequest) {
 
     videoEntries.sort((a, b) => a.index - b.index);
     const videoFiles = videoEntries.map((e) => e.file);
+
+    const totalSizeMB = videoFiles.reduce((sum, f) => sum + f.size, 0) / (1024 * 1024);
+    console.log(`[Stitch:${requestId}] ${videoFiles.length} clips, ${totalSizeMB.toFixed(1)} MB total, loop=${formData.get("loopCount")}, speed=${formData.get("speedPreset")}`);
 
     if (videoFiles.length < 2) {
       return NextResponse.json(
@@ -93,7 +105,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Stitch API error:", error);
+    console.error(`[Stitch:${requestId}] Error:`, error);
     const message =
       error instanceof Error ? error.message : "Stitch failed";
     return NextResponse.json({ error: message }, { status: 500 });

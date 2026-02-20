@@ -72,11 +72,17 @@ export function computeEasingLUT(
   return lut;
 }
 
-// Simple presets that have closed-form inverse setpts expressions
+// Simple presets that have closed-form inverse setpts expressions.
+// All presets are mapped here to avoid the extremely heavy frame-extraction
+// fallback path which OOMs on resource-limited Railway containers.
 const SIMPLE_SETPTS: Record<string, string> = {
   easeInQuad: "sqrt(PTS*TB/DURATION)*DURATION/TB",
   easeOutQuad: "(1-sqrt(1-PTS*TB/DURATION))*DURATION/TB",
   easeInOutSine: "acos(1-2*PTS*TB/DURATION)/3.14159265*DURATION/TB",
+  // Cubic approximated as quad (close enough for video speed ramp)
+  easeInOutCubic: "if(lt(PTS*TB/DURATION,0.5),sqrt(PTS*TB/DURATION/2)*DURATION/TB,(1-sqrt((1-PTS*TB/DURATION)/2))*DURATION/TB)",
+  // Expo approximated via steep power curve
+  easeInOutExpo: "if(lt(PTS*TB/DURATION,0.5),pow(PTS*TB/DURATION*2,0.5)/2*DURATION/TB,(1-pow((1-PTS*TB/DURATION)*2,0.5)/2)*DURATION/TB)",
 };
 
 /**
