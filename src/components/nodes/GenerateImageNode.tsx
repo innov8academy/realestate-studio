@@ -770,8 +770,3 @@ export function GenerateImageNode({ id, data, selected }: NodeProps<GenerateImag
   );
 }
 
-/**
- * @deprecated Use `GenerateImageNode` instead. This alias is kept for backward compatibility
- * with existing workflows but will be removed in a future version.
- */
-export { GenerateImageNode as GenerateImageNode };
