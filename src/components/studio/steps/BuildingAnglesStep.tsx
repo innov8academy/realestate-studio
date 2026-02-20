@@ -7,6 +7,7 @@ import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
+import { LoadingPhrase } from "../shared/LoadingPhrase";
 import type { GenerateImageNodeData } from "@/types";
 
 const ASPECT_RATIOS = [
@@ -218,7 +219,7 @@ export function BuildingAnglesStep() {
               <div className="w-full aspect-square rounded-lg bg-neutral-800 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-8 h-8 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
-                  <span className="text-xs text-neutral-500">Creating...</span>
+                  <LoadingPhrase set="image" className="text-xs" />
                 </div>
               </div>
             ) : (

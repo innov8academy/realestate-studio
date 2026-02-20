@@ -5,55 +5,52 @@ import { useEffect, useState } from "react";
 // ── Phrase sets ────────────────────────────────────────────────────────────
 
 export const IMAGE_PHRASES = [
-  "Measuring the plot...",
-  "Pouring the foundation...",
-  "Raising the structure...",
-  "Setting the columns...",
-  "Installing the facade...",
-  "Fitting the windows...",
-  "Shaping the roofline...",
-  "Landscaping the surroundings...",
-  "Calibrating the lighting...",
-  "Balancing the shadows...",
-  "Polishing the render...",
-  "Perfecting the details...",
-  "Adding street character...",
-  "Almost ready...",
+  "AI pani edukkunnu, oru sec...",
+  "Ippo sheriyakki tharam...",
+  "Aa cheriyoru spanner ingeduthe...",
+  "W house incoming...",
 ];
 
 export const VIDEO_PHRASES = [
-  "Spinning up the drone...",
-  "Mapping the flight path...",
-  "Choreographing the shot...",
-  "Rendering each frame...",
-  "Smoothing the motion...",
-  "Timing the golden hour...",
-  "Balancing the exposure...",
-  "Syncing the camera movement...",
-  "Adding cinematic depth...",
-  "Fine-tuning the transition...",
-  "Cinematic quality check...",
-  "Polishing every frame...",
-  "Almost there...",
+  "Drone parappikunnu, one min...",
+  "W video incoming...",
+  "Kshama venam, samayam edukkum...",
+  "Kshama attin soopinte bhalam cheyyum...",
 ];
 
 export const MAP_PHRASES = [
-  "Reading the terrain...",
-  "Tracing the plot boundary...",
-  "Enhancing the aerial view...",
-  "Sharpening satellite detail...",
-  "Colour grading the scene...",
-  "Highlighting the land...",
-  "Adding the boundary glow...",
-  "Rendering the overhead view...",
-  "Almost ready...",
+  "Sthalam vrithiyakkunnu...",
+  "Satellite nokkunnu, oru sec...",
+  "Plot mele ninnu kandupidikkunnu...",
+  "Map enhance aakkunnu...",
+  "Aerial view varakkunnu, wait...",
+  "GPS lock aakkunnu, adipoli...",
+  "Satellite zoom in cheyyunnu...",
+  "Ninte plot kandupidichu...",
+  "Map thayaraakkunnu, almost done...",
+];
+
+export const STITCH_PHRASES = [
+  "Clips okke set, almost ready...",
+  "Thallipoli cut ready aakkunnu...",
+  "Ithu kandal ningal njettum...",
+  "Kaathirunnu kaathirunnu kannu kazhachu...",
+  "Koncham wait cheyyoo...",
+];
+
+export const SETUP_PHRASES = [
+  "Ellam set aakkunnu...",
+  "Thudangam alle...",
+  "Studio orukkukayaane...",
+  "Ippo thudangam...",
+  "Oru sec, ready aakkunnu...",
 ];
 
 // ── Component ──────────────────────────────────────────────────────────────
 
 interface LoadingPhraseProps {
   /** Which phrase set to use */
-  set?: "image" | "video" | "map";
+  set?: "image" | "video" | "map" | "stitch" | "setup";
   /** How long each phrase is shown, in ms (default 2500) */
   interval?: number;
   className?: string;
@@ -65,14 +62,21 @@ export function LoadingPhrase({
   className = "",
 }: LoadingPhraseProps) {
   const phrases =
-    set === "video" ? VIDEO_PHRASES : set === "map" ? MAP_PHRASES : IMAGE_PHRASES;
+    set === "video"
+      ? VIDEO_PHRASES
+      : set === "map"
+        ? MAP_PHRASES
+        : set === "stitch"
+          ? STITCH_PHRASES
+          : set === "setup"
+            ? SETUP_PHRASES
+            : IMAGE_PHRASES;
 
   const [index, setIndex] = useState(() => Math.floor(Math.random() * phrases.length));
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      // Fade out
       setVisible(false);
       setTimeout(() => {
         setIndex((i) => (i + 1) % phrases.length);
@@ -83,10 +87,31 @@ export function LoadingPhrase({
   }, [phrases.length, interval]);
 
   return (
-    <span
-      className={`transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0"} ${className}`}
-    >
-      {phrases[index]}
+    <span className={`flex flex-col items-center gap-1.5 ${className}`}>
+      <span
+        className={`italic text-white/80 transition-opacity duration-300 text-center ${visible ? "opacity-100" : "opacity-0"}`}
+      >
+        {phrases[index]}
+      </span>
+      <span className="flex gap-1.5">
+        <span className="dot-pulse" style={{ animationDelay: "0ms" }} />
+        <span className="dot-pulse" style={{ animationDelay: "300ms" }} />
+        <span className="dot-pulse" style={{ animationDelay: "600ms" }} />
+      </span>
+      <style>{`
+        .dot-pulse {
+          display: inline-block;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: rgba(255,255,255,0.3);
+          animation: dotPulse 1.2s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+          0%, 80%, 100% { background: rgba(255,255,255,0.2); transform: scale(0.8); }
+          40% { background: rgba(255,255,255,0.8); transform: scale(1.2); }
+        }
+      `}</style>
     </span>
   );
 }

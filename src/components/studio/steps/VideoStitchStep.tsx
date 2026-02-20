@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { DownloadButton } from "../shared/DownloadButton";
+import { LoadingPhrase } from "../shared/LoadingPhrase";
 import type { VideoStitchNodeData, GenerateVideoNodeData } from "@/types";
 
 const VIDEO_LABELS: Record<string, string> = {
@@ -216,6 +217,12 @@ export function VideoStitchStep() {
             "Stitch All Clips"
           )}
         </button>
+      )}
+
+      {isStitching && (
+        <div className="flex justify-center">
+          <LoadingPhrase set="stitch" className="text-xs" />
+        </div>
       )}
 
       {readyClips.length < 2 && readyClips.length > 0 && (

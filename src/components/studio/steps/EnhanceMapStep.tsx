@@ -9,6 +9,7 @@ import { PROMPTS } from "@/lib/quickstart/templates";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
+import { LoadingPhrase } from "../shared/LoadingPhrase";
 import type { GenerateImageNodeData } from "@/types";
 
 const ASPECT_RATIOS = [
@@ -266,8 +267,9 @@ export function EnhanceMapStep() {
                 </div>
               </>
             ) : frame1Status === "loading" ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex flex-col items-center justify-center h-full gap-2">
                 <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <LoadingPhrase set="map" className="text-xs" />
               </div>
             ) : (
               <div className="flex items-center justify-center h-full">
@@ -317,8 +319,9 @@ export function EnhanceMapStep() {
                 </div>
               </>
             ) : frame2Status === "loading" && hasSqm ? (
-              <div className="flex items-center justify-center h-full">
+              <div className="flex flex-col items-center justify-center h-full gap-2">
                 <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                <LoadingPhrase set="map" className="text-xs" />
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full gap-1 px-2">

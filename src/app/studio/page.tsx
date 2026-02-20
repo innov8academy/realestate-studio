@@ -3,6 +3,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { StudioWizard } from "@/components/studio/StudioWizard";
 import { useStudioStore } from "@/store/studioStore";
+import { LoadingPhrase } from "@/components/studio/shared/LoadingPhrase";
 import { useWorkflowStore, type WorkflowFile } from "@/store/workflowStore";
 import { getPresetTemplate, PROMPTS } from "@/lib/quickstart/templates";
 import { AnnotationModal } from "@/components/AnnotationModal";
@@ -237,7 +238,7 @@ export default function StudioPage() {
       <div className="h-full flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-          <span className="text-sm text-neutral-400">Setting up Studio...</span>
+          <LoadingPhrase set="setup" className="text-sm text-neutral-400" />
         </div>
       </div>
     );

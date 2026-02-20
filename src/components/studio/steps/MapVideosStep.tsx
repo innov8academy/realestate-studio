@@ -7,6 +7,7 @@ import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
+import { LoadingPhrase } from "../shared/LoadingPhrase";
 import type { GenerateImageNodeData, GenerateVideoNodeData } from "@/types";
 
 const DURATION_OPTIONS = [
@@ -92,7 +93,7 @@ function VideoCard({
           <div className="flex flex-col items-center gap-2">
             <div className="w-8 h-8 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
             <div className="text-center">
-              <p className="text-xs text-white">Generating video...</p>
+              <LoadingPhrase set="video" className="text-xs" />
               <p className="text-[10px] text-neutral-500 mt-0.5">This may take a few minutes</p>
             </div>
           </div>
