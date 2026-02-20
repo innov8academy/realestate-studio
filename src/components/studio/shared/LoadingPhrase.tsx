@@ -56,9 +56,19 @@ interface LoadingPhraseProps {
   className?: string;
 }
 
+// Default interval per set — tuned so each phrase shows roughly once
+// during a typical generation (image ~60s, video ~2.5min, map ~60s, stitch ~30s)
+const DEFAULT_INTERVALS: Record<string, number> = {
+  image: 15000,  // 4 phrases × 15s = 60s
+  map:    7000,  // 9 phrases ×  7s = 63s
+  video: 35000,  // 4 phrases × 35s = 140s (~2.5 min)
+  stitch: 6000,  // 5 phrases ×  6s = 30s
+  setup:  1500,  // brief, cycles fast
+};
+
 export function LoadingPhrase({
   set = "image",
-  interval = 2500,
+  interval,
   className = "",
 }: LoadingPhraseProps) {
   const phrases =
@@ -72,6 +82,8 @@ export function LoadingPhrase({
             ? SETUP_PHRASES
             : IMAGE_PHRASES;
 
+  const ms = interval ?? DEFAULT_INTERVALS[set] ?? 15000;
+
   const [index, setIndex] = useState(() => Math.floor(Math.random() * phrases.length));
   const [visible, setVisible] = useState(true);
 
@@ -82,9 +94,9 @@ export function LoadingPhrase({
         setIndex((i) => (i + 1) % phrases.length);
         setVisible(true);
       }, 300);
-    }, interval);
+    }, ms);
     return () => clearInterval(timer);
-  }, [phrases.length, interval]);
+  }, [phrases.length, ms]);
 
   return (
     <span className={`flex flex-col items-center gap-1.5 ${className}`}>
