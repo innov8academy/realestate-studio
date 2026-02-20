@@ -16,6 +16,7 @@ import { GenerateRequest, GenerateResponse, ModelType, SelectedModel, ProviderTy
 import { GenerationInput, GenerationOutput, ProviderModel } from "@/lib/providers/types";
 import { uploadImageForUrl, shouldUseImageUrl, deleteImages } from "@/lib/images";
 import { validateMediaUrl } from "@/utils/urlValidation";
+import { trackGeneration } from "@/lib/serverTracker";
 
 export const maxDuration = 300; // 5 minute timeout (Vercel hobby plan limit)
 export const dynamic = 'force-dynamic'; // Ensure this route is always dynamic
@@ -2450,7 +2451,16 @@ async function generateWithWaveSpeed(
 
 export async function POST(request: NextRequest) {
   const requestId = Math.random().toString(36).substring(7);
+  const _startMs = Date.now();
   console.log(`\n[API:${requestId}] ========== NEW GENERATE REQUEST ==========`);
+
+  // Helper: fire-and-forget tracking then return the response unchanged
+  const track = (resp: NextResponse<GenerateResponse>, provider: string, model: string) => {
+    const durationMs = Date.now() - _startMs;
+    const isSuccess = resp.status < 400;
+    trackGeneration({ requestId, provider, model, success: isSuccess, durationMs }).catch(() => {});
+    return resp;
+  };
 
   try {
     const body: MultiProviderGenerateRequest = await request.json();
@@ -2493,7 +2503,8 @@ export async function POST(request: NextRequest) {
 
     // Determine which provider to use
     const provider: ProviderType = selectedModel?.provider || "gemini";
-    console.log(`[API:${requestId}] Provider: ${provider}, Model: ${selectedModel?.modelId || model}`);
+    const _trackModel = selectedModel?.modelId || model || "unknown";
+    console.log(`[API:${requestId}] Provider: ${provider}, Model: ${_trackModel}`);
 
     // Route to appropriate provider
     if (provider === "replicate") {
@@ -2753,6 +2764,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Return appropriate fields based on output type
+      trackGeneration({ requestId, provider: "kie", model: _trackModel, success: true, durationMs: Date.now() - _startMs }).catch(() => {});
       if (output.type === "video") {
         // Check if data is a URL (for large videos) or base64
         const isUrl = output.data.startsWith("http");
@@ -2878,7 +2890,7 @@ export async function POST(request: NextRequest) {
     // Use selectedModel.modelId if available (new format), fallback to legacy model field
     const geminiModel = (selectedModel?.modelId as ModelType) || model;
 
-    return await generateWithGemini(
+    const _geminiResp = await generateWithGemini(
       requestId,
       geminiApiKey,
       prompt,
@@ -2888,6 +2900,8 @@ export async function POST(request: NextRequest) {
       resolution,
       useGoogleSearch
     );
+    trackGeneration({ requestId, provider: "gemini", model: _trackModel, success: _geminiResp.status < 400, durationMs: Date.now() - _startMs }).catch(() => {});
+    return _geminiResp;
   } catch (error) {
     // Extract error information
     let errorMessage = "Generation failed";
@@ -2923,6 +2937,8 @@ export async function POST(request: NextRequest) {
     }
 
     console.error(`[API:${requestId}] Generation error: ${errorMessage}${errorDetails ? ` (${errorDetails.substring(0, 200)})` : ""}`);
+    // Track server-side so analytics always shows failures, even if client navigated away
+    trackGeneration({ requestId, provider: "unknown", model: "unknown", success: false, durationMs: Date.now() - _startMs, error: errorMessage }).catch(() => {});
     return NextResponse.json<GenerateResponse>(
       {
         success: false,
