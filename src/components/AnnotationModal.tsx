@@ -105,6 +105,9 @@ export function AnnotationModal() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
   const [isMobile, setIsMobile] = useState(false);
+  const isPanningRef = useRef(false);
+  const panStartRef = useRef({ x: 0, y: 0 });
+  const panOriginRef = useRef({ x: 0, y: 0 });
 
   // Detect mobile
   useEffect(() => {
@@ -261,16 +264,29 @@ export function AnnotationModal() {
     (e: Konva.KonvaEventObject<MouseEvent>) => {
       if (currentTool === "select") {
         const clickedOnEmpty = e.target === e.target.getStage() || e.target.getClassName() === "Image";
-        if (clickedOnEmpty) selectShape(null);
+        if (clickedOnEmpty) {
+          selectShape(null);
+          // Start panning
+          isPanningRef.current = true;
+          panStartRef.current = { x: e.evt.clientX, y: e.evt.clientY };
+          panOriginRef.current = { x: position.x, y: position.y };
+        }
         return;
       }
       const pos = getRelativePointerPosition();
       startDrawing(pos);
     },
-    [currentTool, getRelativePointerPosition, startDrawing, selectShape]
+    [currentTool, getRelativePointerPosition, startDrawing, selectShape, position]
   );
 
-  const handleMouseMove = useCallback(() => {
+  const handleMouseMove = useCallback((e?: Konva.KonvaEventObject<MouseEvent>) => {
+    if (isPanningRef.current && e) {
+      setPosition({
+        x: panOriginRef.current.x + (e.evt.clientX - panStartRef.current.x),
+        y: panOriginRef.current.y + (e.evt.clientY - panStartRef.current.y),
+      });
+      return;
+    }
     if (!isDrawing || !currentShape) return;
     const pos = getRelativePointerPosition();
 
@@ -299,6 +315,10 @@ export function AnnotationModal() {
   }, [isDrawing, currentShape, drawStart, getRelativePointerPosition]);
 
   const handleMouseUp = useCallback(() => {
+    if (isPanningRef.current) {
+      isPanningRef.current = false;
+      return;
+    }
     if (!isDrawing || !currentShape) return;
     setIsDrawing(false);
 
@@ -326,19 +346,30 @@ export function AnnotationModal() {
     (e: Konva.KonvaEventObject<TouchEvent>) => {
       const touches = e.evt.touches;
       if (touches.length === 1) {
-        if (currentTool !== "select") {
+        if (currentTool === "select") {
+          // Start pan
+          const t = touches[0];
+          isPanningRef.current = true;
+          panStartRef.current = { x: t.clientX, y: t.clientY };
+          panOriginRef.current = { x: position.x, y: position.y };
+          // Also allow tap-to-select via Konva's tap event — don't preventDefault
+        } else {
           e.evt.preventDefault();
-          // Critical: update Konva's internal pointer tracker from the touch event
           const stage = stageRef.current;
           if (stage) stage.setPointersPositions(e.evt);
           const pos = getRelativePointerPosition();
           startDrawing(pos);
         }
-        // select mode: let Konva handle tap selection naturally
+      } else if (touches.length === 2) {
+        // Starting pinch — cancel any panning or drawing
+        isPanningRef.current = false;
+        setIsDrawing(false);
+        setCurrentShape(null);
+        lastPinchDist.current = null;
+        lastPinchCenter.current = null;
       }
-      // 2-finger: handled in handleTouchMove (pinch/zoom)
     },
-    [currentTool, getRelativePointerPosition, startDrawing]
+    [currentTool, getRelativePointerPosition, startDrawing, position]
   );
 
   const lastPinchDist = useRef<number | null>(null);
@@ -349,31 +380,49 @@ export function AnnotationModal() {
       const touch = e.evt.touches;
       if (touch.length === 2) {
         e.evt.preventDefault();
-        const dx = touch[0].clientX - touch[1].clientX;
-        const dy = touch[0].clientY - touch[1].clientY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
+        isPanningRef.current = false;
+        try {
+          const dx = touch[0].clientX - touch[1].clientX;
+          const dy = touch[0].clientY - touch[1].clientY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 1) return; // avoid division by near-zero
 
-        if (lastPinchDist.current !== null) {
-          const delta = dist / lastPinchDist.current;
-          setScale((s) => Math.min(Math.max(s * delta, 0.1), 5));
-        }
-        lastPinchDist.current = dist;
+          if (lastPinchDist.current !== null && lastPinchDist.current > 1) {
+            const delta = dist / lastPinchDist.current;
+            if (isFinite(delta) && !isNaN(delta)) {
+              setScale((s) => Math.min(Math.max(s * delta, 0.1), 5));
+            }
+          }
+          lastPinchDist.current = dist;
 
-        const centerX = (touch[0].clientX + touch[1].clientX) / 2;
-        const centerY = (touch[0].clientY + touch[1].clientY) / 2;
-        if (lastPinchCenter.current) {
-          setPosition((prev) => ({
-            x: prev.x + (centerX - lastPinchCenter.current!.x),
-            y: prev.y + (centerY - lastPinchCenter.current!.y),
-          }));
+          const centerX = (touch[0].clientX + touch[1].clientX) / 2;
+          const centerY = (touch[0].clientY + touch[1].clientY) / 2;
+          if (lastPinchCenter.current) {
+            setPosition((prev) => ({
+              x: prev.x + (centerX - lastPinchCenter.current!.x),
+              y: prev.y + (centerY - lastPinchCenter.current!.y),
+            }));
+          }
+          lastPinchCenter.current = { x: centerX, y: centerY };
+        } catch {
+          // Pinch failed silently — reset state
+          lastPinchDist.current = null;
+          lastPinchCenter.current = null;
         }
-        lastPinchCenter.current = { x: centerX, y: centerY };
-      } else if (touch.length === 1 && isDrawing) {
-        e.evt.preventDefault();
-        // Update pointer position from touch before reading it
-        const stage = stageRef.current;
-        if (stage) stage.setPointersPositions(e.evt);
-        handleMouseMove();
+      } else if (touch.length === 1) {
+        if (isPanningRef.current) {
+          e.evt.preventDefault();
+          const t = touch[0];
+          setPosition({
+            x: panOriginRef.current.x + (t.clientX - panStartRef.current.x),
+            y: panOriginRef.current.y + (t.clientY - panStartRef.current.y),
+          });
+        } else if (isDrawing) {
+          e.evt.preventDefault();
+          const stage = stageRef.current;
+          if (stage) stage.setPointersPositions(e.evt);
+          handleMouseMove();
+        }
       }
     },
     [isDrawing, handleMouseMove]
@@ -382,6 +431,7 @@ export function AnnotationModal() {
   const handleTouchEnd = useCallback(() => {
     lastPinchDist.current = null;
     lastPinchCenter.current = null;
+    isPanningRef.current = false;
     if (isDrawing) handleMouseUp();
   }, [isDrawing, handleMouseUp]);
 
@@ -529,8 +579,6 @@ export function AnnotationModal() {
         scaleY={scale}
         x={position.x}
         y={position.y}
-        draggable={currentTool === "select"}
-        onDragEnd={(e) => { if (e.target === stageRef.current) setPosition({ x: e.target.x(), y: e.target.y() }); }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -618,7 +666,7 @@ export function AnnotationModal() {
     ];
 
     return (
-      <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
+      <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col" style={{ paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
         {/* Top bar: Cancel | title | Done */}
         <div className="flex-shrink-0 h-14 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-4">
           <button onClick={closeModal} className="text-sm text-neutral-400 active:text-white px-2 py-2">Cancel</button>
