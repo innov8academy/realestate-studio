@@ -2692,10 +2692,12 @@ export async function POST(request: NextRequest) {
       if (output.type === "video") {
         // Check if data is a URL (for large videos) or base64
         const isUrl = output.data.startsWith("http");
+        const srcUrl = (output as { url?: string }).url || (isUrl ? output.data : undefined);
         return NextResponse.json<GenerateResponse>({
           success: true,
           video: isUrl ? undefined : output.data,
           videoUrl: isUrl ? output.data : undefined,
+          videoSourceUrl: srcUrl,
           contentType: "video",
         });
       }
@@ -2779,10 +2781,12 @@ export async function POST(request: NextRequest) {
       if (output.type === "video") {
         // Check if data is a URL (for large videos) or base64
         const isUrl = output.data.startsWith("http");
+        const srcUrl = (output as { url?: string }).url || (isUrl ? output.data : undefined);
         return NextResponse.json<GenerateResponse>({
           success: true,
           video: isUrl ? undefined : output.data,
           videoUrl: isUrl ? output.data : undefined,
+          videoSourceUrl: srcUrl,
           contentType: "video",
         });
       }
@@ -2905,10 +2909,12 @@ export async function POST(request: NextRequest) {
       if (output.type === "video") {
         // Check if data is a URL (for large videos) or base64
         const isUrl = output.data.startsWith("http");
+        const srcUrl = (output as { url?: string }).url || (isUrl ? output.data : undefined);
         return NextResponse.json<GenerateResponse>({
           success: true,
           video: isUrl ? undefined : output.data,
           videoUrl: isUrl ? output.data : undefined,
+          videoSourceUrl: srcUrl,
           contentType: "video",
         });
       }
@@ -2995,10 +3001,12 @@ export async function POST(request: NextRequest) {
       // Return appropriate fields based on output type
       if (output.type === "video") {
         const isUrl = output.data.startsWith("http");
+        const srcUrl = (output as { url?: string }).url || (isUrl ? output.data : undefined);
         return NextResponse.json<GenerateResponse>({
           success: true,
           video: isUrl ? undefined : output.data,
           videoUrl: isUrl ? output.data : undefined,
+          videoSourceUrl: srcUrl,
           contentType: "video",
         });
       }

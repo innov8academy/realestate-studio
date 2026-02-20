@@ -24,6 +24,7 @@ export interface GenerateResponse {
   image?: string;
   video?: string;
   videoUrl?: string; // For large videos, return URL directly
+  videoSourceUrl?: string; // Persistent CDN URL for the generated video (survives refresh)
   contentType?: "image" | "video";
   error?: string;
 }

@@ -1620,6 +1620,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
 
                 updateNodeData(node.id, {
                   outputVideo: videoData,
+                  outputVideoRef: result.videoSourceUrl || undefined,
                   status: "complete",
                   error: null,
                   videoHistory: updatedHistory,
@@ -2791,6 +2792,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
 
           updateNodeData(nodeId, {
             outputVideo: videoData,
+            outputVideoRef: result.videoSourceUrl || undefined,
             status: "complete",
             error: null,
             videoHistory: updatedHistory,

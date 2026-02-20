@@ -25,9 +25,17 @@ function captureWorkflow(): WorkflowFile {
     name: "studio-session",
     nodes: nodes.map(({ selected, ...rest }) => {
       const d = rest.data as Record<string, unknown> | undefined;
-      // Strip outputVideo from video nodes — too large for IndexedDB
+      // Strip heavy outputVideo blob/base64, but keep the CDN URL ref for restore
       if (d && "outputVideo" in d && d.outputVideo) {
-        return { ...rest, data: { ...d, outputVideo: null, status: "idle" } as typeof rest.data };
+        const ref = d.outputVideoRef as string | undefined;
+        return {
+          ...rest,
+          data: {
+            ...d,
+            outputVideo: ref || null, // Store CDN URL if available, else null
+            status: ref ? "complete" : "idle",
+          } as typeof rest.data,
+        };
       }
       return rest;
     }),
