@@ -1305,7 +1305,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
               const headers: Record<string, string> = {
                 "Content-Type": "application/json",
               };
-              const provider = nodeData.selectedModel?.provider || "gemini";
+              const provider = nodeData.selectedModel?.provider || "kie";
               if (provider === "gemini") {
                 const geminiConfig = providerSettingsState.providers.gemini;
                 if (geminiConfig?.apiKey) {
@@ -1463,7 +1463,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
               }
 
               const nodeData = node.data as GenerateImageNodeData;
-              const errorProvider = nodeData.selectedModel?.provider || "gemini";
+              const errorProvider = nodeData.selectedModel?.provider || "kie";
               logger.error('node.error', 'Generate node execution failed', {
                 nodeId: node.id,
                 provider: errorProvider,
@@ -2380,7 +2380,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
         const freshNode = get().nodes.find((n) => n.id === nodeId);
         const nodeData = (freshNode?.data || node.data) as GenerateImageNodeData;
         const providerSettingsState = get().providerSettings;
-        const provider = nodeData.selectedModel?.provider || "gemini";
+        const provider = nodeData.selectedModel?.provider || "kie";
 
         // Always get fresh connected inputs first, fall back to stored inputs only if not connected
         const { images: connectedImages, text: connectedText, dynamicInputs } = getConnectedInputs(nodeId);
@@ -3255,7 +3255,7 @@ export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
             data: {
               ...data,
               selectedModel: {
-                provider: "gemini" as ProviderType,
+                provider: "kie" as ProviderType,
                 modelId: data.model,
                 displayName,
               },

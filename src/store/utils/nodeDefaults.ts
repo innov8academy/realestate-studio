@@ -104,7 +104,7 @@ export const createDefaultNodeData = (type: NodeType): WorkflowNodeData => {
       } else {
         const modelDisplayName = legacyDefaults.model === "gemini-flash" ? "Gemini Flash" : "Gemini Pro";
         selectedModel = {
-          provider: "gemini",
+          provider: "kie",
           modelId: legacyDefaults.model,
           displayName: modelDisplayName,
         };

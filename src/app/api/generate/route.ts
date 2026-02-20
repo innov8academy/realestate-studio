@@ -2610,7 +2610,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Determine which provider to use
-    const provider: ProviderType = selectedModel?.provider || "gemini";
+    const provider: ProviderType = selectedModel?.provider || "kie";
     const _trackModel = selectedModel?.modelId || model || "unknown";
     console.log(`[API:${requestId}] Provider: ${provider}, Model: ${_trackModel}`);
 
