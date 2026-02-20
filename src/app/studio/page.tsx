@@ -5,7 +5,7 @@ import { StudioWizard } from "@/components/studio/StudioWizard";
 import { useStudioStore } from "@/store/studioStore";
 import { LoadingPhrase } from "@/components/studio/shared/LoadingPhrase";
 import { useWorkflowStore, type WorkflowFile } from "@/store/workflowStore";
-import { getPresetTemplate, PROMPTS } from "@/lib/quickstart/templates";
+import { getPresetTemplate, PROMPTS as CODE_PROMPTS } from "@/lib/quickstart/templates";
 import { AnnotationModal } from "@/components/AnnotationModal";
 import { configureNodesForProvider } from "@/lib/studio/nodeMap";
 import {
@@ -76,26 +76,35 @@ export default function StudioPage() {
       const provider = hasKie ? ("kie" as const) : ("gemini" as const);
       configureNodesForProvider(store.updateNodeData, provider);
 
+      // Fetch effective prompts — admin overrides take precedence over code defaults
+      let P: Record<string, string> = CODE_PROMPTS as Record<string, string>;
+      try {
+        const res = await fetch("/api/studio/prompts");
+        if (res.ok) P = await res.json();
+      } catch {
+        // fall back to code defaults silently
+      }
+
       // Backfill any empty prompt nodes with template defaults.
       // This handles stale IndexedDB sessions where prompts were saved empty.
       // Use no-ref prompts by default; they auto-switch to ref versions when reference is uploaded.
       const hasReference = !!useStudioStore.getState().buildingReferenceImage;
       const defaultPrompts: Record<string, string> = {
-        "prompt-map-enhance": PROMPTS.mapEnhanceClean,
-        "prompt-map-enhance-frame2": PROMPTS.mapEnhanceWithArea,
-        "prompt-street-enhance": PROMPTS.streetEnhance,
-        "prompt-half-building": hasReference ? PROMPTS.halfBuilding : PROMPTS.halfBuildingNoRef,
-        "prompt-full-building": hasReference ? PROMPTS.fullBuilding : PROMPTS.fullBuildingNoRef,
-        "prompt-angle-front": PROMPTS.angleFront,
-        "prompt-angle-aerial": PROMPTS.angleAerial,
-        "prompt-angle-corner": PROMPTS.angleCorner,
-        "prompt-video-map-area": PROMPTS.videoMapAreaPopup,
-        "prompt-video-1": PROMPTS.videoMapToStreet,
-        "prompt-video-2": PROMPTS.videoStreetToHalf,
-        "prompt-video-3": PROMPTS.videoHalfToFull,
-        "prompt-video-4": PROMPTS.videoFullToAerial,
-        "prompt-video-5": PROMPTS.videoAerialToBalcony,
-        "prompt-video-6": PROMPTS.videoBalconyToInterior,
+        "prompt-map-enhance": P.mapEnhanceClean,
+        "prompt-map-enhance-frame2": P.mapEnhanceWithArea,
+        "prompt-street-enhance": P.streetEnhance,
+        "prompt-half-building": hasReference ? P.halfBuilding : P.halfBuildingNoRef,
+        "prompt-full-building": hasReference ? P.fullBuilding : P.fullBuildingNoRef,
+        "prompt-angle-front": P.angleFront,
+        "prompt-angle-aerial": P.angleAerial,
+        "prompt-angle-corner": P.angleCorner,
+        "prompt-video-map-area": P.videoMapAreaPopup,
+        "prompt-video-1": P.videoMapToStreet,
+        "prompt-video-2": P.videoStreetToHalf,
+        "prompt-video-3": P.videoHalfToFull,
+        "prompt-video-4": P.videoFullToAerial,
+        "prompt-video-5": P.videoAerialToBalcony,
+        "prompt-video-6": P.videoBalconyToInterior,
       };
       const currentNodes = useWorkflowStore.getState().nodes;
       for (const [nodeId, defaultPrompt] of Object.entries(defaultPrompts)) {
@@ -107,9 +116,9 @@ export default function StudioPage() {
       }
 
       // Force-update prompts that changed significantly — always overwrite regardless of saved content.
-      store.updateNodeData("prompt-angle-aerial", { prompt: PROMPTS.angleAerial });
-      store.updateNodeData("prompt-angle-corner", { prompt: PROMPTS.angleCorner });
-      store.updateNodeData("prompt-video-map-area", { prompt: PROMPTS.videoMapAreaPopup });
+      store.updateNodeData("prompt-angle-aerial", { prompt: P.angleAerial });
+      store.updateNodeData("prompt-angle-corner", { prompt: P.angleCorner });
+      store.updateNodeData("prompt-video-map-area", { prompt: P.videoMapAreaPopup });
 
       // Substitute {AREA} placeholder in Frame 2 prompt with actual value
       const sqm = useStudioStore.getState().plotSquareMeters;
