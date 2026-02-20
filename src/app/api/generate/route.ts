@@ -1184,6 +1184,114 @@ async function generateWithFalQueue(
 
 // ============ Kie.ai Helpers ============
 
+// --- Fallback model chains ---
+
+const IMAGE_FALLBACK_CHAIN: Record<string, { modelId: string; displayName: string }[]> = {
+  "gpt-image/1.5-image-to-image": [
+    { modelId: "gemini-pro", displayName: "nano-banana-pro" },
+  ],
+  "gemini-pro": [
+    { modelId: "gpt-image/1.5-image-to-image", displayName: "GPT 1.5" },
+  ],
+};
+
+const VIDEO_FALLBACK_CHAIN: Record<string, { modelId: string; displayName: string }[]> = {
+  "kling/v2-5-turbo-image-to-video-pro": [
+    { modelId: "veo3-fast/image-to-video", displayName: "Veo 3.1 Fast" },
+    { modelId: "bytedance/seedance-1.5-pro", displayName: "Seedance 1.5 Pro" },
+  ],
+};
+
+function mapAspectRatioForGpt15(ratio: string): string {
+  const supported = ["1:1", "2:3", "3:2"];
+  if (supported.includes(ratio)) return ratio;
+  if (ratio === "9:16") return "2:3";
+  // 16:9, 4:3, 21:9, auto, and anything else → 3:2
+  return "3:2";
+}
+
+function mapAspectRatioForVeo(ratio: string): string {
+  // Veo only supports 16:9 and 9:16
+  if (ratio === "9:16") return "9:16";
+  return "16:9";
+}
+
+function mapDurationForSeedance(duration: string): string {
+  if (duration === "5") return "4";
+  if (duration === "10") return "8";
+  return duration;
+}
+
+function buildFallbackInput(
+  originalInput: GenerationInput,
+  fallbackModel: { modelId: string; displayName: string },
+  mediaType: "image" | "video"
+): GenerationInput {
+  const newInput: GenerationInput = {
+    ...originalInput,
+    model: {
+      ...originalInput.model,
+      id: fallbackModel.modelId,
+      name: fallbackModel.displayName,
+    },
+    parameters: { ...originalInput.parameters },
+    dynamicInputs: originalInput.dynamicInputs ? { ...originalInput.dynamicInputs } : undefined,
+  };
+
+  const params = newInput.parameters!;
+  const targetId = fallbackModel.modelId;
+
+  if (mediaType === "image") {
+    if (targetId.startsWith("gpt-image/1.5")) {
+      // Adjust aspect ratio for GPT 1.5
+      if (params.aspect_ratio) {
+        params.aspect_ratio = mapAspectRatioForGpt15(params.aspect_ratio as string);
+      }
+      // Remove resolution (GPT 1.5 uses quality instead)
+      delete params.resolution;
+    } else if (targetId === "gemini-pro") {
+      // Remove quality (gemini-pro uses resolution instead)
+      delete params.quality;
+    }
+  } else {
+    // Video fallbacks: remap dynamic input keys from Kling format to Veo/Seedance format
+    if (newInput.dynamicInputs) {
+      const di = newInput.dynamicInputs;
+      if ("image_url" in di) {
+        di["first_frame"] = di["image_url"];
+        delete di["image_url"];
+      }
+      if ("tail_image_url" in di) {
+        di["last_frame"] = di["tail_image_url"];
+        delete di["tail_image_url"];
+      }
+    }
+
+    if (targetId.startsWith("veo3-fast/") || targetId.startsWith("veo3/")) {
+      // Veo: remove unsupported params
+      delete params.duration;
+      delete params.cfg_scale;
+      delete params.sound;
+      // Map aspect ratio
+      if (params.aspect_ratio) {
+        params.aspect_ratio = mapAspectRatioForVeo(params.aspect_ratio as string);
+      }
+    } else if (targetId === "bytedance/seedance-1.5-pro") {
+      // Seedance: adjust duration, remove unsupported params, add resolution
+      if (params.duration) {
+        params.duration = mapDurationForSeedance(params.duration as string);
+      }
+      delete params.cfg_scale;
+      delete params.sound;
+      if (!params.resolution) {
+        params.resolution = "720p";
+      }
+    }
+  }
+
+  return newInput;
+}
+
 /**
  * Get default required parameters for a Kie model
  * Many Kie models require specific parameters to be present even if not user-specified
@@ -2739,9 +2847,38 @@ export async function POST(request: NextRequest) {
         dynamicInputs: processedDynamicInputs,
       };
 
-      const result = await generateWithKie(requestId, kieApiKey, genInput);
+      // Try primary model, then fallback chain if it fails
+      const fallbackChain = mediaType === "video"
+        ? VIDEO_FALLBACK_CHAIN[genInput.model.id]
+        : IMAGE_FALLBACK_CHAIN[genInput.model.id];
 
-      if (!result.success) {
+      let result = await generateWithKie(requestId, kieApiKey, genInput);
+      let actualModel = _trackModel;
+
+      if (!result.success && fallbackChain && fallbackChain.length > 0) {
+        let lastError = result.error;
+        for (const fallback of fallbackChain) {
+          console.log(`[API:${requestId}] Fallback attempt: ${genInput.model.id} failed, trying ${fallback.modelId} (${fallback.displayName})`);
+          const fallbackInput = buildFallbackInput(genInput, fallback, mediaType as "image" | "video");
+          result = await generateWithKie(requestId, kieApiKey, fallbackInput);
+          if (result.success) {
+            actualModel = fallback.modelId;
+            console.log(`[API:${requestId}] Fallback succeeded with ${fallback.modelId}`);
+            break;
+          }
+          lastError = result.error;
+        }
+        if (!result.success) {
+          trackGeneration({ requestId, provider: "kie", model: _trackModel, success: false, durationMs: Date.now() - _startMs, error: lastError }).catch(() => {});
+          return NextResponse.json<GenerateResponse>(
+            {
+              success: false,
+              error: lastError || "Generation failed (all fallbacks exhausted)",
+            },
+            { status: 500 }
+          );
+        }
+      } else if (!result.success) {
         return NextResponse.json<GenerateResponse>(
           {
             success: false,
@@ -2764,7 +2901,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Return appropriate fields based on output type
-      trackGeneration({ requestId, provider: "kie", model: _trackModel, success: true, durationMs: Date.now() - _startMs }).catch(() => {});
+      trackGeneration({ requestId, provider: "kie", model: actualModel, success: true, durationMs: Date.now() - _startMs }).catch(() => {});
       if (output.type === "video") {
         // Check if data is a URL (for large videos) or base64
         const isUrl = output.data.startsWith("http");
