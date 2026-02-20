@@ -12,7 +12,6 @@ import {
   OutputNodeData,
   OutputGalleryNodeData,
   ImageCompareNodeData,
-  EaseCurveNodeData,
   WorkflowNodeData,
   GroupColor,
   SelectedModel,
@@ -36,8 +35,6 @@ export const defaultNodeDimensions: Record<NodeType, { width: number; height: nu
   output: { width: 320, height: 320 },
   outputGallery: { width: 320, height: 360 },
   imageCompare: { width: 400, height: 360 },
-  videoStitch: { width: 400, height: 280 },
-  easeCurve: { width: 340, height: 480 },
 };
 
 /**
@@ -190,29 +187,5 @@ export const createDefaultNodeData = (type: NodeType): WorkflowNodeData => {
         imageA: null,
         imageB: null,
       } as ImageCompareNodeData;
-    case "videoStitch":
-      return {
-        clips: [],
-        clipOrder: [],
-        outputVideo: null,
-        loopCount: 1,
-        speedPreset: null,
-        status: "idle",
-        error: null,
-        progress: 0,
-        encoderSupported: null,
-      };
-    case "easeCurve":
-      return {
-        bezierHandles: [0.445, 0.05, 0.55, 0.95], // easeInOutSine preset
-        easingPreset: "easeInOutSine",
-        inheritedFrom: null,
-        outputDuration: 1.5,
-        outputVideo: null,
-        status: "idle",
-        error: null,
-        progress: 0,
-        encoderSupported: null,
-      } as EaseCurveNodeData;
   }
 };

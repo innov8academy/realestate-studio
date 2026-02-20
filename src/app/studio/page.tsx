@@ -150,31 +150,13 @@ export default function StudioPage() {
         }
       }
 
-      // Inject VideoStitch node into existing sessions if missing
+      // Remove legacy videoStitch node if present from old sessions
       const hasStitchNode = useWorkflowStore.getState().nodes.find((n) => n.id === "videoStitch-final");
-      if (!hasStitchNode) {
-        const { nodes: currentNodes } = useWorkflowStore.getState();
+      if (hasStitchNode) {
+        const { nodes: currentNodes, edges: currentEdges } = useWorkflowStore.getState();
         useWorkflowStore.setState({
-          nodes: [
-            ...currentNodes,
-            {
-              id: "videoStitch-final",
-              type: "videoStitch",
-              position: { x: 3360, y: 100 },
-              data: {
-                clips: [],
-                clipOrder: [],
-                outputVideo: null,
-                loopCount: 1,
-                speedPreset: null,
-                status: "idle",
-                error: null,
-                progress: 0,
-                encoderSupported: null,
-              },
-              style: { width: 520, height: 420 },
-            } as any,
-          ],
+          nodes: currentNodes.filter((n) => n.id !== "videoStitch-final"),
+          edges: currentEdges.filter((e) => e.source !== "videoStitch-final" && e.target !== "videoStitch-final"),
         });
       }
 
@@ -196,21 +178,10 @@ export default function StudioPage() {
           targetHandle: "image",
         },
       ];
-      const REQUIRED_STITCH_EDGES = [
-        { id: "e-vid0-to-stitch", source: "generateVideo-map-area", sourceHandle: "video", target: "videoStitch-final", targetHandle: "video-0" },
-        { id: "e-vid1-to-stitch", source: "generateVideo-1", sourceHandle: "video", target: "videoStitch-final", targetHandle: "video-1" },
-        { id: "e-vid2-to-stitch", source: "generateVideo-2", sourceHandle: "video", target: "videoStitch-final", targetHandle: "video-2" },
-        { id: "e-vid3-to-stitch", source: "generateVideo-3", sourceHandle: "video", target: "videoStitch-final", targetHandle: "video-3" },
-        { id: "e-vid4-to-stitch", source: "generateVideo-4", sourceHandle: "video", target: "videoStitch-final", targetHandle: "video-4" },
-        { id: "e-vid5-to-stitch", source: "generateVideo-5", sourceHandle: "video", target: "videoStitch-final", targetHandle: "video-5" },
-        { id: "e-vid6-to-stitch", source: "generateVideo-6", sourceHandle: "video", target: "videoStitch-final", targetHandle: "video-6" },
-      ];
-
       const currentEdges = useWorkflowStore.getState().edges;
       const edgeIds = new Set(currentEdges.map((e) => e.id));
       const missingEdges = [
         ...REQUIRED_ANGLE_EDGES,
-        ...REQUIRED_STITCH_EDGES,
       ].filter((e) => !edgeIds.has(e.id));
       if (missingEdges.length > 0) {
         useWorkflowStore.setState({ edges: [...currentEdges, ...missingEdges] });

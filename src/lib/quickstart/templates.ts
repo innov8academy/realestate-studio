@@ -650,28 +650,7 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         },
 
         // ==========================================
-        // STAGE 7: VIDEO STITCH
-        // ==========================================
-        {
-          id: "videoStitch-final",
-          type: "videoStitch",
-          position: { x: COL.outputs, y: ROW.mapRow + 100 },
-          data: {
-            clips: [],
-            clipOrder: [],
-            outputVideo: null,
-            loopCount: 1,
-            speedPreset: null,
-            status: "idle",
-            error: null,
-            progress: 0,
-            encoderSupported: null,
-          },
-          style: { width: 520, height: 420 },
-        },
-
-        // ==========================================
-        // STAGE 8: OUTPUT
+        // STAGE 7: OUTPUT
         // ==========================================
         {
           id: "output-1",
@@ -1047,60 +1026,7 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
         },
 
         // ==========================================
-        // STAGE 7: Video Stitch — all 7 videos → VideoStitch node
-        // ==========================================
-        {
-          id: "e-vid0-to-stitch",
-          source: "generateVideo-map-area",
-          sourceHandle: "video",
-          target: "videoStitch-final",
-          targetHandle: "video-0",
-        },
-        {
-          id: "e-vid1-to-stitch",
-          source: "generateVideo-1",
-          sourceHandle: "video",
-          target: "videoStitch-final",
-          targetHandle: "video-1",
-        },
-        {
-          id: "e-vid2-to-stitch",
-          source: "generateVideo-2",
-          sourceHandle: "video",
-          target: "videoStitch-final",
-          targetHandle: "video-2",
-        },
-        {
-          id: "e-vid3-to-stitch",
-          source: "generateVideo-3",
-          sourceHandle: "video",
-          target: "videoStitch-final",
-          targetHandle: "video-3",
-        },
-        {
-          id: "e-vid4-to-stitch",
-          source: "generateVideo-4",
-          sourceHandle: "video",
-          target: "videoStitch-final",
-          targetHandle: "video-4",
-        },
-        {
-          id: "e-vid5-to-stitch",
-          source: "generateVideo-5",
-          sourceHandle: "video",
-          target: "videoStitch-final",
-          targetHandle: "video-5",
-        },
-        {
-          id: "e-vid6-to-stitch",
-          source: "generateVideo-6",
-          sourceHandle: "video",
-          target: "videoStitch-final",
-          targetHandle: "video-6",
-        },
-
-        // ==========================================
-        // STAGE 8: Outputs
+        // STAGE 7: Outputs
         // ==========================================
         {
           id: "e-fullbuild-to-output1",

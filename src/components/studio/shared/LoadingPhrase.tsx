@@ -30,14 +30,6 @@ export const MAP_PHRASES = [
   "Map thayaraakkunnu, almost done...",
 ];
 
-export const STITCH_PHRASES = [
-  "Clips okke set, almost ready...",
-  "Thallipoli cut ready aakkunnu...",
-  "Ithu kandal ningal njettum...",
-  "Kaathirunnu kaathirunnu kannu kazhachu...",
-  "Koncham wait cheyyoo...",
-];
-
 export const SETUP_PHRASES = [
   "Ellam set aakkunnu...",
   "Thudangam alle...",
@@ -50,19 +42,18 @@ export const SETUP_PHRASES = [
 
 interface LoadingPhraseProps {
   /** Which phrase set to use */
-  set?: "image" | "video" | "map" | "stitch" | "setup";
+  set?: "image" | "video" | "map" | "setup";
   /** How long each phrase is shown, in ms (default 2500) */
   interval?: number;
   className?: string;
 }
 
 // Default interval per set — tuned so each phrase shows roughly once
-// during a typical generation (image ~60s, video ~2.5min, map ~60s, stitch ~30s)
+// during a typical generation (image ~60s, video ~2.5min, map ~60s)
 const DEFAULT_INTERVALS: Record<string, number> = {
   image: 15000,  // 4 phrases × 15s = 60s
   map:    7000,  // 9 phrases ×  7s = 63s
   video: 35000,  // 4 phrases × 35s = 140s (~2.5 min)
-  stitch: 6000,  // 5 phrases ×  6s = 30s
   setup:  1500,  // brief, cycles fast
 };
 
@@ -76,9 +67,7 @@ export function LoadingPhrase({
       ? VIDEO_PHRASES
       : set === "map"
         ? MAP_PHRASES
-        : set === "stitch"
-          ? STITCH_PHRASES
-          : set === "setup"
+        : set === "setup"
             ? SETUP_PHRASES
             : IMAGE_PHRASES;
 

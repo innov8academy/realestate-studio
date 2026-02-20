@@ -48,7 +48,7 @@ export function StudioWizard() {
    *   5: Map Videos (V0, V1)
    *   6: Construction Videos (V2, V3)
    *   7: Showcase Videos (V4, V5, V6)
-   *   8: Stitch Videos
+   *   8: Download & Stitch (EasyPeasyEase)
    *   9: Your Animation (Output)
    */
 
@@ -100,7 +100,7 @@ export function StudioWizard() {
         return v4?.status === "complete" || v5?.status === "complete" || v6?.status === "complete";
       }
       case 8:
-        return true; // Stitch step — always allow moving on
+        return true; // Download & stitch step — always allow moving on
       case 9:
         return true; // Output step is always "complete"
       default:

@@ -35,8 +35,7 @@ export type NodeType =
   | "output"
   | "outputGallery"
   | "imageCompare"
-  | "videoStitch"
-  | "easeCurve";
+;
 
 /**
  * Node execution status
@@ -216,47 +215,6 @@ export interface ImageCompareNodeData extends BaseNodeData {
 }
 
 /**
- * Video stitch clip - represents a single video clip in the filmstrip
- */
-export interface VideoStitchClip {
-  edgeId: string;                // Edge ID for disconnect capability
-  sourceNodeId: string;          // Source node producing this video
-  thumbnail: string | null;      // Base64 JPEG thumbnail
-  duration: number | null;       // Clip duration in seconds
-  handleId: string;              // Which input handle (video-0, video-1, etc.)
-}
-
-/**
- * Video Stitch node - concatenates multiple videos into a single output
- */
-export interface VideoStitchNodeData extends BaseNodeData {
-  clips: VideoStitchClip[];       // Ordered clip sequence for filmstrip
-  clipOrder: string[];            // Edge IDs in user-defined order (drag reorder)
-  outputVideo: string | null;     // Stitched video blob URL or data URL
-  loopCount: 1 | 2 | 3;          // How many times to repeat the clip sequence (1 = no loop)
-  speedPreset: string | null;     // Easing function name for speed ramp (null = no ramp)
-  status: NodeStatus;
-  error: string | null;
-  progress: number;               // 0-100 processing progress
-  encoderSupported: boolean | null; // null = not checked yet, true/false after check
-}
-
-/**
- * Ease Curve node - applies speed curve to video using easing functions
- */
-export interface EaseCurveNodeData extends BaseNodeData {
-  bezierHandles: [number, number, number, number];
-  easingPreset: string | null;
-  inheritedFrom: string | null;
-  outputDuration: number;
-  outputVideo: string | null;
-  status: NodeStatus;
-  error: string | null;
-  progress: number;
-  encoderSupported: boolean | null;
-}
-
-/**
  * Split Grid node - splits image into grid cells for parallel processing
  */
 export interface SplitGridNodeData extends BaseNodeData {
@@ -297,9 +255,7 @@ export type WorkflowNodeData =
   | SplitGridNodeData
   | OutputNodeData
   | OutputGalleryNodeData
-  | ImageCompareNodeData
-  | VideoStitchNodeData
-  | EaseCurveNodeData;
+  | ImageCompareNodeData;
 
 /**
  * Workflow node with typed data (extended with optional groupId)
@@ -311,7 +267,7 @@ export type WorkflowNode = Node<WorkflowNodeData, NodeType> & {
 /**
  * Handle types for node connections
  */
-export type HandleType = "image" | "text" | "audio" | "video" | "easeCurve";
+export type HandleType = "image" | "text" | "audio" | "video";
 
 /**
  * Default settings for node types - stored in localStorage

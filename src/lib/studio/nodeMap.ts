@@ -77,10 +77,7 @@ export const STUDIO_NODES = {
   promptVideoV6: "prompt-video-6",
   generateVideoV6: "generateVideo-6",
 
-  // Step 8: Video Stitch
-  videoStitchFinal: "videoStitch-final",
-
-  // Step 9: Output
+  // Step 8: Output
   output1: "output-1",
   output2: "output-2",
 } as const;
@@ -211,11 +208,6 @@ export const STUDIO_STEPS: StudioStep[] = [
     id: "showcase-videos",
     title: "Showcase Videos",
     description: "Aerial orbit, balcony, and interior transitions",
-  },
-  {
-    id: "stitch",
-    title: "Stitch Videos",
-    description: "Combine all clips into one seamless animation",
   },
   {
     id: "output",
