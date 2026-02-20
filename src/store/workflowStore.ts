@@ -439,7 +439,7 @@ function clearNodeImageRefs(nodes: WorkflowNode[]): WorkflowNode[] {
 }
 
 // Re-export for backward compatibility
-export { generateWorkflowId, saveGenerateImageDefaults, saveGenerateImageDefaults } from "./utils/localStorage";
+export { generateWorkflowId, saveGenerateImageDefaults } from "./utils/localStorage";
 export { GROUP_COLORS } from "./utils/nodeDefaults";
 
 export const useWorkflowStore = create<WorkflowStore>((set, get) => ({
