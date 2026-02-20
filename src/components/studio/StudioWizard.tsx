@@ -23,7 +23,6 @@ export function StudioWizard() {
   const regenerateNode = useWorkflowStore((s) => s.regenerateNode);
   const updateNodeData = useWorkflowStore((s) => s.updateNodeData);
   const isRunning = useWorkflowStore((s) => s.isRunning);
-  const stopWorkflow = useWorkflowStore((s) => s.stopWorkflow);
   const buildingDescription = useStudioStore((s) => s.buildingDescription);
 
   // Check if Kie API key is configured
@@ -124,8 +123,6 @@ export function StudioWizard() {
           primaryLabel: "Next",
           primaryDisabled: mapFrame1?.status !== "complete",
           onPrimary: goNext,
-          showStop: isRunning,
-          onStop: stopWorkflow,
         };
       }
       case 3: {
@@ -141,8 +138,6 @@ export function StudioWizard() {
           primaryLabel: "Generate Building",
           primaryDisabled: isRunning,
           primaryLoading: isRunning,
-          showStop: isRunning,
-          onStop: stopWorkflow,
           onPrimary: async () => {
             // Inject building description into prompts if provided
             if (buildingDescription.trim()) {
@@ -168,8 +163,6 @@ export function StudioWizard() {
           primaryLabel: "Next",
           primaryDisabled: !isStepComplete(),
           onPrimary: goNext,
-          showStop: isRunning,
-          onStop: stopWorkflow,
         };
       }
       case 5:
@@ -180,8 +173,6 @@ export function StudioWizard() {
           primaryLabel: "Next",
           primaryDisabled: !isStepComplete(),
           onPrimary: goNext,
-          showStop: isRunning,
-          onStop: stopWorkflow,
         };
       }
       case 8:
