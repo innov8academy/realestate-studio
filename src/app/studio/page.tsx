@@ -6,15 +6,7 @@ import { useStudioStore } from "@/store/studioStore";
 import { LoadingPhrase } from "@/components/studio/shared/LoadingPhrase";
 import { useWorkflowStore, type WorkflowFile } from "@/store/workflowStore";
 import { getPresetTemplate, PROMPTS as CODE_PROMPTS } from "@/lib/quickstart/templates";
-import dynamic from "next/dynamic";
-
-// AnnotationModal uses react-konva (canvas library) which requires window/document.
-// Dynamic import with ssr:false prevents server-side rendering and hydration mismatches
-// that cause the modal to break on first load (especially on mobile).
-const AnnotationModal = dynamic(
-  () => import("@/components/AnnotationModal").then((m) => m.AnnotationModal),
-  { ssr: false }
-);
+import { AnnotationModal } from "@/components/AnnotationModal";
 import { configureNodesForProvider } from "@/lib/studio/nodeMap";
 import {
   saveStudioState,
