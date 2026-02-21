@@ -14,6 +14,7 @@ export function ApiKeySetup() {
   const [apiKey, setApiKey] = useState("");
   const [error, setError] = useState("");
   const [showKey, setShowKey] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   const handleSubmit = () => {
     const trimmed = apiKey.trim();
@@ -38,111 +39,15 @@ export function ApiKeySetup() {
           </div>
           <h1 className="text-lg font-semibold text-white">Connect Kie.ai</h1>
           <p className="text-xs text-neutral-400 mt-1">
-            This app uses Kie.ai to generate your property animation.
+            Paste your API key below to start generating.
           </p>
         </div>
-
-        {/* Cost Estimate Card */}
-        <div className="bg-amber-950/40 border border-amber-800/50 rounded-xl p-4">
-          <div className="flex items-start gap-2.5">
-            <span className="text-amber-400 mt-0.5 shrink-0">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-            </span>
-            <div>
-              <p className="text-xs font-semibold text-amber-300 mb-1">How much will it cost?</p>
-              <p className="text-xs text-amber-200/70 leading-relaxed">
-                Each full property animation costs approximately{" "}
-                <span className="text-amber-200 font-semibold">$2 – $5 in API credits</span>{" "}
-                (8 AI images + 7 videos).
-              </p>
-              <div className="mt-2.5 space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-amber-200/60">8 image generations</span>
-                  <span className="text-amber-200/80">~$0.50</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-amber-200/60">7 video clips (5s each)</span>
-                  <span className="text-amber-200/80">~$1.50</span>
-                </div>
-                <div className="flex justify-between text-xs border-t border-amber-800/40 pt-1 mt-1">
-                  <span className="text-amber-300 font-medium">Minimum top-up recommended</span>
-                  <span className="text-amber-300 font-semibold">$10</span>
-                </div>
-              </div>
-              <p className="text-xs text-amber-200/50 mt-2">
-                Credits never expire. $10 covers 2–4 full generations.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Steps */}
-        <div className="space-y-3">
-          <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
-            How to get started
-          </p>
-
-          {/* Step 1 */}
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-xs font-semibold text-neutral-300">
-              1
-            </div>
-            <div className="flex-1 pt-0.5">
-              <p className="text-xs font-medium text-neutral-200">Create a free Kie.ai account</p>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Sign up takes under 1 minute — no credit card required.
-              </p>
-              <a
-                href={KIE_REFERRAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 mt-1.5 text-xs text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Go to Kie.ai to sign up
-                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
-              </a>
-            </div>
-          </div>
-
-          {/* Step 2 */}
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-xs font-semibold text-neutral-300">
-              2
-            </div>
-            <div className="flex-1 pt-0.5">
-              <p className="text-xs font-medium text-neutral-200">Add credits to your account</p>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Go to <span className="text-neutral-400">Billing</span> in your Kie.ai dashboard and top up. We recommend <span className="text-neutral-300 font-medium">$10</span> to get started comfortably.
-              </p>
-            </div>
-          </div>
-
-          {/* Step 3 */}
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-xs font-semibold text-neutral-300">
-              3
-            </div>
-            <div className="flex-1 pt-0.5">
-              <p className="text-xs font-medium text-neutral-200">Copy your API key</p>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                In your Kie.ai dashboard, go to <span className="text-neutral-400">API Keys</span>, create a new key, and paste it below.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-neutral-800" />
 
         {/* API Key Input */}
         <div className="space-y-3">
           <div>
             <label className="block text-xs font-medium text-neutral-400 mb-1.5">
-              Paste your Kie.ai API Key
+              Kie.ai API Key
             </label>
             <div className="relative">
               <input
@@ -188,6 +93,134 @@ export function ApiKeySetup() {
             Your API key is stored locally and never shared.
           </p>
         </div>
+
+        {/* Divider */}
+        <div className="border-t border-neutral-800" />
+
+        {/* Tutorial Button */}
+        <button
+          onClick={() => setShowTutorial((v) => !v)}
+          className="w-full flex items-center justify-between px-4 py-3 bg-neutral-900 border border-neutral-800 rounded-xl hover:border-neutral-700 transition-colors group"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="text-blue-400">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+              </svg>
+            </span>
+            <span className="text-xs font-medium text-neutral-300">
+              {showTutorial ? "Hide guide" : "I don't have an API key — how do I get one?"}
+            </span>
+          </div>
+          <svg
+            className={`w-4 h-4 text-neutral-500 transition-transform ${showTutorial ? "rotate-180" : ""}`}
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {/* Expandable Tutorial */}
+        {showTutorial && (
+          <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
+
+            {/* Cost info */}
+            <div className="bg-amber-950/40 border border-amber-800/50 rounded-xl p-4">
+              <p className="text-xs font-semibold text-amber-300 mb-1.5">How much does it cost?</p>
+              <p className="text-xs text-amber-200/70 leading-relaxed">
+                One full property animation costs about{" "}
+                <span className="text-amber-200 font-semibold">$3</span>.
+                {" "}Add <span className="text-amber-200 font-semibold">$5</span> to your
+                account and you're good for your first animation.
+              </p>
+              <div className="mt-2.5 space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-amber-200/60">8 AI images</span>
+                  <span className="text-amber-200/80">~$0.85</span>
+                </div>
+                <div className="flex justify-between text-xs">
+                  <span className="text-amber-200/60">7 video clips (5s each)</span>
+                  <span className="text-amber-200/80">~$1.96</span>
+                </div>
+                <div className="flex justify-between text-xs border-t border-amber-800/40 pt-1 mt-1">
+                  <span className="text-amber-300 font-medium">Total per animation</span>
+                  <span className="text-amber-300 font-semibold">~$2.81</span>
+                </div>
+              </div>
+              <p className="text-xs text-amber-200/50 mt-2">
+                Credits never expire. $5 is enough for your first full generation.
+              </p>
+            </div>
+
+            {/* Simple Tutorial Steps */}
+            <div className="space-y-3">
+              <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                3 easy steps
+              </p>
+
+              {/* Step 1 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs font-semibold text-blue-300">
+                  1
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <p className="text-xs font-medium text-neutral-200">Go to Kie.ai and make a free account</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    Just click the link below. Sign up with your email.
+                    It takes less than a minute. You don't need a credit card to sign up.
+                  </p>
+                  <a
+                    href={KIE_REFERRAL_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 mt-1.5 px-3 py-1.5 bg-blue-900/40 border border-blue-800/50 rounded-lg text-xs text-blue-400 hover:text-blue-300 hover:bg-blue-900/60 transition-colors"
+                  >
+                    Open Kie.ai
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+
+              {/* Step 2 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs font-semibold text-blue-300">
+                  2
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <p className="text-xs font-medium text-neutral-200">Add $5 to your account</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    Once you're logged in, look for <span className="text-neutral-400">"Billing"</span> in
+                    the menu on the left side. Click it, then add <span className="text-neutral-300 font-medium">$5</span>.
+                    That's enough for your first full property video.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 */}
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-900/50 border border-blue-700/50 flex items-center justify-center text-xs font-semibold text-blue-300">
+                  3
+                </div>
+                <div className="flex-1 pt-0.5">
+                  <p className="text-xs font-medium text-neutral-200">Copy your API key and paste it above</p>
+                  <p className="text-xs text-neutral-500 mt-0.5">
+                    In the Kie.ai menu, look for <span className="text-neutral-400">"API Keys"</span>.
+                    {" "}Click <span className="text-neutral-400">"Create"</span> to make a new key.
+                    {" "}Click the copy button next to it.
+                    {" "}Then come back here and paste it in the box above.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xs text-neutral-600 text-center">
+              That's it! Once you paste your key, you're ready to go.
+            </p>
+          </div>
+        )}
+
       </div>
     </div>
   );
