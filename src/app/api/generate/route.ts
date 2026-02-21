@@ -2894,7 +2894,9 @@ export async function POST(request: NextRequest) {
       }
 
       // Merge wizard-level aspectRatio into parameters so Kie models receive it
-      const mergedParameters = aspectRatio
+      // Only for image models — video models have their own aspect_ratio defaults
+      // and the wizard-level value (e.g. "3:2") may not be valid for video APIs
+      const mergedParameters = aspectRatio && mediaType !== "video"
         ? { ...(parameters || {}), aspect_ratio: aspectRatio }
         : parameters;
 
