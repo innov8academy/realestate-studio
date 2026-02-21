@@ -30,6 +30,20 @@ export function ApiKeySetup() {
     <div className="h-full overflow-y-auto">
       <div className="px-5 py-6 space-y-5 max-w-sm mx-auto">
 
+        {/* Why Kie API */}
+        <div className="bg-gradient-to-br from-blue-950/50 to-neutral-900 rounded-xl p-4 border border-blue-800/30">
+          <h3 className="text-sm font-semibold text-blue-300 mb-1.5">
+            Why Kie.ai?
+          </h3>
+          <p className="text-xs text-neutral-300 leading-relaxed">
+            We searched for the cheapest way to generate AI videos and images via API.{" "}
+            <span className="text-blue-300 font-medium">Kie.ai is the most affordable API we found</span>{" "}
+            &mdash; a full property animation (8 images + 7 video clips) costs about{" "}
+            <span className="text-white font-semibold">$3</span>.
+            No subscriptions, no minimums. You only pay for what you generate.
+          </p>
+        </div>
+
         {/* Header */}
         <div className="text-center">
           <div className="w-14 h-14 bg-neutral-800 rounded-2xl mx-auto mb-3 flex items-center justify-center">

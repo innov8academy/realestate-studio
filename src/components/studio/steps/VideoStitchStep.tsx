@@ -32,7 +32,7 @@ export function VideoStitchStep() {
         <h3 className="text-sm font-semibold text-emerald-300 mb-2">
           Stitch & add ease curves
         </h3>
-        <p className="text-xs text-neutral-300 leading-relaxed mb-3">
+        <p className="text-xs text-neutral-300 leading-relaxed mb-2">
           Download each clip below, then combine them with ease curves at{" "}
           <a
             href="https://easypeasyease.vercel.app/"
@@ -44,6 +44,15 @@ export function VideoStitchStep() {
           </a>
           {" "}&mdash; a free tool for stitching and applying ease curves to short videos.
         </p>
+        <div className="flex items-start gap-2 bg-amber-950/40 border border-amber-800/40 rounded-lg px-3 py-2 mb-3">
+          <svg className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <p className="text-[11px] text-amber-200/80 leading-relaxed">
+            <span className="font-semibold text-amber-300">Open on desktop.</span>{" "}
+            EasyPeasyEase uses hardware-accelerated video processing and needs to run on a desktop browser. It won't work on mobile.
+          </p>
+        </div>
       </div>
 
       {/* Clip list with download buttons */}

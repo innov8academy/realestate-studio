@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useWorkflowStore } from "@/store/workflowStore";
 import { useStudioStore } from "@/store/studioStore";
 import { STUDIO_NODES } from "@/lib/studio/nodeMap";
@@ -8,6 +8,7 @@ import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
 import { LoadingPhrase } from "../shared/LoadingPhrase";
+import { GenerateAllVideosButton } from "../shared/GenerateAllVideosButton";
 import type { GenerateImageNodeData, GenerateVideoNodeData } from "@/types";
 
 const DURATION_OPTIONS = [
@@ -35,7 +36,6 @@ function VideoCard({
   const nodes = useWorkflowStore((s) => s.nodes);
   const regenerateNode = useWorkflowStore((s) => s.regenerateNode);
   const updateNodeData = useWorkflowStore((s) => s.updateNodeData);
-  const isRunning = useWorkflowStore((s) => s.isRunning);
   const currentNodeIds = useWorkflowStore((s) => s.currentNodeIds);
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
   const videoDuration = useStudioStore((s) => s.videoDuration);
@@ -76,7 +76,7 @@ function VideoCard({
             {!isVideoRunning && (
               <button
                 onClick={handleGenerate}
-                disabled={isRunning}
+                disabled={isVideoRunning}
                 className="flex-1 h-8 bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-medium rounded-lg transition-colors active:scale-[0.98] disabled:opacity-50"
               >
                 Regenerate
@@ -98,18 +98,12 @@ function VideoCard({
             </div>
           </div>
         </div>
-      ) : disabled ? (
-        <div className="w-full aspect-video rounded-lg bg-neutral-800/30 flex items-center justify-center">
-          <p className="text-xs text-neutral-600 text-center px-4">{disabledReason}</p>
-        </div>
       ) : (
-        <button
-          onClick={handleGenerate}
-          disabled={isRunning}
-          className="w-full h-10 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-xl transition-colors active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Generate Video
-        </button>
+        <div className="w-full aspect-video rounded-lg bg-neutral-800/50 flex items-center justify-center">
+          <span className="text-xs text-neutral-600">
+            {disabled ? disabledReason : "Ready to generate"}
+          </span>
+        </div>
       )}
 
       <AdvancedPromptSection promptNodeId={promptNodeId} label="Edit Prompt" />
@@ -160,6 +154,8 @@ export function MapVideosStep() {
           <span className="text-xs font-medium text-neutral-300 bg-neutral-800 px-2.5 py-1 rounded-lg">{aspectRatio}</span>
         </div>
       </div>
+
+      <GenerateAllVideosButton />
 
       {/* V0: Area Text Popup */}
       <VideoCard
