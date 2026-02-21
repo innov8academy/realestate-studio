@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { logger } from "@/utils/logger";
+import { sanitizePath, invalidPathResponse } from "@/lib/security";
 
 export const maxDuration = 300; // 5 minute timeout for large image operations
 
@@ -44,12 +45,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize workflow path
+    const safeWorkflowPath = sanitizePath(workflowPath);
+    if (!safeWorkflowPath) {
+      logger.warn('file.error', 'Workflow image save rejected: invalid path', { workflowPath });
+      return invalidPathResponse("workflowPath");
+    }
+
+    // Sanitize imageId to prevent path traversal
+    if (imageId.includes("..") || imageId.includes("/") || imageId.includes("\\") || imageId.includes("\0")) {
+      logger.warn('file.error', 'Workflow image save rejected: invalid imageId', { imageId });
+      return NextResponse.json(
+        { success: false, error: "Invalid imageId" },
+        { status: 400 }
+      );
+    }
+
     // Validate workflow directory exists
     try {
-      const stats = await fs.stat(workflowPath);
+      const stats = await fs.stat(safeWorkflowPath);
       if (!stats.isDirectory()) {
         logger.warn('file.error', 'Workflow image save failed: path is not a directory', {
-          workflowPath,
+          workflowPath: safeWorkflowPath,
         });
         return NextResponse.json(
           { success: false, error: "Workflow path is not a directory" },
@@ -58,7 +75,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (dirError) {
       logger.warn('file.error', 'Workflow image save failed: directory does not exist', {
-        workflowPath,
+        workflowPath: safeWorkflowPath,
       });
       return NextResponse.json(
         { success: false, error: "Workflow directory does not exist" },
@@ -67,7 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create target folder if it doesn't exist
-    const targetFolder = path.join(workflowPath, folder);
+    const targetFolder = path.join(safeWorkflowPath, folder);
     try {
       await fs.mkdir(targetFolder, { recursive: true });
     } catch (mkdirError) {
@@ -110,7 +127,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Save failed",
+        error: "Failed to save workflow image",
       },
       { status: 500 }
     );
@@ -140,10 +157,24 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Sanitize workflow path
+  const safeWorkflowPath = sanitizePath(workflowPath);
+  if (!safeWorkflowPath) {
+    return invalidPathResponse("workflowPath");
+  }
+
+  // Sanitize imageId
+  if (imageId.includes("..") || imageId.includes("/") || imageId.includes("\\") || imageId.includes("\0")) {
+    return NextResponse.json(
+      { success: false, error: "Invalid imageId" },
+      { status: 400 }
+    );
+  }
+
   try {
     // Validate workflow directory exists
     try {
-      const stats = await fs.stat(workflowPath);
+      const stats = await fs.stat(safeWorkflowPath);
       if (!stats.isDirectory()) {
         return NextResponse.json(
           { success: false, error: "Workflow path is not a directory" },
@@ -159,9 +190,9 @@ export async function GET(request: NextRequest) {
 
     // Construct file path - check folders in order based on hint
     const filename = `${imageId}.png`;
-    const inputsFolder = path.join(workflowPath, IMAGES_FOLDER);
-    const generationsFolder = path.join(workflowPath, "generations");
-    const legacyFolder = path.join(workflowPath, LEGACY_IMAGES_FOLDER);
+    const inputsFolder = path.join(safeWorkflowPath, IMAGES_FOLDER);
+    const generationsFolder = path.join(safeWorkflowPath, "generations");
+    const legacyFolder = path.join(safeWorkflowPath, LEGACY_IMAGES_FOLDER);
 
     // Build search order based on folder hint
     const searchOrder = folder === "generations"
@@ -225,7 +256,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Load failed",
+        error: "Failed to load workflow image",
       },
       { status: 500 }
     );

@@ -107,25 +107,27 @@ type ModelsResponse = ModelsSuccessResponse | ModelsErrorResponse;
  * GET /api/providers/replicate/models
  *
  * Fetches available models from Replicate API.
- * Requires API key in X-API-Key header or api_key query param.
+ * Requires API key in X-API-Key header.
+ *
+ * Headers:
+ *   - X-API-Key: Replicate API key (required)
  *
  * Query params:
  *   - search: Optional search query to filter models
- *   - api_key: Alternative to X-API-Key header
  */
 export async function GET(
   request: NextRequest
 ): Promise<NextResponse<ModelsResponse>> {
-  // Get API key from header or query param
+  // Get API key from header only (never from query params to avoid credential leakage)
   const apiKey =
     request.headers.get("X-API-Key") ||
-    request.nextUrl.searchParams.get("api_key");
+    process.env.REPLICATE_API_KEY;
 
   if (!apiKey) {
     return NextResponse.json<ModelsErrorResponse>(
       {
         success: false,
-        error: "API key required. Provide X-API-Key header or api_key query param.",
+        error: "API key required. Provide X-API-Key header.",
       },
       { status: 401 }
     );
@@ -199,13 +201,11 @@ export async function GET(
       models,
     });
   } catch (error) {
+    console.error("[Replicate Models]", error instanceof Error ? error.message : error);
     return NextResponse.json<ModelsErrorResponse>(
       {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch models from Replicate",
+        error: "Failed to fetch models from Replicate",
       },
       { status: 500 }
     );

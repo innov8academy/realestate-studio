@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { logger } from "@/utils/logger";
+import { sanitizePath, sanitizeFilename, invalidPathResponse } from "@/lib/security";
 
 // Supported file extensions
 const SUPPORTED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'webm', 'mov'];
@@ -46,12 +47,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize directory path
+    const safeDirPath = sanitizePath(directoryPath);
+    if (!safeDirPath) {
+      logger.warn('file.error', 'Generation load rejected: invalid directory path', { directoryPath });
+      return invalidPathResponse("directoryPath");
+    }
+
+    // Sanitize imageId to prevent path traversal via filename
+    // imageId can contain hash suffixes like "prompt_abc123" so we allow alphanumeric, -, _
+    if (imageId.includes("..") || imageId.includes("/") || imageId.includes("\\") || imageId.includes("\0")) {
+      logger.warn('file.error', 'Generation load rejected: invalid imageId', { imageId });
+      return NextResponse.json(
+        { success: false, error: "Invalid imageId" },
+        { status: 400 }
+      );
+    }
+
     // Validate directory exists
     try {
-      const stats = await fs.stat(directoryPath);
+      const stats = await fs.stat(safeDirPath);
       if (!stats.isDirectory()) {
         logger.warn('file.error', 'Generation load failed: path is not a directory', {
-          directoryPath,
+          directoryPath: safeDirPath,
         });
         return NextResponse.json(
           { success: false, error: "Path is not a directory" },
@@ -60,7 +78,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (dirError) {
       logger.warn('file.error', 'Generation load failed: directory does not exist', {
-        directoryPath,
+        directoryPath: safeDirPath,
       });
       return NextResponse.json(
         { success: false, error: "Directory does not exist" },
@@ -73,7 +91,7 @@ export async function POST(request: NextRequest) {
     let filePath: string | null = null;
 
     for (const ext of SUPPORTED_EXTENSIONS) {
-      const candidatePath = path.join(directoryPath, `${imageId}.${ext}`);
+      const candidatePath = path.join(safeDirPath, `${imageId}.${ext}`);
       try {
         await fs.access(candidatePath);
         foundExtension = ext;
@@ -89,7 +107,7 @@ export async function POST(request: NextRequest) {
       // Missing files are expected when workflow refs point to deleted/moved images
       logger.info('file.load', 'Generation file not found (expected for missing refs)', {
         imageId,
-        directoryPath,
+        directoryPath: safeDirPath,
       });
       return NextResponse.json({
         success: false,
@@ -138,7 +156,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Load failed",
+        error: "Failed to load generation",
       },
       { status: 500 }
     );

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { logger } from "@/utils/logger";
+import { sanitizePath, invalidPathResponse } from "@/lib/security";
 
 export const maxDuration = 300; // 5 minute timeout for large workflow files
 
@@ -35,12 +36,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Sanitize directory path to prevent traversal attacks
+    const safeDirPath = sanitizePath(directoryPath);
+    if (!safeDirPath) {
+      logger.warn('file.error', 'Workflow save rejected: invalid directory path', { directoryPath });
+      return invalidPathResponse("directoryPath");
+    }
+
     // Validate directory exists
     try {
-      const stats = await fs.stat(directoryPath);
+      const stats = await fs.stat(safeDirPath);
       if (!stats.isDirectory()) {
         logger.warn('file.error', 'Workflow save failed: path is not a directory', {
-          directoryPath,
+          directoryPath: safeDirPath,
         });
         return NextResponse.json(
           { success: false, error: "Path is not a directory" },
@@ -49,7 +57,7 @@ export async function POST(request: NextRequest) {
       }
     } catch (dirError) {
       logger.warn('file.error', 'Workflow save failed: directory does not exist', {
-        directoryPath,
+        directoryPath: safeDirPath,
       });
       return NextResponse.json(
         { success: false, error: "Directory does not exist" },
@@ -58,8 +66,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Auto-create subfolders for inputs and generations
-    const inputsFolder = path.join(directoryPath, "inputs");
-    const generationsFolder = path.join(directoryPath, "generations");
+    const inputsFolder = path.join(safeDirPath, "inputs");
+    const generationsFolder = path.join(safeDirPath, "generations");
 
     try {
       await fs.mkdir(inputsFolder, { recursive: true });
@@ -75,7 +83,7 @@ export async function POST(request: NextRequest) {
 
     // Sanitize filename (remove special chars, ensure .json extension)
     const safeName = filename.replace(/[^a-zA-Z0-9-_]/g, "_");
-    const filePath = path.join(directoryPath, `${safeName}.json`);
+    const filePath = path.join(safeDirPath, `${safeName}.json`);
 
     // Write workflow JSON
     const json = JSON.stringify(workflow, null, 2);
@@ -98,7 +106,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Save failed",
+        error: "Failed to save workflow",
       },
       { status: 500 }
     );
@@ -121,11 +129,17 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Sanitize path
+  const safePath = sanitizePath(directoryPath);
+  if (!safePath) {
+    return invalidPathResponse();
+  }
+
   try {
-    const stats = await fs.stat(directoryPath);
+    const stats = await fs.stat(safePath);
     const isDirectory = stats.isDirectory();
     logger.info('file.load', 'Directory validation successful', {
-      directoryPath,
+      directoryPath: safePath,
       exists: true,
       isDirectory,
     });
@@ -136,7 +150,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     logger.info('file.load', 'Directory does not exist', {
-      directoryPath,
+      directoryPath: safePath,
     });
     return NextResponse.json({
       success: true,

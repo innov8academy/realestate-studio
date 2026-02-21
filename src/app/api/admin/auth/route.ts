@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import {
+  createAuthToken,
+  isAuthed,
+  getAuthCookieName,
+} from "@/lib/security";
 
-const COOKIE = "admin_tok";
+export { isAuthed };
 
 export async function POST(req: NextRequest) {
   const { password } = await req.json();
@@ -14,10 +18,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: false, error: "Wrong password" }, { status: 401 });
   }
 
-  const token = Buffer.from(password).toString("base64");
+  const token = createAuthToken(password);
   const res = NextResponse.json({ ok: true });
-  res.cookies.set(COOKIE, token, {
+  res.cookies.set(getAuthCookieName(), token, {
     httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
     path: "/",
     maxAge: 60 * 60 * 24 * 7, // 7 days
@@ -27,19 +32,6 @@ export async function POST(req: NextRequest) {
 
 export async function DELETE() {
   const res = NextResponse.json({ ok: true });
-  res.cookies.delete(COOKIE);
+  res.cookies.delete(getAuthCookieName());
   return res;
-}
-
-/** Helper used by other admin routes to verify auth */
-export function isAuthed(req: NextRequest): boolean {
-  const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) return false;
-  const token = req.cookies.get(COOKIE)?.value;
-  if (!token) return false;
-  try {
-    return Buffer.from(token, "base64").toString("utf8") === expected;
-  } catch {
-    return false;
-  }
 }

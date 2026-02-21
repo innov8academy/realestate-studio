@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { isAuthed } from "../auth/route";
+import { isAuthed } from "@/lib/security";
 import { PROMPTS } from "@/lib/quickstart/templates";
 
 export const dynamic = "force-dynamic";

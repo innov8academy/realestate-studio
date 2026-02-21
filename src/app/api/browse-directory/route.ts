@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
 import { writeFile, unlink } from "fs/promises";
 import { tmpdir } from "os";
 import { join } from "path";
+import { requireAuthIfConfigured, unauthorizedResponse } from "@/lib/security";
 
 const execAsync = promisify(exec);
 
@@ -35,7 +36,12 @@ export function normalizeSelectedPath(selectedPath: string, platform: string): s
 }
 
 // GET: Open native directory picker and return the selected path
-export async function GET() {
+export async function GET(req: NextRequest) {
+  // Require authentication when ADMIN_PASSWORD is configured - this route opens OS-level dialogs
+  if (!requireAuthIfConfigured(req)) {
+    return unauthorizedResponse();
+  }
+
   const platform = process.platform;
 
   try {
@@ -101,7 +107,7 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
       }
     } else {
       return NextResponse.json(
-        { success: false, error: `Unsupported platform: ${platform}` },
+        { success: false, error: "Unsupported platform" },
         { status: 500 }
       );
     }
@@ -139,8 +145,7 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
     return NextResponse.json(
       {
         success: false,
-        error:
-          error instanceof Error ? error.message : "Failed to open dialog",
+        error: "Failed to open directory picker",
       },
       { status: 500 }
     );

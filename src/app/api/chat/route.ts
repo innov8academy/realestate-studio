@@ -78,7 +78,7 @@ export async function POST(request: Request) {
     }
 
     return new Response(
-      error instanceof Error ? error.message : 'Chat request failed',
+      'Chat request failed. Please try again.',
       { status: 500 }
     );
   }

@@ -264,7 +264,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json<LLMGenerateResponse>(
       {
         success: false,
-        error: error instanceof Error ? error.message : "LLM generation failed",
+        error: "LLM generation failed. Please try again.",
       },
       { status: 500 }
     );

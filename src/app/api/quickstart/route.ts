@@ -239,7 +239,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json<QuickstartResponse>(
       {
         success: false,
-        error: error instanceof Error ? error.message : "Failed to generate workflow",
+        error: "Failed to generate workflow. Please try again.",
       },
       { status: 500 }
     );

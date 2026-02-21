@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
+import * as path from "path";
 
 // Mock fs/promises before importing the route
 const mockStat = vi.fn();
@@ -71,9 +72,9 @@ describe("/api/workflow route", () => {
       const data = await response.json();
 
       expect(data.success).toBe(true);
-      expect(data.filePath).toBe("/test/dir/my-workflow.json");
+      expect(data.filePath).toBe(path.join(path.resolve("/test/dir"), "my-workflow.json"));
       expect(mockWriteFile).toHaveBeenCalledWith(
-        "/test/dir/my-workflow.json",
+        path.join(path.resolve("/test/dir"), "my-workflow.json"),
         JSON.stringify(mockWorkflow, null, 2),
         "utf-8"
       );
@@ -98,7 +99,7 @@ describe("/api/workflow route", () => {
       const data = await response.json();
 
       expect(data.success).toBe(true);
-      expect(data.filePath).toBe("/test/dir/my_workflow_____.json");
+      expect(data.filePath).toBe(path.join(path.resolve("/test/dir"), "my_workflow_____.json"));
     });
 
     it("should create inputs and generations subfolders", async () => {
@@ -118,8 +119,8 @@ describe("/api/workflow route", () => {
 
       await POST(request);
 
-      expect(mockMkdir).toHaveBeenCalledWith("/test/dir/inputs", { recursive: true });
-      expect(mockMkdir).toHaveBeenCalledWith("/test/dir/generations", { recursive: true });
+      expect(mockMkdir).toHaveBeenCalledWith(path.join(path.resolve("/test/dir"), "inputs"), { recursive: true });
+      expect(mockMkdir).toHaveBeenCalledWith(path.join(path.resolve("/test/dir"), "generations"), { recursive: true });
     });
 
     it("should reject missing directoryPath", async () => {
@@ -219,7 +220,7 @@ describe("/api/workflow route", () => {
       const data = await response.json();
 
       expect(data.success).toBe(true);
-      expect(data.filePath).toBe("/test/dir/workflow.json");
+      expect(data.filePath).toBe(path.join(path.resolve("/test/dir"), "workflow.json"));
     });
 
     it("should return 500 on write failure", async () => {
@@ -240,7 +241,7 @@ describe("/api/workflow route", () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Disk full");
+      expect(data.error).toBe("Failed to save workflow");
     });
   });
 

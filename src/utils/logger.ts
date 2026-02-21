@@ -173,6 +173,30 @@ class Logger {
     return `exec-${timestamp}-${random}`;
   }
 
+  /** Keys that should be redacted from log context to prevent credential leakage */
+  private static readonly SENSITIVE_KEYS = new Set([
+    'apikey', 'api_key', 'apiKey',
+    'token', 'secret', 'password',
+    'authorization', 'credential', 'credentials',
+    'private_key', 'privateKey',
+    'access_token', 'accessToken',
+    'refresh_token', 'refreshToken',
+  ]);
+
+  /**
+   * Check if a key name represents sensitive data
+   */
+  private isSensitiveKey(key: string): boolean {
+    const lower = key.toLowerCase();
+    return Logger.SENSITIVE_KEYS.has(key) ||
+      lower.includes('apikey') ||
+      lower.includes('api_key') ||
+      lower.includes('secret') ||
+      lower.includes('password') ||
+      lower.includes('token') ||
+      lower.includes('authorization');
+  }
+
   /**
    * Sanitize context to protect privacy and reduce log size
    */
@@ -180,8 +204,12 @@ class Logger {
     const sanitized: Record<string, any> = {};
 
     for (const [key, value] of Object.entries(context)) {
+      // Redact sensitive fields (API keys, tokens, passwords, etc.)
+      if (this.isSensitiveKey(key)) {
+        sanitized[key] = '[REDACTED]';
+      }
       // Truncate prompts to 200 characters
-      if (key === 'prompt' && typeof value === 'string') {
+      else if (key === 'prompt' && typeof value === 'string') {
         sanitized[key] = value.length > 200 ? value.substring(0, 200) + '...[truncated]' : value;
       }
       // Convert image data URIs to metadata

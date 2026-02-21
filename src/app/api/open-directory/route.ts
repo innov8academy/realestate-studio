@@ -4,10 +4,16 @@ import { promisify } from "util";
 import { stat } from "fs/promises";
 import path from "path";
 import os from "os";
+import { requireAuthIfConfigured, unauthorizedResponse, sanitizePath, invalidPathResponse } from "@/lib/security";
 
 const execFileAsync = promisify(execFile);
 
 export async function POST(req: NextRequest) {
+    // Require authentication when ADMIN_PASSWORD is configured - this route executes OS commands
+    if (!requireAuthIfConfigured(req)) {
+        return unauthorizedResponse();
+    }
+
     try {
         const body = await req.json();
         const { path: inputPath } = body;
@@ -19,12 +25,15 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        // Normalize and resolve the path to prevent traversal attacks
-        const normalizedPath = path.resolve(inputPath);
+        // Sanitize the path to prevent traversal attacks
+        const safePath = sanitizePath(inputPath);
+        if (!safePath) {
+            return invalidPathResponse();
+        }
 
         // Validate that the path exists and is a directory
         try {
-            const stats = await stat(normalizedPath);
+            const stats = await stat(safePath);
             if (!stats.isDirectory()) {
                 return NextResponse.json(
                     { success: false, error: "Path is not a directory" },
@@ -45,20 +54,20 @@ export async function POST(req: NextRequest) {
         switch (platform) {
             case "darwin":
                 command = "open";
-                args = [normalizedPath];
+                args = [safePath];
                 break;
             case "win32":
                 command = "explorer";
-                args = [normalizedPath];
+                args = [safePath];
                 break;
             case "linux":
                 command = "xdg-open";
-                args = [normalizedPath];
+                args = [safePath];
                 break;
             default:
                 // Fallback for other Unix-like systems
                 command = "xdg-open";
-                args = [normalizedPath];
+                args = [safePath];
         }
 
         await execFileAsync(command, args);

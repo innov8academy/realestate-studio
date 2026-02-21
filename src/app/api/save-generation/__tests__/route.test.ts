@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
 import * as crypto from "crypto";
+import * as path from "path";
 
 // Mock fs/promises before importing the route
 const mockStat = vi.fn();
@@ -84,7 +85,7 @@ describe("/api/save-generation route", () => {
       expect(data.isDuplicate).toBe(false);
       expect(data.filename).toContain(expectedHash);
       expect(data.filename.endsWith(".png")).toBe(true);
-      expect(data.filePath).toContain("/test/generations/");
+      expect(data.filePath).toContain(path.resolve("/test/generations"));
       expect(mockWriteFile).toHaveBeenCalled();
     });
 
@@ -294,7 +295,7 @@ describe("/api/save-generation route", () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toContain("Failed to fetch content");
+      expect(data.error).toBe("Failed to save generation");
     });
 
     it("should handle raw base64 without data URL prefix", async () => {
@@ -387,7 +388,7 @@ describe("/api/save-generation route", () => {
 
       expect(response.status).toBe(500);
       expect(data.success).toBe(false);
-      expect(data.error).toBe("Disk full");
+      expect(data.error).toBe("Failed to save generation");
     });
 
     it("should return imageId without extension", async () => {
@@ -484,7 +485,7 @@ describe("/api/save-generation route", () => {
       const data = await response.json();
 
       expect(data.success).toBe(true);
-      expect(mockMkdir).toHaveBeenCalledWith("/test/outputs", { recursive: true });
+      expect(mockMkdir).toHaveBeenCalledWith(path.resolve("/test/outputs"), { recursive: true });
     });
 
     it("should not create directory when createDirectory is false", async () => {

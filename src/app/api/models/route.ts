@@ -979,11 +979,11 @@ export async function GET(
         const errorMessage =
           error instanceof Error ? error.message : "Unknown error";
         console.error(`[Models] ${provider}: ${errorMessage}`);
-        errors.push(`${provider}: ${errorMessage}`);
+        errors.push(`${provider}: Failed to fetch models`);
         providerResults[provider] = {
           success: false,
           count: 0,
-          error: errorMessage,
+          error: "Failed to fetch models",
         };
         continue;
       }

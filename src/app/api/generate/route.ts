@@ -3149,7 +3149,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json<GenerateResponse>(
       {
         success: false,
-        error: errorMessage,
+        error: "Generation failed. Please try again.",
       },
       { status: 500 }
     );

@@ -1174,7 +1174,7 @@ export async function GET(
     return NextResponse.json<SchemaErrorResponse>(
       {
         success: false,
-        error: errorMessage,
+        error: "Failed to fetch model schema",
       },
       { status: 500 }
     );

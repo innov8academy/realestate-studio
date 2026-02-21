@@ -9,12 +9,18 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { saveSession, rotateLogFiles } from '@/utils/logger-server';
+import { requireAuthIfConfigured, unauthorizedResponse } from '@/lib/security';
 import type { LogSession } from '@/utils/logger';
 
 /**
  * POST /api/logs - Save a logging session to disk
  */
 export async function POST(req: NextRequest) {
+  // Require authentication when ADMIN_PASSWORD is configured
+  if (!requireAuthIfConfigured(req)) {
+    return unauthorizedResponse();
+  }
+
   try {
     const body = await req.json();
     const session = body.session as LogSession;
@@ -45,7 +51,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Failed to save log session',
       },
       { status: 500 }
     );
