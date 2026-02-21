@@ -129,22 +129,8 @@ export function AnnotationModal() {
   // ══════════════════════════════════════════════════════════════════════════
   if (isMobile) {
     return (
-      <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col" style={{ paddingTop: "env(safe-area-inset-top, 0px)", paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-        {/* Top bar: Cancel | title | Done */}
-        <div className="flex-shrink-0 h-14 bg-neutral-900 border-b border-neutral-800 flex items-center justify-between px-4">
-          <button onClick={closeModal} className="text-sm text-neutral-400 active:text-white px-2 py-2">Cancel</button>
-          <span className="text-sm font-medium text-neutral-200">Mark Plot Boundary</span>
-          <button onClick={handleDone} className="text-sm font-semibold text-white bg-neutral-700 active:bg-neutral-600 px-4 py-2 rounded-lg">Done</button>
-        </div>
-
-        {/* Hint bar */}
-        <div className="flex-shrink-0 bg-neutral-950 px-4 py-1.5 flex items-center justify-between">
-          <span className="text-xs text-neutral-500">
-            {isEraser ? "Drag to erase strokes" : "Drag to draw on the image"}
-          </span>
-        </div>
-
-        {/* Canvas */}
+      <div className="fixed inset-0 z-[100] bg-neutral-950 flex flex-col">
+        {/* Canvas — takes all available space */}
         <div ref={containerRef} className="flex-1 overflow-hidden bg-neutral-900" style={{ touchAction: "none" }}>
           {sourceImage && (
             <ReactSketchCanvas
@@ -164,48 +150,52 @@ export function AnnotationModal() {
           )}
         </div>
 
-        {/* Bottom toolbar */}
+        {/* Bottom toolbar — always visible, Cancel/Done here */}
         <div className="flex-shrink-0 bg-neutral-900 border-t border-neutral-800" style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}>
-          {/* Color palette + undo/delete */}
-          <div className="flex items-center gap-2 px-3 py-2">
-            {COLORS.map((color) => (
-              <button
-                key={color}
-                onTouchEnd={(e) => { e.preventDefault(); setIsEraser(false); canvasRef.current?.eraseMode(false); setToolOptions({ strokeColor: color }); }}
-                onClick={() => { setIsEraser(false); canvasRef.current?.eraseMode(false); setToolOptions({ strokeColor: color }); }}
-                className={`w-10 h-10 rounded-full flex-shrink-0 active:scale-90 transition-transform ${toolOptions.strokeColor === color && !isEraser ? "ring-2 ring-white ring-offset-2 ring-offset-neutral-900" : ""}`}
-                style={{ backgroundColor: color }}
-              />
-            ))}
+          {/* Row 1: Cancel + Colors + Undo/Clear + Done */}
+          <div className="flex items-center gap-1.5 px-3 py-2">
+            <button
+              onTouchEnd={(e) => { e.preventDefault(); closeModal(); }}
+              onClick={closeModal}
+              className="px-3 py-2 text-sm text-neutral-400 active:text-white rounded-lg flex-shrink-0"
+            >
+              Cancel
+            </button>
 
-            <div className="w-px h-8 bg-neutral-700 mx-1 flex-shrink-0" />
+            <div className="flex items-center gap-1.5 flex-1 overflow-x-auto scrollbar-none">
+              {COLORS.map((color) => (
+                <button
+                  key={color}
+                  onTouchEnd={(e) => { e.preventDefault(); setIsEraser(false); canvasRef.current?.eraseMode(false); setToolOptions({ strokeColor: color }); }}
+                  onClick={() => { setIsEraser(false); canvasRef.current?.eraseMode(false); setToolOptions({ strokeColor: color }); }}
+                  className={`w-8 h-8 rounded-full flex-shrink-0 active:scale-90 transition-transform ${toolOptions.strokeColor === color && !isEraser ? "ring-2 ring-white ring-offset-1 ring-offset-neutral-900" : ""}`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
 
             {/* Undo */}
             <button
               onTouchEnd={(e) => { e.preventDefault(); handleUndo(); }}
               onClick={handleUndo}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-neutral-800 text-neutral-400 active:bg-neutral-700 active:text-white flex-shrink-0"
+              className="w-8 h-8 rounded-lg flex items-center justify-center bg-neutral-800 text-neutral-400 active:text-white flex-shrink-0"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3" />
               </svg>
             </button>
 
-            {/* Clear */}
             <button
-              onTouchEnd={(e) => { e.preventDefault(); handleClear(); }}
-              onClick={handleClear}
-              className="w-10 h-10 rounded-xl flex items-center justify-center bg-neutral-800 text-neutral-400 active:bg-neutral-700 active:text-red-400 flex-shrink-0"
+              onTouchEnd={(e) => { e.preventDefault(); handleDone(); }}
+              onClick={handleDone}
+              className="px-4 py-2 text-sm font-semibold text-white bg-emerald-600 active:bg-emerald-500 rounded-lg flex-shrink-0"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-              </svg>
+              Done
             </button>
           </div>
 
-          {/* Stroke width + Draw/Eraser */}
+          {/* Row 2: Stroke widths + Draw/Eraser */}
           <div className="flex items-center gap-2 px-3 pb-2">
-            {/* Stroke widths */}
             {STROKE_WIDTHS.map((width) => (
               <button
                 key={width}
