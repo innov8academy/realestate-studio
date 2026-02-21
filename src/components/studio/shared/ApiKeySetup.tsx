@@ -109,7 +109,7 @@ export function ApiKeySetup() {
               </svg>
             </span>
             <span className="text-xs font-medium text-neutral-300">
-              {showTutorial ? "Hide guide" : "I don't have an API key — how do I get one?"}
+              {showTutorial ? "Hide guide" : "API? athenth thengaya\uD83E\uDD65! — How do I get one?"}
             </span>
           </div>
           <svg
