@@ -21,6 +21,11 @@ app.prepare().then(() => {
   server.requestTimeout = 600000; // 10 minutes
   server.headersTimeout = 610000; // Slightly longer than requestTimeout
 
+  // Keep-alive timeout must be LONGER than the reverse proxy's idle timeout.
+  // Railway/Varnish reuses connections; if Node closes them first, the proxy
+  // gets "unexpected eof while reading" → 503 errors.
+  server.keepAliveTimeout = 65000; // 65 seconds (default is only 5s)
+
   server.listen(port, () => {
     console.log(`> Ready on http://${hostname}:${port}`);
     console.log(`> Server timeout set to ${server.requestTimeout / 1000 / 60} minutes`);
