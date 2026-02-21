@@ -210,8 +210,13 @@ export const STUDIO_STEPS: StudioStep[] = [
     description: "Aerial orbit, balcony, and interior transitions",
   },
   {
-    id: "output",
+    id: "video-stitch",
     title: "Your Animation",
-    description: "Review and download all generated content",
+    description: "Download clips and stitch with ease curves",
+  },
+  {
+    id: "output",
+    title: "Share",
+    description: "Share this tool with a friend",
   },
 ];

@@ -183,31 +183,22 @@ export function StudioWizard() {
         };
       case 9:
         return {
-          primaryLabel: "Download All",
+          primaryLabel: "Share with a Friend",
           primaryDisabled: false,
-          onPrimary: () => {
-            // Download all available videos
-            const videoNodeIds = [
-              STUDIO_NODES.generateVideoV0,
-              STUDIO_NODES.generateVideoV1,
-              STUDIO_NODES.generateVideoV2,
-              STUDIO_NODES.generateVideoV3,
-              STUDIO_NODES.generateVideoV4,
-              STUDIO_NODES.generateVideoV5,
-              STUDIO_NODES.generateVideoV6,
-            ];
-            const labels = ["area-popup", "aerial-dive", "construction-rise", "construction-complete", "street-aerial", "aerial-balcony", "balcony-interior"];
-            videoNodeIds.forEach((nodeId, i) => {
-              const data = getNodeData(nodeId) as GenerateVideoNodeData | undefined;
-              if (data?.outputVideo) {
-                const a = document.createElement("a");
-                a.href = data.outputVideo;
-                a.download = `property-${labels[i]}-${Date.now()}.mp4`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+          onPrimary: async () => {
+            if (typeof navigator !== "undefined" && navigator.share) {
+              try {
+                await navigator.share({
+                  title: "AI Property Animation",
+                  text: "Check out this AI property animation tool",
+                  url: "https://realestate-studio-production.up.railway.app",
+                });
+              } catch {
+                // User cancelled or share not supported
               }
-            });
+            } else {
+              await navigator.clipboard.writeText("https://realestate-studio-production.up.railway.app");
+            }
           },
         };
       default:
