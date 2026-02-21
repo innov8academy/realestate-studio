@@ -1762,6 +1762,27 @@ async function generateWithKie(
     Object.assign(inputParams, input.parameters);
   }
 
+  // Validate aspect_ratio against model's allowed values (stale workflow data may contain
+  // values from a previously-selected model, e.g. "3:2" from an image model sent to Kling)
+  if (inputParams.aspect_ratio && modelDefaults.aspect_ratio) {
+    const VALID_ASPECT_RATIOS: Record<string, string[]> = {
+      "kling": ["16:9", "9:16", "1:1"],
+      "kling-2.6": ["16:9", "9:16", "1:1"],
+      "kling-3.0": ["16:9", "9:16", "1:1"],
+      "veo3": ["16:9", "9:16"],
+      "veo3-fast": ["16:9", "9:16"],
+      "bytedance": ["16:9", "9:16", "1:1"],
+    };
+    const prefix = Object.keys(VALID_ASPECT_RATIOS).find((p) => modelId.startsWith(p));
+    if (prefix) {
+      const allowed = VALID_ASPECT_RATIOS[prefix];
+      if (!allowed.includes(inputParams.aspect_ratio as string)) {
+        console.log(`[API] aspect_ratio "${inputParams.aspect_ratio}" not valid for ${modelId}, using default "${modelDefaults.aspect_ratio}"`);
+        inputParams.aspect_ratio = modelDefaults.aspect_ratio;
+      }
+    }
+  }
+
   // GPT Image 1.5 does NOT support 'size' parameter - only 'aspect_ratio'
   // Remove any stale 'size' values from old workflow data
   if (modelId.startsWith("gpt-image/1.5")) {
