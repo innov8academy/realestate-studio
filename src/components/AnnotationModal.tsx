@@ -104,12 +104,13 @@ export function AnnotationModal() {
   const textInputCreatedAt = useRef<number>(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 800, height: 600 });
-  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
   const isPanningRef = useRef(false);
   const panStartRef = useRef({ x: 0, y: 0 });
   const panOriginRef = useRef({ x: 0, y: 0 });
 
-  // Detect mobile
+  // Detect mobile — isMobile starts as null to avoid rendering the wrong layout
+  // before we know the actual screen size (prevents desktop UI flash on mobile)
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
     check();
@@ -567,6 +568,9 @@ export function AnnotationModal() {
   };
 
   if (!isModalOpen) return null;
+
+  // Wait until we've detected the viewport size to avoid flashing the wrong layout
+  if (isMobile === null) return null;
 
   // ── Shared canvas ────────────────────────────────────────────────────────
   const canvas = (
