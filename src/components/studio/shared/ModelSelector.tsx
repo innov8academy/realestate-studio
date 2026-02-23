@@ -13,12 +13,13 @@ interface ModelSelectorProps {
   onChange: (model: StudioImageModel) => void;
   recommendedModel: StudioImageModel;
   disabled?: boolean;
+  label?: string;
 }
 
-export function ModelSelector({ value, onChange, recommendedModel, disabled }: ModelSelectorProps) {
+export function ModelSelector({ value, onChange, recommendedModel, disabled, label = "Model" }: ModelSelectorProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-neutral-400 uppercase tracking-wide">Model</label>
+      <label className="text-xs font-medium text-neutral-400 uppercase tracking-wide">{label}</label>
       <div className="flex gap-1.5">
         {MODEL_OPTIONS.map((opt) => {
           const info = STUDIO_IMAGE_MODELS[opt.key];

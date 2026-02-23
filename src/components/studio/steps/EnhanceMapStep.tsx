@@ -49,7 +49,7 @@ export function EnhanceMapStep() {
   const plotSquareMeters = useStudioStore((s) => s.plotSquareMeters);
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
   const setAspectRatio = useStudioStore((s) => s.setAspectRatio);
-  const currentModel = useStudioStore((s) => s.stepModel[2] ?? "gpt-1.5");
+  const currentModel = useStudioStore((s) => s.stepModel["2"] ?? "gpt-1.5");
   const setStepModel = useStudioStore((s) => s.setStepModel);
 
   const aspectRatios = getAspectRatiosForModel(currentModel);
@@ -115,10 +115,6 @@ export function EnhanceMapStep() {
     try {
       const selectedModel = getSelectedModel(currentModel);
 
-      // Set Frame 1 prompt (clean, no text)
-      updateNodeData(STUDIO_NODES.promptMapFrame1, {
-        prompt: PROMPTS.mapEnhanceClean,
-      });
       // Set aspect ratio + model on Frame 1 node
       updateNodeData(STUDIO_NODES.generateMap, {
         aspectRatio,
@@ -130,9 +126,6 @@ export function EnhanceMapStep() {
 
       // Generate Frame 2 only if user entered square meters
       if (hasSqm) {
-        updateNodeData(STUDIO_NODES.promptMapFrame2, {
-          prompt: frame2PromptText,
-        });
         updateNodeData(STUDIO_NODES.generateMapFrame2, {
           aspectRatio,
           selectedModel,
@@ -149,28 +142,22 @@ export function EnhanceMapStep() {
     regenerateNode,
     aspectRatio,
     hasSqm,
-    frame2PromptText,
     currentModel,
   ]);
 
   const handleRegenerateFrame1 = useCallback(async () => {
     if (isRunning) return;
-    updateNodeData(STUDIO_NODES.promptMapFrame1, {
-      prompt: PROMPTS.mapEnhanceClean,
-    });
     updateNodeData(STUDIO_NODES.generateMap, { aspectRatio, selectedModel: getSelectedModel(currentModel) });
     await regenerateNode(STUDIO_NODES.generateMap);
   }, [isRunning, updateNodeData, regenerateNode, aspectRatio, currentModel]);
 
   const handleRegenerateFrame2 = useCallback(async () => {
     if (isRunning || !hasSqm) return;
-    updateNodeData(STUDIO_NODES.promptMapFrame2, { prompt: frame2PromptText });
     updateNodeData(STUDIO_NODES.generateMapFrame2, { aspectRatio, selectedModel: getSelectedModel(currentModel) });
     await regenerateNode(STUDIO_NODES.generateMapFrame2);
   }, [
     isRunning,
     hasSqm,
-    frame2PromptText,
     updateNodeData,
     regenerateNode,
     aspectRatio,
@@ -191,7 +178,7 @@ export function EnhanceMapStep() {
       {/* Model Selector */}
       <ModelSelector
         value={currentModel}
-        onChange={(m) => setStepModel(2, m)}
+        onChange={(m) => setStepModel("2", m)}
         recommendedModel="gpt-1.5"
       />
 

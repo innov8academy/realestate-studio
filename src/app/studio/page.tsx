@@ -82,12 +82,24 @@ export default function StudioPage() {
           useStudioStore.getState().setBuildingDescription(saved.buildingDescription);
         }
         if (saved.stepModel) {
-          const sm = saved.stepModel as Record<number, string>;
+          const sm = saved.stepModel as Record<string, string>;
           for (const [step, model] of Object.entries(sm)) {
-            useStudioStore.getState().setStepModel(
-              Number(step),
-              model as import("@/lib/studio/modelConfig").StudioImageModel
-            );
+            // Migrate old numeric key "3" to new split keys "3-street" + "3-building"
+            if (step === "3") {
+              useStudioStore.getState().setStepModel(
+                "3-street",
+                "gpt-1.5"
+              );
+              useStudioStore.getState().setStepModel(
+                "3-building",
+                model as import("@/lib/studio/modelConfig").StudioImageModel
+              );
+            } else {
+              useStudioStore.getState().setStepModel(
+                step,
+                model as import("@/lib/studio/modelConfig").StudioImageModel
+              );
+            }
           }
         }
       } else {
@@ -146,6 +158,8 @@ export default function StudioPage() {
       store.updateNodeData("prompt-angle-aerial", { prompt: P.angleAerial });
       store.updateNodeData("prompt-angle-corner", { prompt: P.angleCorner });
       store.updateNodeData("prompt-video-map-area", { prompt: P.videoMapAreaPopup });
+      store.updateNodeData("prompt-map-enhance-frame2", { prompt: P.mapEnhanceWithArea });
+      store.updateNodeData("prompt-street-enhance", { prompt: P.streetEnhance });
 
       // Substitute {AREA} placeholder in Frame 2 prompt with actual value
       const sqm = useStudioStore.getState().plotSquareMeters;

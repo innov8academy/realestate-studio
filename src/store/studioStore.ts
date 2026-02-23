@@ -7,7 +7,7 @@ import {
 
 const TOTAL_STEPS = 10;
 
-const DEFAULT_STEP_MODELS: Record<number, StudioImageModel> = { ...STEP_DEFAULT_MODEL };
+const DEFAULT_STEP_MODELS: Record<string, StudioImageModel> = { ...STEP_DEFAULT_MODEL };
 
 interface StudioState {
   // Navigation
@@ -21,7 +21,7 @@ interface StudioState {
   videoDuration: string; // "5" | "10"
   buildingReferenceImage: string | null; // base64 data URL
   buildingDescription: string; // optional text description of desired building
-  stepModel: Record<number, StudioImageModel>; // per-step model selection
+  stepModel: Record<string, StudioImageModel>; // per-step model selection
 
   // Actions
   goNext: () => void;
@@ -33,7 +33,7 @@ interface StudioState {
   setVideoDuration: (duration: string) => void;
   setBuildingReferenceImage: (image: string | null) => void;
   setBuildingDescription: (description: string) => void;
-  setStepModel: (step: number, model: StudioImageModel) => void;
+  setStepModel: (step: string, model: StudioImageModel) => void;
   reset: () => void;
 }
 
@@ -92,7 +92,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     set({ buildingDescription: description });
   },
 
-  setStepModel: (step: number, model: StudioImageModel) => {
+  setStepModel: (step: string, model: StudioImageModel) => {
     const { aspectRatio } = get();
     const supported = STUDIO_IMAGE_MODELS[model].supportedAspectRatios;
     const updates: Partial<StudioState> = {

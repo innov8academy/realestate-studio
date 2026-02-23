@@ -114,10 +114,11 @@ export function GenerateBuildingStep() {
 
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
   const setAspectRatio = useStudioStore((s) => s.setAspectRatio);
-  const currentModel = useStudioStore((s) => s.stepModel[3] ?? "nano-banana-pro");
+  const streetModel = useStudioStore((s) => s.stepModel["3-street"] ?? "gpt-1.5");
+  const buildingModel = useStudioStore((s) => s.stepModel["3-building"] ?? "nano-banana-pro");
   const setStepModel = useStudioStore((s) => s.setStepModel);
 
-  const aspectRatios = getAspectRatiosForModel(currentModel);
+  const aspectRatios = getAspectRatiosForModel(buildingModel);
 
   const buildingReferenceImage = useStudioStore((s) => s.buildingReferenceImage);
   const setBuildingReferenceImage = useStudioStore((s) => s.setBuildingReferenceImage);
@@ -196,31 +197,26 @@ export function GenerateBuildingStep() {
     setIsGenerating(true);
 
     try {
-      // Auto-switch pipeline: use reference-aware prompts only when reference image is provided
-      const hasReference = !!buildingReferenceImage;
-      updateNodeData(STUDIO_NODES.promptStreetEnhance, { prompt: PROMPTS.streetEnhance });
-      updateNodeData(STUDIO_NODES.promptHalfBuilding, {
-        prompt: hasReference ? PROMPTS.halfBuilding : PROMPTS.halfBuildingNoRef,
-      });
-      updateNodeData(STUDIO_NODES.promptFullBuilding, {
-        prompt: hasReference ? PROMPTS.fullBuilding : PROMPTS.fullBuildingNoRef,
-      });
-
       // Inject building description into half/full building prompts
       injectDescription(STUDIO_NODES.promptHalfBuilding);
       injectDescription(STUDIO_NODES.promptFullBuilding);
 
-      // Set aspect ratio + quality + model on all building generation nodes
-      const selectedModel = getSelectedModel(currentModel);
-      const buildingNodes = [
-        STUDIO_NODES.generateStreet,
-        STUDIO_NODES.generateHalfBuilding,
-        STUDIO_NODES.generateFullBuilding,
-      ];
-      for (const nodeId of buildingNodes) {
+      // Set aspect ratio + quality + model on generation nodes
+      const selectedStreetModel = getSelectedModel(streetModel);
+      const selectedBuildingModel = getSelectedModel(buildingModel);
+
+      // Street node uses street model
+      updateNodeData(STUDIO_NODES.generateStreet, {
+        aspectRatio,
+        selectedModel: selectedStreetModel,
+        parameters: { aspect_ratio: aspectRatio, quality },
+      });
+
+      // Building nodes use building model
+      for (const nodeId of [STUDIO_NODES.generateHalfBuilding, STUDIO_NODES.generateFullBuilding]) {
         updateNodeData(nodeId, {
           aspectRatio,
-          selectedModel,
+          selectedModel: selectedBuildingModel,
           parameters: { aspect_ratio: aspectRatio, quality },
         });
       }
@@ -236,7 +232,7 @@ export function GenerateBuildingStep() {
     } finally {
       setIsGenerating(false);
     }
-  }, [isGenerating, isRunning, regenerateNode, injectDescription, updateNodeData, aspectRatio, quality, buildingReferenceImage, currentModel]);
+  }, [isGenerating, isRunning, regenerateNode, injectDescription, updateNodeData, aspectRatio, quality, streetModel, buildingModel]);
 
   return (
     <div className="flex flex-col gap-3 py-4">
@@ -300,11 +296,20 @@ export function GenerateBuildingStep() {
 
       {/* Model + Aspect Ratio + Quality */}
       <div className="bg-neutral-900 rounded-xl p-3 flex flex-col gap-3">
-        {/* Model */}
+        {/* Street Enhancement Model */}
         <ModelSelector
-          value={currentModel}
-          onChange={(m) => setStepModel(3, m)}
+          value={streetModel}
+          onChange={(m) => setStepModel("3-street", m)}
+          recommendedModel="gpt-1.5"
+          label="Street Model"
+        />
+
+        {/* Building Model */}
+        <ModelSelector
+          value={buildingModel}
+          onChange={(m) => setStepModel("3-building", m)}
           recommendedModel="nano-banana-pro"
+          label="Building Model"
         />
 
         {/* Aspect Ratio */}
@@ -330,8 +335,8 @@ export function GenerateBuildingStep() {
           </div>
         </div>
 
-        {/* Quality — only relevant for GPT 1.5 */}
-        {currentModel === "gpt-1.5" && (
+        {/* Quality — only relevant when building model is GPT 1.5 */}
+        {buildingModel === "gpt-1.5" && (
           <div className="flex flex-col gap-1.5">
             <h3 className="text-xs font-medium text-neutral-300">Quality</h3>
             <div className="flex gap-2">
@@ -381,7 +386,7 @@ export function GenerateBuildingStep() {
         promptNodeId={STUDIO_NODES.promptStreetEnhance}
         aspectRatio={aspectRatio}
         quality={quality}
-        modelKey={currentModel}
+        modelKey={streetModel}
       />
 
       <GenerationCard
@@ -390,7 +395,7 @@ export function GenerateBuildingStep() {
         promptNodeId={STUDIO_NODES.promptHalfBuilding}
         aspectRatio={aspectRatio}
         quality={quality}
-        modelKey={currentModel}
+        modelKey={buildingModel}
       />
 
       <GenerationCard
@@ -399,7 +404,7 @@ export function GenerateBuildingStep() {
         promptNodeId={STUDIO_NODES.promptFullBuilding}
         aspectRatio={aspectRatio}
         quality={quality}
-        modelKey={currentModel}
+        modelKey={buildingModel}
       />
 
       <p className="text-xs text-neutral-500 text-center">

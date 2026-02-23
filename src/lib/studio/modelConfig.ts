@@ -25,11 +25,12 @@ export const STUDIO_IMAGE_MODELS: Record<StudioImageModel, StudioModelInfo> = {
   },
 };
 
-/** Default model per wizard step index. */
-export const STEP_DEFAULT_MODEL: Record<number, StudioImageModel> = {
-  2: "gpt-1.5",       // Enhanced Map → GPT 1.5 (cheapest)
-  3: "nano-banana-pro", // Building → Nano Banana Pro (better quality)
-  4: "nano-banana-pro", // Angles  → Nano Banana Pro
+/** Default model per wizard step key. */
+export const STEP_DEFAULT_MODEL: Record<string, StudioImageModel> = {
+  "2": "gpt-1.5",            // Enhanced Map → GPT 1.5 (cheapest)
+  "3-street": "gpt-1.5",     // Street Enhancement → GPT 1.5
+  "3-building": "nano-banana-pro", // Building → Nano Banana Pro (better quality)
+  "4": "nano-banana-pro",    // Angles  → Nano Banana Pro
 };
 
 /** Get the aspect-ratio button config for a given model. */
