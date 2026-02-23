@@ -25,11 +25,17 @@ export function GenerateAllVideosButton() {
   const videoDuration = useStudioStore((s) => s.videoDuration);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Count completed and loading videos
+  // Count completed, loading, and failed videos
   const completedCount = ALL_VIDEO_NODE_IDS.filter((id) => {
     const data = nodes.find((n) => n.id === id)?.data as GenerateVideoNodeData | undefined;
     return data?.status === "complete";
   }).length;
+
+  const failedIds = ALL_VIDEO_NODE_IDS.filter((id) => {
+    const data = nodes.find((n) => n.id === id)?.data as GenerateVideoNodeData | undefined;
+    return data?.status === "error";
+  });
+  const failedCount = failedIds.length;
 
   const loadingCount = ALL_VIDEO_NODE_IDS.filter((id) => {
     return currentNodeIds.includes(id);
@@ -65,6 +71,28 @@ export function GenerateAllVideosButton() {
     }
   }, [isGenerating, anyLoading, nodes, updateNodeData, regenerateNode, aspectRatio, videoDuration]);
 
+  const handleRetryFailed = useCallback(async () => {
+    if (isGenerating || anyLoading || failedIds.length === 0) return;
+    setIsGenerating(true);
+    try {
+      // Re-apply params to failed nodes
+      for (const nodeId of failedIds) {
+        const videoData = nodes.find((n) => n.id === nodeId)?.data as GenerateVideoNodeData | undefined;
+        const existingParams = videoData?.parameters || {};
+        updateNodeData(nodeId, {
+          parameters: {
+            ...existingParams,
+            aspect_ratio: aspectRatio,
+            duration: videoDuration,
+          },
+        });
+      }
+      await Promise.all(failedIds.map((id) => regenerateNode(id)));
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [isGenerating, anyLoading, failedIds, nodes, updateNodeData, regenerateNode, aspectRatio, videoDuration]);
+
   // Button text
   let buttonText: string;
   if (anyLoading) {
@@ -81,20 +109,31 @@ export function GenerateAllVideosButton() {
   const isPrimary = !anyComplete && !anyLoading;
 
   return (
-    <button
-      onClick={handleGenerateAll}
-      disabled={anyLoading}
-      className={`w-full h-12 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] disabled:cursor-not-allowed ${
-        anyLoading
-          ? "bg-blue-600/70 animate-pulse"
-          : allComplete
-            ? "bg-emerald-700 hover:bg-emerald-600"
-            : isPrimary
-              ? "bg-blue-600 hover:bg-blue-500"
-              : "bg-neutral-800 hover:bg-neutral-700"
-      }`}
-    >
-      {buttonText}
-    </button>
+    <div className="flex flex-col gap-2">
+      <button
+        onClick={handleGenerateAll}
+        disabled={anyLoading}
+        className={`w-full h-12 text-white text-sm font-semibold rounded-xl transition-colors active:scale-[0.98] disabled:cursor-not-allowed ${
+          anyLoading
+            ? "bg-blue-600/70 animate-pulse"
+            : allComplete
+              ? "bg-emerald-700 hover:bg-emerald-600"
+              : isPrimary
+                ? "bg-blue-600 hover:bg-blue-500"
+                : "bg-neutral-800 hover:bg-neutral-700"
+        }`}
+      >
+        {buttonText}
+      </button>
+
+      {failedCount > 0 && !anyLoading && (
+        <button
+          onClick={handleRetryFailed}
+          className="w-full h-10 bg-red-900/60 hover:bg-red-800/70 text-red-200 text-sm font-medium rounded-xl transition-colors active:scale-[0.98]"
+        >
+          Retry {failedCount} Failed Video{failedCount > 1 ? "s" : ""}
+        </button>
+      )}
+    </div>
   );
 }

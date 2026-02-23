@@ -81,6 +81,15 @@ export default function StudioPage() {
         if (saved.buildingDescription) {
           useStudioStore.getState().setBuildingDescription(saved.buildingDescription);
         }
+        if (saved.stepModel) {
+          const sm = saved.stepModel as Record<number, string>;
+          for (const [step, model] of Object.entries(sm)) {
+            useStudioStore.getState().setStepModel(
+              Number(step),
+              model as import("@/lib/studio/modelConfig").StudioImageModel
+            );
+          }
+        }
       } else {
         // First time — load the preset template
         const workflow = getPresetTemplate("real-estate-map-animation", "minimal");
@@ -206,6 +215,7 @@ export default function StudioPage() {
         videoDuration: studioState.videoDuration,
         buildingReferenceImage: studioState.buildingReferenceImage,
         buildingDescription: studioState.buildingDescription,
+        stepModel: studioState.stepModel,
         savedAt: Date.now(),
       };
       saveStudioState(snapshot);

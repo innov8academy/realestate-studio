@@ -8,14 +8,9 @@ import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
 import { LoadingPhrase } from "../shared/LoadingPhrase";
+import { ModelSelector } from "../shared/ModelSelector";
+import { getAspectRatiosForModel, getSelectedModel } from "@/lib/studio/modelConfig";
 import type { GenerateImageNodeData } from "@/types";
-
-const ASPECT_RATIOS = [
-  { value: "3:2", label: "3:2", recommended: true },
-  { value: "16:9", label: "16:9", recommended: false },
-  { value: "1:1", label: "1:1", recommended: false },
-  { value: "2:3", label: "2:3", recommended: false },
-];
 
 const QUALITY_OPTIONS = [
   { value: "medium", label: "Medium" },
@@ -52,6 +47,10 @@ export function BuildingAnglesStep() {
 
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
   const setAspectRatio = useStudioStore((s) => s.setAspectRatio);
+  const currentModel = useStudioStore((s) => s.stepModel[4] ?? "nano-banana-pro");
+  const setStepModel = useStudioStore((s) => s.setStepModel);
+
+  const aspectRatios = getAspectRatiosForModel(currentModel);
   const [quality, setQuality] = useState("medium");
 
   // Check prerequisite: full building must be complete
@@ -66,26 +65,29 @@ export function BuildingAnglesStep() {
     return data?.status === "complete";
   });
 
-  // Apply aspect ratio + quality to a node before regenerating
+  // Apply aspect ratio + quality + model to a node before regenerating
   const applySettingsAndRegenerate = useCallback(
     async (nodeId: string) => {
       updateNodeData(nodeId, {
         aspectRatio,
+        selectedModel: getSelectedModel(currentModel),
         parameters: { aspect_ratio: aspectRatio, quality },
       });
       await regenerateNode(nodeId);
     },
-    [updateNodeData, regenerateNode, aspectRatio, quality]
+    [updateNodeData, regenerateNode, aspectRatio, quality, currentModel]
   );
 
   const handleGenerateAll = useCallback(async () => {
     if (isGenerating || isRunning || !hasBuilding) return;
     setIsGenerating(true);
     try {
-      // Apply aspect ratio + quality to all angle nodes first
+      // Apply aspect ratio + quality + model to all angle nodes first
+      const selectedModel = getSelectedModel(currentModel);
       for (const cfg of ANGLE_CONFIGS) {
         updateNodeData(cfg.generateId, {
           aspectRatio,
+          selectedModel,
           parameters: { aspect_ratio: aspectRatio, quality },
         });
       }
@@ -101,7 +103,7 @@ export function BuildingAnglesStep() {
     } finally {
       setIsGenerating(false);
     }
-  }, [isGenerating, isRunning, hasBuilding, regenerateNode, updateNodeData, aspectRatio, quality]);
+  }, [isGenerating, isRunning, hasBuilding, regenerateNode, updateNodeData, aspectRatio, quality, currentModel]);
 
   return (
     <div className="flex flex-col gap-3 py-4">
@@ -113,12 +115,19 @@ export function BuildingAnglesStep() {
         </div>
       )}
 
-      {/* Aspect Ratio + Quality controls */}
+      {/* Model + Aspect Ratio + Quality controls */}
       <div className="bg-neutral-900 rounded-xl p-3 flex flex-col gap-3">
+        {/* Model */}
+        <ModelSelector
+          value={currentModel}
+          onChange={(m) => setStepModel(4, m)}
+          recommendedModel="nano-banana-pro"
+        />
+
         <div className="flex flex-col gap-1.5">
           <h3 className="text-xs font-medium text-neutral-300">Aspect Ratio</h3>
           <div className="flex gap-2">
-            {ASPECT_RATIOS.map((ar) => (
+            {aspectRatios.map((ar) => (
               <button
                 key={ar.value}
                 onClick={() => setAspectRatio(ar.value)}
@@ -137,24 +146,27 @@ export function BuildingAnglesStep() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <h3 className="text-xs font-medium text-neutral-300">Quality</h3>
-          <div className="flex gap-2">
-            {QUALITY_OPTIONS.map((q) => (
-              <button
-                key={q.value}
-                onClick={() => setQuality(q.value)}
-                className={`flex-1 h-9 rounded-lg text-xs font-medium transition-colors ${
-                  quality === q.value
-                    ? "bg-white text-neutral-900"
-                    : "bg-neutral-800 text-neutral-400 hover:text-white"
-                }`}
-              >
-                {q.label}
-              </button>
-            ))}
+        {/* Quality — only relevant for GPT 1.5 */}
+        {currentModel === "gpt-1.5" && (
+          <div className="flex flex-col gap-1.5">
+            <h3 className="text-xs font-medium text-neutral-300">Quality</h3>
+            <div className="flex gap-2">
+              {QUALITY_OPTIONS.map((q) => (
+                <button
+                  key={q.value}
+                  onClick={() => setQuality(q.value)}
+                  className={`flex-1 h-9 rounded-lg text-xs font-medium transition-colors ${
+                    quality === q.value
+                      ? "bg-white text-neutral-900"
+                      : "bg-neutral-800 text-neutral-400 hover:text-white"
+                  }`}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {hasBuilding && (

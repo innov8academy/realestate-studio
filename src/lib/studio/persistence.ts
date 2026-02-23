@@ -90,6 +90,7 @@ export interface StudioSnapshot {
   videoDuration?: string;
   buildingReferenceImage?: string | null;
   buildingDescription?: string;
+  stepModel?: Record<number, string>;
   savedAt: number; // Date.now()
 }
 

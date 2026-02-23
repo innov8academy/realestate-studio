@@ -9,14 +9,9 @@ import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
 import { LoadingPhrase } from "../shared/LoadingPhrase";
+import { ModelSelector } from "../shared/ModelSelector";
+import { getAspectRatiosForModel, getSelectedModel } from "@/lib/studio/modelConfig";
 import type { GenerateImageNodeData, NodeStatus } from "@/types";
-
-const ASPECT_RATIOS = [
-  { value: "3:2", label: "3:2", recommended: true },
-  { value: "16:9", label: "16:9", recommended: false },
-  { value: "1:1", label: "1:1", recommended: false },
-  { value: "2:3", label: "2:3", recommended: false },
-];
 
 // Quality options for GPT Image 1.5
 const QUALITY_OPTIONS = [
@@ -31,9 +26,10 @@ interface GenerationCardProps {
   showRegenerate?: boolean;
   aspectRatio: string;
   quality: string;
+  modelKey: import("@/lib/studio/modelConfig").StudioImageModel;
 }
 
-function GenerationCard({ label, nodeId, promptNodeId, showRegenerate = true, aspectRatio, quality }: GenerationCardProps) {
+function GenerationCard({ label, nodeId, promptNodeId, showRegenerate = true, aspectRatio, quality, modelKey }: GenerationCardProps) {
   const nodes = useWorkflowStore((s) => s.nodes);
   const regenerateNode = useWorkflowStore((s) => s.regenerateNode);
   const updateNodeData = useWorkflowStore((s) => s.updateNodeData);
@@ -46,13 +42,13 @@ function GenerationCard({ label, nodeId, promptNodeId, showRegenerate = true, as
   const isNodeRunning = currentNodeIds.includes(nodeId);
 
   const handleRegenerate = useCallback(() => {
-    // Apply current aspect ratio + quality before regenerating
     updateNodeData(nodeId, {
       aspectRatio,
+      selectedModel: getSelectedModel(modelKey),
       parameters: { aspect_ratio: aspectRatio, quality },
     });
     regenerateNode(nodeId);
-  }, [nodeId, regenerateNode, updateNodeData, aspectRatio, quality]);
+  }, [nodeId, regenerateNode, updateNodeData, aspectRatio, quality, modelKey]);
 
   return (
     <div className="bg-neutral-900 rounded-xl p-3 flex flex-col gap-2">
@@ -118,6 +114,10 @@ export function GenerateBuildingStep() {
 
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
   const setAspectRatio = useStudioStore((s) => s.setAspectRatio);
+  const currentModel = useStudioStore((s) => s.stepModel[3] ?? "nano-banana-pro");
+  const setStepModel = useStudioStore((s) => s.setStepModel);
+
+  const aspectRatios = getAspectRatiosForModel(currentModel);
 
   const buildingReferenceImage = useStudioStore((s) => s.buildingReferenceImage);
   const setBuildingReferenceImage = useStudioStore((s) => s.setBuildingReferenceImage);
@@ -210,7 +210,8 @@ export function GenerateBuildingStep() {
       injectDescription(STUDIO_NODES.promptHalfBuilding);
       injectDescription(STUDIO_NODES.promptFullBuilding);
 
-      // Set aspect ratio + quality on all building generation nodes
+      // Set aspect ratio + quality + model on all building generation nodes
+      const selectedModel = getSelectedModel(currentModel);
       const buildingNodes = [
         STUDIO_NODES.generateStreet,
         STUDIO_NODES.generateHalfBuilding,
@@ -219,6 +220,7 @@ export function GenerateBuildingStep() {
       for (const nodeId of buildingNodes) {
         updateNodeData(nodeId, {
           aspectRatio,
+          selectedModel,
           parameters: { aspect_ratio: aspectRatio, quality },
         });
       }
@@ -234,7 +236,7 @@ export function GenerateBuildingStep() {
     } finally {
       setIsGenerating(false);
     }
-  }, [isGenerating, isRunning, regenerateNode, injectDescription, updateNodeData, aspectRatio, quality, buildingReferenceImage]);
+  }, [isGenerating, isRunning, regenerateNode, injectDescription, updateNodeData, aspectRatio, quality, buildingReferenceImage, currentModel]);
 
   return (
     <div className="flex flex-col gap-3 py-4">
@@ -296,13 +298,20 @@ export function GenerateBuildingStep() {
         />
       </div>
 
-      {/* Aspect Ratio + Quality */}
+      {/* Model + Aspect Ratio + Quality */}
       <div className="bg-neutral-900 rounded-xl p-3 flex flex-col gap-3">
+        {/* Model */}
+        <ModelSelector
+          value={currentModel}
+          onChange={(m) => setStepModel(3, m)}
+          recommendedModel="nano-banana-pro"
+        />
+
         {/* Aspect Ratio */}
         <div className="flex flex-col gap-1.5">
           <h3 className="text-xs font-medium text-neutral-300">Aspect Ratio</h3>
           <div className="flex gap-2">
-            {ASPECT_RATIOS.map((ar) => (
+            {aspectRatios.map((ar) => (
               <button
                 key={ar.value}
                 onClick={() => setAspectRatio(ar.value)}
@@ -321,25 +330,27 @@ export function GenerateBuildingStep() {
           </div>
         </div>
 
-        {/* Quality */}
-        <div className="flex flex-col gap-1.5">
-          <h3 className="text-xs font-medium text-neutral-300">Quality</h3>
-          <div className="flex gap-2">
-            {QUALITY_OPTIONS.map((q) => (
-              <button
-                key={q.value}
-                onClick={() => setQuality(q.value)}
-                className={`flex-1 h-9 rounded-lg text-xs font-medium transition-colors ${
-                  quality === q.value
-                    ? "bg-white text-neutral-900"
-                    : "bg-neutral-800 text-neutral-400 hover:text-white"
-                }`}
-              >
-                {q.label}
-              </button>
-            ))}
+        {/* Quality — only relevant for GPT 1.5 */}
+        {currentModel === "gpt-1.5" && (
+          <div className="flex flex-col gap-1.5">
+            <h3 className="text-xs font-medium text-neutral-300">Quality</h3>
+            <div className="flex gap-2">
+              {QUALITY_OPTIONS.map((q) => (
+                <button
+                  key={q.value}
+                  onClick={() => setQuality(q.value)}
+                  className={`flex-1 h-9 rounded-lg text-xs font-medium transition-colors ${
+                    quality === q.value
+                      ? "bg-white text-neutral-900"
+                      : "bg-neutral-800 text-neutral-400 hover:text-white"
+                  }`}
+                >
+                  {q.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Generate buttons */}
@@ -370,6 +381,7 @@ export function GenerateBuildingStep() {
         promptNodeId={STUDIO_NODES.promptStreetEnhance}
         aspectRatio={aspectRatio}
         quality={quality}
+        modelKey={currentModel}
       />
 
       <GenerationCard
@@ -378,6 +390,7 @@ export function GenerateBuildingStep() {
         promptNodeId={STUDIO_NODES.promptHalfBuilding}
         aspectRatio={aspectRatio}
         quality={quality}
+        modelKey={currentModel}
       />
 
       <GenerationCard
@@ -386,6 +399,7 @@ export function GenerateBuildingStep() {
         promptNodeId={STUDIO_NODES.promptFullBuilding}
         aspectRatio={aspectRatio}
         quality={quality}
+        modelKey={currentModel}
       />
 
       <p className="text-xs text-neutral-500 text-center">

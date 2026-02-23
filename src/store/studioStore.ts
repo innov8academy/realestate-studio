@@ -1,6 +1,13 @@
 import { create } from "zustand";
+import {
+  type StudioImageModel,
+  STEP_DEFAULT_MODEL,
+  STUDIO_IMAGE_MODELS,
+} from "@/lib/studio/modelConfig";
 
 const TOTAL_STEPS = 10;
+
+const DEFAULT_STEP_MODELS: Record<number, StudioImageModel> = { ...STEP_DEFAULT_MODEL };
 
 interface StudioState {
   // Navigation
@@ -14,6 +21,7 @@ interface StudioState {
   videoDuration: string; // "5" | "10"
   buildingReferenceImage: string | null; // base64 data URL
   buildingDescription: string; // optional text description of desired building
+  stepModel: Record<number, StudioImageModel>; // per-step model selection
 
   // Actions
   goNext: () => void;
@@ -25,6 +33,7 @@ interface StudioState {
   setVideoDuration: (duration: string) => void;
   setBuildingReferenceImage: (image: string | null) => void;
   setBuildingDescription: (description: string) => void;
+  setStepModel: (step: number, model: StudioImageModel) => void;
   reset: () => void;
 }
 
@@ -37,6 +46,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   videoDuration: "5",
   buildingReferenceImage: null,
   buildingDescription: "",
+  stepModel: { ...DEFAULT_STEP_MODELS },
 
   goNext: () => {
     const { currentStep, totalSteps } = get();
@@ -82,6 +92,19 @@ export const useStudioStore = create<StudioState>((set, get) => ({
     set({ buildingDescription: description });
   },
 
+  setStepModel: (step: number, model: StudioImageModel) => {
+    const { aspectRatio } = get();
+    const supported = STUDIO_IMAGE_MODELS[model].supportedAspectRatios;
+    const updates: Partial<StudioState> = {
+      stepModel: { ...get().stepModel, [step]: model },
+    };
+    // Auto-correct aspect ratio if unsupported by the new model
+    if (!supported.includes(aspectRatio)) {
+      updates.aspectRatio = "3:2";
+    }
+    set(updates);
+  },
+
   reset: () => {
     set({
       currentStep: 0,
@@ -91,6 +114,7 @@ export const useStudioStore = create<StudioState>((set, get) => ({
       videoDuration: "5",
       buildingReferenceImage: null,
       buildingDescription: "",
+      stepModel: { ...DEFAULT_STEP_MODELS },
     });
   },
 }));

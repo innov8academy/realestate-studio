@@ -10,13 +10,9 @@ import { StatusIndicator } from "../shared/StatusIndicator";
 import { AdvancedPromptSection } from "../shared/AdvancedPromptSection";
 import { DownloadButton } from "../shared/DownloadButton";
 import { LoadingPhrase } from "../shared/LoadingPhrase";
+import { ModelSelector } from "../shared/ModelSelector";
+import { getAspectRatiosForModel, getSelectedModel } from "@/lib/studio/modelConfig";
 import type { GenerateImageNodeData } from "@/types";
-
-const ASPECT_RATIOS = [
-  { value: "3:2", label: "3:2", recommended: true },
-  { value: "1:1", label: "1:1", recommended: false },
-  { value: "2:3", label: "2:3", recommended: false },
-];
 
 function ImageViewer({ src, alt, onClose }: { src: string; alt: string; onClose: () => void }) {
   // Use portal to render outside the carousel's transform context
@@ -53,6 +49,10 @@ export function EnhanceMapStep() {
   const plotSquareMeters = useStudioStore((s) => s.plotSquareMeters);
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
   const setAspectRatio = useStudioStore((s) => s.setAspectRatio);
+  const currentModel = useStudioStore((s) => s.stepModel[2] ?? "gpt-1.5");
+  const setStepModel = useStudioStore((s) => s.setStepModel);
+
+  const aspectRatios = getAspectRatiosForModel(currentModel);
 
   const [isGenerating, setIsGenerating] = useState(false);
   const [viewerImage, setViewerImage] = useState<{ src: string; alt: string } | null>(null);
@@ -113,13 +113,16 @@ export function EnhanceMapStep() {
     setIsGenerating(true);
 
     try {
+      const selectedModel = getSelectedModel(currentModel);
+
       // Set Frame 1 prompt (clean, no text)
       updateNodeData(STUDIO_NODES.promptMapFrame1, {
         prompt: PROMPTS.mapEnhanceClean,
       });
-      // Set aspect ratio on Frame 1 node
+      // Set aspect ratio + model on Frame 1 node
       updateNodeData(STUDIO_NODES.generateMap, {
-        aspectRatio: aspectRatio,
+        aspectRatio,
+        selectedModel,
       });
 
       // Generate Frame 1
@@ -131,7 +134,8 @@ export function EnhanceMapStep() {
           prompt: frame2PromptText,
         });
         updateNodeData(STUDIO_NODES.generateMapFrame2, {
-          aspectRatio: aspectRatio,
+          aspectRatio,
+          selectedModel,
         });
         await regenerateNode(STUDIO_NODES.generateMapFrame2);
       }
@@ -146,6 +150,7 @@ export function EnhanceMapStep() {
     aspectRatio,
     hasSqm,
     frame2PromptText,
+    currentModel,
   ]);
 
   const handleRegenerateFrame1 = useCallback(async () => {
@@ -153,14 +158,14 @@ export function EnhanceMapStep() {
     updateNodeData(STUDIO_NODES.promptMapFrame1, {
       prompt: PROMPTS.mapEnhanceClean,
     });
-    updateNodeData(STUDIO_NODES.generateMap, { aspectRatio });
+    updateNodeData(STUDIO_NODES.generateMap, { aspectRatio, selectedModel: getSelectedModel(currentModel) });
     await regenerateNode(STUDIO_NODES.generateMap);
-  }, [isRunning, updateNodeData, regenerateNode, aspectRatio]);
+  }, [isRunning, updateNodeData, regenerateNode, aspectRatio, currentModel]);
 
   const handleRegenerateFrame2 = useCallback(async () => {
     if (isRunning || !hasSqm) return;
     updateNodeData(STUDIO_NODES.promptMapFrame2, { prompt: frame2PromptText });
-    updateNodeData(STUDIO_NODES.generateMapFrame2, { aspectRatio });
+    updateNodeData(STUDIO_NODES.generateMapFrame2, { aspectRatio, selectedModel: getSelectedModel(currentModel) });
     await regenerateNode(STUDIO_NODES.generateMapFrame2);
   }, [
     isRunning,
@@ -169,6 +174,7 @@ export function EnhanceMapStep() {
     updateNodeData,
     regenerateNode,
     aspectRatio,
+    currentModel,
   ]);
 
   return (
@@ -182,13 +188,20 @@ export function EnhanceMapStep() {
         />
       )}
 
+      {/* Model Selector */}
+      <ModelSelector
+        value={currentModel}
+        onChange={(m) => setStepModel(2, m)}
+        recommendedModel="gpt-1.5"
+      />
+
       {/* Aspect Ratio Selector */}
       <div className="flex flex-col gap-1.5">
         <label className="text-xs font-medium text-neutral-400 uppercase tracking-wide">
           Aspect Ratio
         </label>
         <div className="flex gap-1.5">
-          {ASPECT_RATIOS.map((ar) => (
+          {aspectRatios.map((ar) => (
             <button
               key={ar.value}
               onClick={() => setAspectRatio(ar.value)}
