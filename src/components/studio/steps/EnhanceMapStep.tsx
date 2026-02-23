@@ -103,7 +103,10 @@ export function EnhanceMapStep() {
   useEffect(() => {
     const isEmpty = !frame2CurrentPrompt || frame2CurrentPrompt.trim() === "";
     const hasPlaceholder = frame2CurrentPrompt.includes("{AREA}");
-    if (isEmpty || hasPlaceholder) {
+    // Detect auto-generated prompt with a previous sq.m value (e.g. "1 sq.m")
+    // so we re-sync when the user changes the area input
+    const hasOldAreaValue = /"\d+(\.\d+)?\s*sq\.m"/.test(frame2CurrentPrompt);
+    if (isEmpty || hasPlaceholder || hasOldAreaValue) {
       updateNodeData(STUDIO_NODES.promptMapFrame2, { prompt: frame2PromptText });
     }
   }, [frame2PromptText, frame2CurrentPrompt, updateNodeData, hasSqm, plotSquareMeters]);

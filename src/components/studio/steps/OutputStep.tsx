@@ -51,24 +51,31 @@ export function OutputStep() {
   }).filter((item) => item.url);
 
   const handleDownloadAll = useCallback(() => {
+    const allFiles: { url: string; filename: string }[] = [];
     for (const img of availableImages) {
       if (!img.url) continue;
-      const a = document.createElement("a");
-      a.href = img.url;
-      a.download = `property-${img.label.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      allFiles.push({
+        url: img.url,
+        filename: `property-${img.label.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`,
+      });
     }
     for (const vid of availableVideos) {
       if (!vid.url) continue;
-      const a = document.createElement("a");
-      a.href = vid.url;
-      a.download = `property-${vid.filename}-${Date.now()}.mp4`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      allFiles.push({
+        url: vid.url,
+        filename: `property-${vid.filename}-${Date.now()}.mp4`,
+      });
     }
+    allFiles.forEach((file, index) => {
+      setTimeout(() => {
+        const a = document.createElement("a");
+        a.href = file.url;
+        a.download = file.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }, index * 300);
+    });
   }, [availableImages, availableVideos]);
 
   const handleShare = useCallback(async () => {
