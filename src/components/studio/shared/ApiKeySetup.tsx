@@ -39,7 +39,7 @@ export function ApiKeySetup() {
             We searched for the cheapest way to generate AI videos and images via API.{" "}
             <span className="text-blue-300 font-medium">Kie.ai is the most affordable API we found</span>{" "}
             &mdash; a full property animation (8 images + 7 video clips) costs about{" "}
-            <span className="text-white font-semibold">$3</span>.
+            <span className="text-white font-semibold">$2.50</span>.
             No subscriptions, no minimums. You only pay for what you generate.
           </p>
         </div>
@@ -143,14 +143,14 @@ export function ApiKeySetup() {
               <p className="text-xs font-semibold text-amber-300 mb-1.5">How much does it cost?</p>
               <p className="text-xs text-amber-200/70 leading-relaxed">
                 One full property animation costs about{" "}
-                <span className="text-amber-200 font-semibold">$3</span>.
+                <span className="text-amber-200 font-semibold">$2.50</span>.
                 {" "}Add <span className="text-amber-200 font-semibold">$5</span> to your
-                account and you're good for your first animation.
+                account and you're good for your first two animations.
               </p>
               <div className="mt-2.5 space-y-1">
                 <div className="flex justify-between text-xs">
                   <span className="text-amber-200/60">8 AI images</span>
-                  <span className="text-amber-200/80">~$0.85</span>
+                  <span className="text-amber-200/80">~$0.38</span>
                 </div>
                 <div className="flex justify-between text-xs">
                   <span className="text-amber-200/60">7 video clips (5s each)</span>
@@ -158,7 +158,7 @@ export function ApiKeySetup() {
                 </div>
                 <div className="flex justify-between text-xs border-t border-amber-800/40 pt-1 mt-1">
                   <span className="text-amber-300 font-medium">Total per animation</span>
-                  <span className="text-amber-300 font-semibold">~$2.81</span>
+                  <span className="text-amber-300 font-semibold">~$2.34</span>
                 </div>
               </div>
               <p className="text-xs text-amber-200/50 mt-2">
