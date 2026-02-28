@@ -16,6 +16,46 @@ const ALL_VIDEO_NODE_IDS = [
   STUDIO_NODES.generateVideoV6,
 ] as const;
 
+const CONCURRENCY_LIMIT = 2;
+const TIMEOUT_MS = 8 * 60 * 1000; // 8 minutes
+
+/** Run async tasks with a concurrency limit */
+async function runWithConcurrency<T>(
+  tasks: (() => Promise<T>)[],
+  limit: number,
+): Promise<PromiseSettledResult<T>[]> {
+  const results: PromiseSettledResult<T>[] = new Array(tasks.length);
+  let nextIndex = 0;
+
+  async function runNext(): Promise<void> {
+    while (nextIndex < tasks.length) {
+      const index = nextIndex++;
+      try {
+        const value = await tasks[index]();
+        results[index] = { status: "fulfilled", value };
+      } catch (reason) {
+        results[index] = { status: "rejected", reason };
+      }
+    }
+  }
+
+  // Start `limit` workers in parallel
+  const workers = Array.from({ length: Math.min(limit, tasks.length) }, () => runNext());
+  await Promise.all(workers);
+  return results;
+}
+
+/** Wrap a promise with a timeout that rejects after `ms` milliseconds */
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms);
+    promise.then(
+      (value) => { clearTimeout(timer); resolve(value); },
+      (reason) => { clearTimeout(timer); reject(reason); },
+    );
+  });
+}
+
 export function GenerateAllVideosButton() {
   const nodes = useWorkflowStore((s) => s.nodes);
   const regenerateNode = useWorkflowStore((s) => s.regenerateNode);
@@ -62,10 +102,11 @@ export function GenerateAllVideosButton() {
         });
       }
 
-      // Fire all 7 videos in parallel
-      await Promise.all(
-        ALL_VIDEO_NODE_IDS.map((id) => regenerateNode(id))
+      // Generate videos with concurrency limit + per-video timeout
+      const tasks = ALL_VIDEO_NODE_IDS.map(
+        (id) => () => withTimeout(regenerateNode(id), TIMEOUT_MS),
       );
+      await runWithConcurrency(tasks, CONCURRENCY_LIMIT);
     } finally {
       setIsGenerating(false);
     }
@@ -87,7 +128,11 @@ export function GenerateAllVideosButton() {
           },
         });
       }
-      await Promise.all(failedIds.map((id) => regenerateNode(id)));
+
+      const tasks = failedIds.map(
+        (id) => () => withTimeout(regenerateNode(id), TIMEOUT_MS),
+      );
+      await runWithConcurrency(tasks, CONCURRENCY_LIMIT);
     } finally {
       setIsGenerating(false);
     }

@@ -6,6 +6,7 @@ import { useStudioStore } from "@/store/studioStore";
 import { STUDIO_NODES } from "@/lib/studio/nodeMap";
 import { getPresetTemplate } from "@/lib/quickstart/templates";
 import { clearStudioState } from "@/lib/studio/persistence";
+import JSZip from "jszip";
 import type { GenerateImageNodeData, GenerateVideoNodeData } from "@/types";
 
 const APP_URL = "https://realestate-studio-production.up.railway.app";
@@ -38,6 +39,7 @@ export function OutputStep() {
   const reset = useStudioStore((s) => s.reset);
   const setInitialized = useStudioStore((s) => s.setInitialized);
   const [copied, setCopied] = useState(false);
+  const [isZipping, setIsZipping] = useState(false);
 
   // Collect available content for download
   const availableImages = IMAGE_ITEMS.map((item) => {
@@ -50,33 +52,63 @@ export function OutputStep() {
     return { ...item, url: data?.outputVideo || null };
   }).filter((item) => item.url);
 
-  const handleDownloadAll = useCallback(() => {
-    const allFiles: { url: string; filename: string }[] = [];
-    for (const img of availableImages) {
-      if (!img.url) continue;
-      allFiles.push({
-        url: img.url,
-        filename: `property-${img.label.toLowerCase().replace(/\s+/g, "-")}-${Date.now()}.png`,
-      });
+  const handleDownloadAll = useCallback(async () => {
+    if (isZipping) return;
+    setIsZipping(true);
+
+    try {
+      const zip = new JSZip();
+
+      // Add images to ZIP
+      for (const img of availableImages) {
+        if (!img.url) continue;
+        const name = `property-${img.label.toLowerCase().replace(/\s+/g, "-")}.png`;
+
+        if (img.url.startsWith("data:")) {
+          // Strip data URL prefix and add as base64
+          const base64Data = img.url.replace(/^data:image\/\w+;base64,/, "");
+          zip.file(name, base64Data, { base64: true });
+        } else {
+          // HTTP URL — fetch as blob
+          const response = await fetch(img.url);
+          const blob = await response.blob();
+          zip.file(name, blob);
+        }
+      }
+
+      // Add videos to ZIP
+      for (const vid of availableVideos) {
+        if (!vid.url) continue;
+        const name = `property-${vid.filename}.mp4`;
+
+        if (vid.url.startsWith("data:")) {
+          // Strip data URL prefix and add as base64
+          const base64Data = vid.url.replace(/^data:[^;]+;base64,/, "");
+          zip.file(name, base64Data, { base64: true });
+        } else {
+          // HTTP URL — fetch as blob
+          const response = await fetch(vid.url);
+          const blob = await response.blob();
+          zip.file(name, blob);
+        }
+      }
+
+      // Generate ZIP and trigger download
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `property-animation-${Date.now()}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Failed to create ZIP:", error);
+    } finally {
+      setIsZipping(false);
     }
-    for (const vid of availableVideos) {
-      if (!vid.url) continue;
-      allFiles.push({
-        url: vid.url,
-        filename: `property-${vid.filename}-${Date.now()}.mp4`,
-      });
-    }
-    allFiles.forEach((file, index) => {
-      setTimeout(() => {
-        const a = document.createElement("a");
-        a.href = file.url;
-        a.download = file.filename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }, index * 300);
-    });
-  }, [availableImages, availableVideos]);
+  }, [isZipping, availableImages, availableVideos]);
 
   const handleShare = useCallback(async () => {
     if (typeof navigator !== "undefined" && navigator.share) {
@@ -105,6 +137,8 @@ export function OutputStep() {
     setInitialized(true);
   }, [reset, loadWorkflow, setInitialized]);
 
+  const totalFiles = availableImages.length + availableVideos.length;
+
   return (
     <div className="flex flex-col gap-5 py-6">
       {/* Share CTA */}
@@ -132,15 +166,20 @@ export function OutputStep() {
       <div className="border-t border-neutral-800" />
 
       {/* Download All */}
-      {(availableImages.length > 0 || availableVideos.length > 0) && (
+      {totalFiles > 0 && (
         <button
           onClick={handleDownloadAll}
-          className="w-full h-11 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          disabled={isZipping}
+          className={`w-full h-11 text-white rounded-xl font-medium text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 ${
+            isZipping
+              ? "bg-neutral-700 cursor-not-allowed"
+              : "bg-neutral-800 hover:bg-neutral-700"
+          }`}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
           </svg>
-          Download All ({availableImages.length + availableVideos.length} files)
+          {isZipping ? "Creating ZIP..." : `Download All (${totalFiles} files)`}
         </button>
       )}
 
