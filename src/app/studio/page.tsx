@@ -84,6 +84,7 @@ export default function StudioPage() {
         if (saved.stepModel) {
           const sm = saved.stepModel as Record<string, string>;
           for (const [step, model] of Object.entries(sm)) {
+            const migratedModel = model === "nano-banana-pro" ? "nano-banana-2" : model;
             // Migrate old numeric key "3" to new split keys "3-street" + "3-building"
             if (step === "3") {
               useStudioStore.getState().setStepModel(
@@ -92,12 +93,12 @@ export default function StudioPage() {
               );
               useStudioStore.getState().setStepModel(
                 "3-building",
-                model as import("@/lib/studio/modelConfig").StudioImageModel
+                migratedModel as import("@/lib/studio/modelConfig").StudioImageModel
               );
             } else {
               useStudioStore.getState().setStepModel(
                 step,
-                model as import("@/lib/studio/modelConfig").StudioImageModel
+                migratedModel as import("@/lib/studio/modelConfig").StudioImageModel
               );
             }
           }

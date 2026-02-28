@@ -93,8 +93,10 @@ export const useStudioStore = create<StudioState>((set, get) => ({
   },
 
   setStepModel: (step: string, model: StudioImageModel) => {
+    const info = STUDIO_IMAGE_MODELS[model];
+    if (!info) return;
     const { aspectRatio } = get();
-    const supported = STUDIO_IMAGE_MODELS[model].supportedAspectRatios;
+    const supported = info.supportedAspectRatios;
     const updates: Partial<StudioState> = {
       stepModel: { ...get().stepModel, [step]: model },
     };
