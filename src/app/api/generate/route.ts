@@ -1188,7 +1188,7 @@ async function generateWithFalQueue(
 
 const IMAGE_FALLBACK_CHAIN: Record<string, { modelId: string; displayName: string }[]> = {
   "gpt-image/1.5-image-to-image": [
-    { modelId: "gemini-pro", displayName: "nano-banana-pro" },
+    { modelId: "gemini-pro", displayName: "nano-banana-2" },
   ],
   "gemini-pro": [
     { modelId: "gpt-image/1.5-image-to-image", displayName: "GPT 1.5" },
@@ -2012,8 +2012,8 @@ async function generateWithKie(
 
   // Map internal model IDs to the actual Kie.ai API model ID strings
   const KIE_API_MODEL_MAP: Record<string, string> = {
-    "gemini-pro":   "nano-banana-pro",
-    "gemini-flash": "google/nano-banana",
+    "gemini-pro":   "nano-banana-2",
+    "gemini-flash": "nano-banana-2",
   };
   const kieApiModelId = KIE_API_MODEL_MAP[modelId] ?? modelId;
 

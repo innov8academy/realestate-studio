@@ -47,12 +47,12 @@ export async function GET(req: NextRequest) {
     },
     building: {
       label: "Half & Full Building generation",
-      kieModel: "gemini-pro → nano-banana-pro",
+      kieModel: "gemini-pro → nano-banana-2",
       geminiModel: "gemini-pro → gemini-3-pro-image-preview",
     },
     angles: {
       label: "Building angles (aerial, balcony, interior)",
-      kieModel: "gemini-pro → nano-banana-pro",
+      kieModel: "gemini-pro → nano-banana-2",
       geminiModel: "gemini-pro → gemini-3-pro-image-preview",
     },
     video: {

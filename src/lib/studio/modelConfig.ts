@@ -1,7 +1,7 @@
 import type { SelectedModel } from "@/types/providers";
 
 /** Studio image model keys. */
-export type StudioImageModel = "gpt-1.5" | "nano-banana-pro";
+export type StudioImageModel = "gpt-1.5" | "nano-banana-2";
 
 export interface StudioModelInfo {
   modelId: string;
@@ -17,11 +17,11 @@ export const STUDIO_IMAGE_MODELS: Record<StudioImageModel, StudioModelInfo> = {
     costPerRun: 0.06,
     supportedAspectRatios: ["1:1", "2:3", "3:2"],
   },
-  "nano-banana-pro": {
+  "nano-banana-2": {
     modelId: "gemini-pro",
-    displayName: "Nano Banana Pro",
-    costPerRun: 0.134,
-    supportedAspectRatios: ["1:1", "2:3", "3:2", "16:9"],
+    displayName: "Nano Banana 2",
+    costPerRun: 0.04,
+    supportedAspectRatios: ["1:1", "1:4", "1:8", "2:3", "3:2", "3:4", "4:1", "4:3", "4:5", "5:4", "8:1", "9:16", "16:9", "21:9"],
   },
 };
 
@@ -29,8 +29,8 @@ export const STUDIO_IMAGE_MODELS: Record<StudioImageModel, StudioModelInfo> = {
 export const STEP_DEFAULT_MODEL: Record<string, StudioImageModel> = {
   "2": "gpt-1.5",            // Enhanced Map → GPT 1.5 (cheapest)
   "3-street": "gpt-1.5",     // Street Enhancement → GPT 1.5
-  "3-building": "nano-banana-pro", // Building → Nano Banana Pro (better quality)
-  "4": "nano-banana-pro",    // Angles  → Nano Banana Pro
+  "3-building": "nano-banana-2", // Building → Nano Banana 2 (better quality)
+  "4": "nano-banana-2",    // Angles  → Nano Banana 2
 };
 
 /** Get the aspect-ratio button config for a given model. */
@@ -39,6 +39,7 @@ export function getAspectRatiosForModel(model: StudioImageModel) {
   const all = [
     { value: "3:2", label: "3:2", recommended: true },
     { value: "16:9", label: "16:9", recommended: false },
+    { value: "9:16", label: "9:16", recommended: false },
     { value: "1:1", label: "1:1", recommended: false },
     { value: "2:3", label: "2:3", recommended: false },
   ];

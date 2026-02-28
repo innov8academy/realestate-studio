@@ -88,7 +88,7 @@ Maps semantic role names to template node IDs. 34 entries covering:
 - 2 output nodes
 
 ### configureNodesForProvider() — `src/lib/studio/nodeMap.ts`
-Sets the AI model on all 8 nanoBanana nodes and 7 video nodes based on whether the user has a Kie or Gemini API key. For Kie: `nano-banana-pro` for images, `kling/v2-5-turbo-image-to-video-pro` for video.
+Sets the AI model on all 8 nanoBanana nodes and 7 video nodes based on whether the user has a Kie or Gemini API key. For Kie: `nano-banana-2` for images, `kling/v2-5-turbo-image-to-video-pro` for video.
 
 ### Template — `src/lib/quickstart/templates.ts`
 - `PROMPTS` object: all prompt texts (mapEnhanceClean, mapEnhanceWithArea with `{AREA}` placeholder, streetEnhance, halfBuilding, fullBuilding, 3 angles, 7 video prompts)

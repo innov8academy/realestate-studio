@@ -47,7 +47,7 @@ export function BuildingAnglesStep() {
 
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
   const setAspectRatio = useStudioStore((s) => s.setAspectRatio);
-  const currentModel = useStudioStore((s) => s.stepModel["4"] ?? "nano-banana-pro");
+  const currentModel = useStudioStore((s) => s.stepModel["4"] ?? "nano-banana-2");
   const setStepModel = useStudioStore((s) => s.setStepModel);
 
   const aspectRatios = getAspectRatiosForModel(currentModel);
@@ -121,7 +121,7 @@ export function BuildingAnglesStep() {
         <ModelSelector
           value={currentModel}
           onChange={(m) => setStepModel("4", m)}
-          recommendedModel="nano-banana-pro"
+          recommendedModel="nano-banana-2"
         />
 
         <div className="flex flex-col gap-1.5">

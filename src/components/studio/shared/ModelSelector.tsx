@@ -5,7 +5,7 @@ import { STUDIO_IMAGE_MODELS } from "@/lib/studio/modelConfig";
 
 const MODEL_OPTIONS: { key: StudioImageModel; label: string }[] = [
   { key: "gpt-1.5", label: "GPT 1.5" },
-  { key: "nano-banana-pro", label: "Nano Banana Pro" },
+  { key: "nano-banana-2", label: "Nano Banana 2" },
 ];
 
 interface ModelSelectorProps {

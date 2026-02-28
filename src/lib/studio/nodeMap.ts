@@ -128,7 +128,7 @@ export function configureNodesForProvider(
       selectedModel: {
         provider,
         modelId: "gemini-pro",
-        displayName: provider === "kie" ? "Nano Banana Pro" : "Gemini Pro",
+        displayName: provider === "kie" ? "Nano Banana 2" : "Gemini Pro",
       },
     });
   }

@@ -115,7 +115,7 @@ export function GenerateBuildingStep() {
   const aspectRatio = useStudioStore((s) => s.aspectRatio);
   const setAspectRatio = useStudioStore((s) => s.setAspectRatio);
   const streetModel = useStudioStore((s) => s.stepModel["3-street"] ?? "gpt-1.5");
-  const buildingModel = useStudioStore((s) => s.stepModel["3-building"] ?? "nano-banana-pro");
+  const buildingModel = useStudioStore((s) => s.stepModel["3-building"] ?? "nano-banana-2");
   const setStepModel = useStudioStore((s) => s.setStepModel);
 
   const aspectRatios = getAspectRatiosForModel(buildingModel);
@@ -308,7 +308,7 @@ export function GenerateBuildingStep() {
         <ModelSelector
           value={buildingModel}
           onChange={(m) => setStepModel("3-building", m)}
-          recommendedModel="nano-banana-pro"
+          recommendedModel="nano-banana-2"
           label="Building Model"
         />
 
